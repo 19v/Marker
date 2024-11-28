@@ -72,4 +72,18 @@ class CommonUtils {
         }
     }
     
+    // 获取底部安全区域的高度
+    static var safeBottomInset: CGFloat {
+        UIApplication.shared.connectedScenes
+            .compactMap { ($0 as? UIWindowScene)?.windows.first?.safeAreaInsets.bottom }
+            .first ?? 0
+    }
+    
+    // 获取顶部安全区域的高度
+    static var safeTopInset: CGFloat {
+        UIApplication.shared.connectedScenes
+            .compactMap { ($0 as? UIWindowScene)?.windows.first?.safeAreaInsets.top }
+            .first ?? 0
+    }
+    
 }

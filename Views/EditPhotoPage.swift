@@ -4,127 +4,190 @@ import PhotosUI
 struct EditPhotoPage: View {
     @StateObject var viewModel = PhotoModel()
     
+    // 设置页面 Sheet 的设置
     @State private var isSheetPresented = false
+    @State private var settingsDetent = PresentationDetent.large
     
+    // 控制开关
     @State private var displayTime = false // 显示时间的开关
     @State private var displayCoordinate = false // 显示经纬度的开关
     
-    @State private var selectedButton: Int? = nil // 用于管理选中状态的按钮
-    @State private var bold = false
-    @State private var italic = false
-    @State private var fontSize = 12.0
+    // 控制图片显示的参数
+    @State private var scale: CGFloat = 1.0 // 控制缩放比例
+    @State private var lastScale: CGFloat = 1.0 // 保存上一次的缩放比例
+    @State private var offset: CGSize = .zero // 偏移量
+    @State private var lastOffset: CGSize = .zero // 上一次偏移量
     
     var body: some View {
-//        ZStack {
-//            // 背景颜色
-//            Color(hex: "#282828")
-////                .ignoresSafeArea() // 填充背景，忽略安全区
+        VStack(spacing: 0) {
+            // MARK: - 顶部工具栏
+            HStack {
+                Spacer()
+                Button(action: {
+                    isSheetPresented.toggle()
+                }) {
+                    Image(systemName: "gearshape")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 20, height: 20)
+                        .foregroundColor(.gray)
+                        .padding()
+                        .background(Circle().fill(Color.white)) // 添加圆形背景
+                }
+                .buttonStyle(PlainButtonStyle())
+                .opacity(0.8)
+                .background(.ultraThinMaterial) // 添加模糊效果
+                .cornerRadius(20)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.top, CommonUtils.safeTopInset)
+            .padding([.bottom, .leading, .trailing], 20)
+            .background(
+                Color.white
+                    .opacity(0.8)
+                    .background(.ultraThinMaterial) // 添加模糊效果
+                    .cornerRadius(0)
+            )
+            .zIndex(1) // 确保显示在图片的上方
             
-            VStack(spacing: 0) {
-                HStack(spacing: 2) {
-                    Spacer()
-                    Button("设定", systemImage:"gearshape") {
-                        print("test")
+            // MARK: - 中间部分图片
+            GeometryReader { geometry in
+                switch viewModel.imageState {
+                case .empty:
+                    PhotosPicker(selection: $viewModel.imageSelection,
+                                 matching: .images,
+                                 photoLibrary: .shared()) {
+                        VStack {
+                            Image(systemName: "plus.circle")
+                                .scaledToFit()
+                                .font(.system(size: 52))
+                                .foregroundStyle(.gray)
+                            Text("请选择图片")
+                                .foregroundStyle(.gray)
+                                .padding([.top], 8)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
-                    Button(action: {
-                        print("Button tapped!")
-                    }) {
-                        Image(systemName: "gearshape")
+                                 .buttonStyle(.borderless)
+                                 .frame(width: geometry.size.width, height: geometry.size.height)
+                case .loading:
+                    ProgressView()
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                case .success(let image):
+                    ZStack {
+                        Color.white
+                            .opacity(0.01)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .gesture(
+                                // 双击
+                                TapGesture(count: 2)
+                                    .onEnded {
+                                        withAnimation {
+                                            if offset != .zero {
+                                                offset = .zero
+                                                lastOffset = .zero
+                                            } else {
+                                                scale = scale == 1.0 ? 2.0 : 1.0
+                                            }
+                                        }
+                                    }
+                            )
+                        
+                        image
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 40, height: 40)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Circle().fill(Color.red)) // 添加圆形背景
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.blue.opacity(0.2)) // 下半部分背景颜色
-                
-                // 上半部分：图片
-                GeometryReader { geometry in
-//                    DisplayedImage(viewModel: viewModel)
-//                        .listRowInsets(EdgeInsets())
-//                        .frame(width: geometry.size.width, height: geometry.size.height)
-                    
-                    PhotoView(imageState: viewModel.imageState)
-                        .scaledToFill()
-//                        .frame(maxWidth: .infinity, maxHeight: 360)
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        .background {
-                            Rectangle().fill(
-                                Color(.systemGray5)
+                            .scaleEffect(scale) // 缩放
+                            .offset(offset) // 偏移
+                            .gesture(
+                                // 拖拽
+                                DragGesture()
+                                    .onChanged { value in
+                                        offset = CGSize(
+                                            width: lastOffset.width + value.translation.width,
+                                            height: lastOffset.height + value.translation.height
+                                        )
+                                    }
+                                    .onEnded { _ in
+                                        lastOffset = offset
+                                    }
+                                    .simultaneously(
+                                        with: MagnificationGesture()
+                                            .onChanged { value in
+                                                scale = lastScale * value
+                                            }
+                                            .onEnded { _ in
+                                                lastScale = scale
+                                            }
+                                    )
                             )
-                        }
-                        .listRowInsets(EdgeInsets())
+                            .gesture(
+                                // 双指放大
+                                MagnificationGesture()
+                                    .onChanged { value in
+                                        scale = lastScale * value // 动态更新缩放比例
+                                    }
+                                    .onEnded { _ in
+                                        lastScale = scale // 保存最终缩放比例
+                                    }
+                            )
+                            .gesture(
+                                // 双击
+                                TapGesture(count: 2)
+                                    .onEnded {
+                                        withAnimation {
+                                            if offset != .zero {
+                                                offset = .zero
+                                                lastOffset = .zero
+                                            } else {
+                                                scale = scale == 1.0 ? 2.0 : 1.0
+                                            }
+                                        }
+                                    }
+                            )
+                        //                        .aspectRatio(contentMode: .fill)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .draggable(image)
+                            .listRowInsets(EdgeInsets())
+                    }
+                case .failure:
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 40))
+                        .foregroundColor(.white)
                 }
-                .background(Color.green.opacity(0.2)) // 上半部分背景颜色
-                .frame(maxHeight: .infinity) // 占据剩余空间
-                
+            }
+            //            .background(Color.green.opacity(0.2)) // 上半部分背景颜色
+            .frame(maxHeight: .infinity) // 占据剩余空间
+            
+            // 底部工具栏
+            switch viewModel.imageState {
+            case .success(_):
                 HStack(spacing: 2) {
                     Spacer()
-                    MainPageButton(icon: "star.fill", title: "按钮1")
+                    MainPageButton(icon: "star.fill", title: "显示日期")
                     Spacer()
-                    MainPageButton(icon: "star.fill", title: "按钮2")
+                    MainPageButton(icon: "star.fill", title: "显示经纬度")
                     Spacer()
                 }
                 .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.blue.opacity(0.2)) // 下半部分背景颜色
+                .padding(.top, 10)
+                .padding(.bottom, CommonUtils.safeBottomInset)
+                .background(
+                    Color.white
+                        .opacity(0.8)
+                        .background(.ultraThinMaterial) // 添加模糊效果
+                        .cornerRadius(0)
+                ) // 下半部分背景颜色
+            default:
+                Color.clear.frame(height: 50)
             }
-//        }
-        .background(Color.black) // 页面背景颜色
-        .safeAreaInset(edge: .bottom) { Color.clear.frame(height: 0) } // 保留安全区
-//        .navigationBarTitleDisplayMode(.inline)
-//        .toolbarBackgroundVisibility(.hidden, for: .navigationBar)
-//        .toolbar {
-//            ToolbarItem {
-//                Button("设置", systemImage: "gearshape") {
-//                    print("test")
-//                }
-//            }
-//        }
-    }
-}
-
-struct EditPhotoPageButton: View {
-    @State private var isPressed = false
-    
-    let icon: String  // 图标名称（SF Symbols）
-    let title: String // 按钮文字
-    
-    var body: some View {
-        VStack(spacing: 8) {
-            Image(systemName: icon)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 40, height: 40)
-                .foregroundColor(isPressed ? .white : .gray)
-            
-            // 上半部分：圆形 + 图标
-            ZStack {
-                Circle()
-                    .fill(isPressed ? Color.blue : Color.gray)
-                    .frame(width: 80, height: 80)
-                Image(systemName: icon)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 40, height: 40)
-                    .foregroundColor(isPressed ? .white : .gray)
-            }
-            .onTapGesture {
-                withAnimation {
-                    isPressed.toggle()
-                }
-            }
-            
-            // 下半部分：文字
-            Text(title)
-                .font(.system(size: 16))
-                .foregroundColor(.white)
-                .padding(.bottom, 10)
         }
+        .sheet(isPresented: $isSheetPresented) {
+            HalfTransparentSheetView(isSheetPresented: $isSheetPresented, viewModel: viewModel)
+                .presentationBackground(.ultraThinMaterial)
+                .presentationDetents([.fraction(0.2), .medium, .large], selection: $settingsDetent)
+                .presentationDragIndicator(.visible)
+        }
+        .background(Color.clear) // 页面背景颜色
+        .ignoresSafeArea() // 忽略安全区
     }
 }
