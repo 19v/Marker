@@ -83,8 +83,14 @@ struct AddTabView: View {
                     isOn: $viewModel.displayCoordinate
                 )
                 
-                MianPageButton(icon: "star.fill", title: "按钮")
-                        .padding()
+                MainPageButton(icon: "star.fill", title: "按钮")
+                    .padding()
+            }
+            
+            Section {
+                NavigationLink(destination: EditPhotoPage()) {
+                    Text("测试页面")
+                }
             }
         }
         .sheet(isPresented: $isSheetPresented) {

@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct MianPageButton: View {
+struct MainPageButton: View {
     @State private var isPressed = false
     
     let icon: String  // 图标名称（SF Symbols）
@@ -29,6 +29,7 @@ struct MianPageButton: View {
             Text(title)
                 .font(.system(size: 16))
                 .foregroundColor(.primary)
+                .padding(.bottom, 10)
         }
     }
 }

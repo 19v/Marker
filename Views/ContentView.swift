@@ -18,9 +18,13 @@ struct ContentView: View {
 //                SettingsTabView()
 //            }
 //        }
-        // TODO: 上面的代码暂时注释，其他Tab没做完就不显示出来了，先搞定基础的功能-添加水印
+//        // TODO: 上面的代码暂时注释，其他Tab没做完就不显示出来了，先搞定基础的功能-添加水印
+//        NavigationStack {
+//            AddTabView()
+//        }
+//        .navigationTitle(CommonUtils.appName)
         NavigationStack {
-            AddTabView()
+            EditPhotoPage()
         }
         .navigationTitle(CommonUtils.appName)
     }
