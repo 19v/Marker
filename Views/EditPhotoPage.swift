@@ -19,38 +19,14 @@ struct EditPhotoPage: View {
     @State private var lastOffset: CGSize = .zero // 上一次偏移量
     
     var body: some View {
-        VStack(spacing: 0) {
-            // MARK: - 顶部工具栏
-            HStack {
-                Spacer()
-                Button(action: {
-                    isSheetPresented.toggle()
-                }) {
-                    Image(systemName: "gearshape")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 20, height: 20)
-                        .foregroundColor(.gray)
-                        .padding()
-                        .background(Circle().fill(Color.white)) // 添加圆形背景
-                }
-                .buttonStyle(PlainButtonStyle())
-                .opacity(0.8)
-                .background(.ultraThinMaterial) // 添加模糊效果
-                .cornerRadius(20)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.top, CommonUtils.safeTopInset)
-            .padding([.bottom, .leading, .trailing], 20)
-            .background(
-                Color.white
-                    .opacity(0.8)
-                    .background(.ultraThinMaterial) // 添加模糊效果
-                    .cornerRadius(0)
-            )
-            .zIndex(1) // 确保显示在图片的上方
+        ZStack {
+            // 一个全屏幕的背景
+            Rectangle()
+                .fill(Color(hex: "#282828"))
+                .edgesIgnoringSafeArea(.all)
+                .ignoresSafeArea() // 填充背景，忽略安全区
             
-            // MARK: - 中间部分图片
+            // MARK: 中间部分图片
             GeometryReader { geometry in
                 switch viewModel.imageState {
                 case .empty:
@@ -146,7 +122,7 @@ struct EditPhotoPage: View {
                             )
                         //                        .aspectRatio(contentMode: .fill)
                             .frame(width: geometry.size.width, height: geometry.size.height)
-                            .draggable(image)
+//                            .draggable(image)
                             .listRowInsets(EdgeInsets())
                     }
                 case .failure:
@@ -158,36 +134,98 @@ struct EditPhotoPage: View {
             //            .background(Color.green.opacity(0.2)) // 上半部分背景颜色
             .frame(maxHeight: .infinity) // 占据剩余空间
             
-            // 底部工具栏
-            switch viewModel.imageState {
-            case .success(_):
-                HStack(spacing: 2) {
+            VStack {
+                // MARK: 顶部工具栏
+                HStack {
                     Spacer()
-                    MainPageButton(icon: "star.fill", title: "显示日期")
-                    Spacer()
-                    MainPageButton(icon: "star.fill", title: "显示经纬度")
-                    Spacer()
+                    Button(action: {
+                        isSheetPresented.toggle()
+                    }) {
+                        Image(systemName: "gearshape")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 16, height: 16)
+                            .foregroundColor(.gray)
+                            .padding()
+                            .background(Circle().fill(Color(hex: "#404040"))) // 添加圆形背景
+                    }
+                    .buttonStyle(PlainButtonStyle())
+//                    .background(.ultraThinMaterial) // 添加模糊效果
+//                    .opacity(0.8)
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.top, 10)
-                .padding(.bottom, CommonUtils.safeBottomInset)
-                .background(
-                    Color.white
-                        .opacity(0.8)
-                        .background(.ultraThinMaterial) // 添加模糊效果
-                        .cornerRadius(0)
-                ) // 下半部分背景颜色
-            default:
-                Color.clear.frame(height: 50)
+                .padding(.top, CommonUtils.safeTopInset)
+                .padding([.bottom, .leading, .trailing], 20)
+//                .background(
+//                    Color.white
+//                        .opacity(0.8)
+//                        .background(.ultraThinMaterial) // 添加模糊效果
+//                        .cornerRadius(0)
+//                )
+                .background(Color.clear)
+                .alignmentGuide(.top) { _ in 0 }
+                .zIndex(1) // 确保显示在图片的上方
+                
+                Spacer()
+                
+                // MARK: 底部工具栏
+                switch viewModel.imageState {
+                case .success(_), .empty:
+//                    ScrollView(.horizontal) {
+                    HStack(spacing: 2) {
+                        Spacer()
+                        ColorChangedButton(icon: "calendar", title: "日期")
+                            .frame(height: 20)
+                        Spacer()
+                        ColorChangedButton(icon: "location.fill", title: "经纬度")
+                        Spacer()
+                        ContentChangedButton(items: [
+                            ("circle.lefthalf.filled", "白底"), ("circle.righthalf.filled", "黑底")
+                        ])
+                        Spacer()
+//                        Button("设置", systemImage: "gearshape") {
+//                            print("pressed")
+//                        }
+//                        .buttonBorderShape(.circle)
+//                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 10)
+                    .padding(.bottom, CommonUtils.safeBottomInset + 32)
+//                    .background(
+//                        Color.white
+//                            .opacity(0.8)
+//                            .background(.ultraThinMaterial) // 添加模糊效果
+//                            .cornerRadius(0)
+//                    ) // 下半部分背景颜色
+                    .zIndex(1) // 确保显示在图片的上方
+                    .alignmentGuide(.bottom) { _ in 0 }
+                    
+                default:
+                    Color.clear.frame(height: 50)
+                }
             }
         }
+        .toolbar {
+            ToolbarItem {
+                Button("设置", systemImage: "gearshape") {
+                    print("pressed")
+                }
+                .buttonBorderShape(.circle)
+            }
+        }
+        .navigationTitle(CommonUtils.appName)
         .sheet(isPresented: $isSheetPresented) {
             HalfTransparentSheetView(isSheetPresented: $isSheetPresented, viewModel: viewModel)
                 .presentationBackground(.ultraThinMaterial)
                 .presentationDetents([.fraction(0.2), .medium, .large], selection: $settingsDetent)
                 .presentationDragIndicator(.visible)
         }
-        .background(Color.clear) // 页面背景颜色
+        .background(Color(hex: "#020305")) // 页面背景颜色
         .ignoresSafeArea() // 忽略安全区
     }
+}
+
+#Preview {
+    EditPhotoPage()
 }

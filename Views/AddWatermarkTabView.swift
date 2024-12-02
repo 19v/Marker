@@ -83,7 +83,7 @@ struct AddTabView: View {
                     isOn: $viewModel.displayCoordinate
                 )
                 
-                MainPageButton(icon: "star.fill", title: "按钮")
+                ColorChangedButton(icon: "star.fill", title: "按钮")
                     .padding()
             }
             
