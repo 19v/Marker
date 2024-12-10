@@ -19,12 +19,34 @@ struct EditPhotoPage: View {
     @State private var lastOffset: CGSize = .zero // 上一次偏移量
     
     var body: some View {
-        ZStack {
-            // 一个全屏幕的背景
-            Rectangle()
-                .fill(Color(hex: "#282828"))
-                .edgesIgnoringSafeArea(.all)
-                .ignoresSafeArea() // 填充背景，忽略安全区
+        VStack {
+            // MARK: 顶部工具栏
+            HStack {
+                Spacer()
+                
+                Button(action: {
+                    isSheetPresented.toggle()
+                }) {
+                    Image(systemName: "gearshape")
+                        .foregroundColor(.white)
+                        .padding()
+                }
+                .background(Circle().fill(Color(hex: "#404040"))) // 添加圆形背景
+                .shadow(radius: 1)
+                
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.top, CommonUtils.safeTopInset)
+            .padding([.bottom, .leading, .trailing], 20)
+            .background(
+                Color(hex: "#FFFFFF")
+                    .opacity(0.8)
+                    .background(.ultraThinMaterial) // 添加模糊效果
+                    .cornerRadius(0)
+                )
+            .background(Color.clear)
+            .alignmentGuide(.top) { _ in 0 }
+            .zIndex(1) // 确保显示在图片的上方
             
             // MARK: 中间部分图片
             GeometryReader { geometry in
@@ -122,7 +144,7 @@ struct EditPhotoPage: View {
                             )
                         //                        .aspectRatio(contentMode: .fill)
                             .frame(width: geometry.size.width, height: geometry.size.height)
-//                            .draggable(image)
+                        //                            .draggable(image)
                             .listRowInsets(EdgeInsets())
                     }
                 case .failure:
@@ -131,79 +153,75 @@ struct EditPhotoPage: View {
                         .foregroundColor(.white)
                 }
             }
-            //            .background(Color.green.opacity(0.2)) // 上半部分背景颜色
+//            .background(Color.green.opacity(0.2)) // 背景颜色
             .frame(maxHeight: .infinity) // 占据剩余空间
+            .padding()
             
-            VStack {
-                // MARK: 顶部工具栏
-                HStack {
-                    Spacer()
-                    Button(action: {
-                        isSheetPresented.toggle()
-                    }) {
-                        Image(systemName: "gearshape")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 16, height: 16)
-                            .foregroundColor(.gray)
-                            .padding()
-                            .background(Circle().fill(Color(hex: "#404040"))) // 添加圆形背景
+            // MARK: 底部工具栏
+            switch viewModel.imageState {
+            case .success(_), .empty:
+                HStack(alignment: .center) {
+                    //                        GeometryReader { geometry in
+                    ScrollView(.horizontal) {
+                        HStack(spacing: 10) {
+                            //                            Spacer()
+                            ColorChangedButton(icon: "calendar", title: "日期")
+                            //                            Spacer()
+                            ColorChangedButton(icon: "location.fill", title: "经纬度")
+                            //                            Spacer()
+                            ContentChangedButton(items: [
+                                ("circle.lefthalf.filled", "白底"), ("circle.righthalf.filled", "黑底")
+                            ])
+                            
+//                            ColorChangedButton(icon: "gearshape", title: "设置")
+                            
+                            Toggle(isOn: $displayTime) {
+                                Label("Flag", systemImage: "flag.fill")
+                                    .foregroundStyle(.black)
+                            }
+                            .toggleStyle(.button)
+                            //                            Spacer()
+                            //                        Button("设置", systemImage: "gearshape") {
+                            //                            print("pressed")
+                            //                        }
+                            //                        .buttonBorderShape(.circle)
+                            //                        Spacer()
+                        }
+                        .frame(maxWidth: .infinity)
+                        //                                .padding(.top, 10)
+                        //                                .padding(.bottom, CommonUtils.safeBottomInset + 32)
+                        .background(
+                            Color.white
+                                .opacity(0.8)
+                                .background(.ultraThinMaterial) // 添加模糊效果
+                                .cornerRadius(0)
+                        ) // 下半部分背景颜色
+                        .zIndex(1) // 确保显示在图片的上方
+                        .alignmentGuide(.bottom) { _ in 0 }
                     }
-                    .buttonStyle(PlainButtonStyle())
-//                    .background(.ultraThinMaterial) // 添加模糊效果
-//                    .opacity(0.8)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.top, CommonUtils.safeTopInset)
-                .padding([.bottom, .leading, .trailing], 20)
-//                .background(
-//                    Color.white
-//                        .opacity(0.8)
-//                        .background(.ultraThinMaterial) // 添加模糊效果
-//                        .cornerRadius(0)
-//                )
-                .background(Color.clear)
-                .alignmentGuide(.top) { _ in 0 }
-                .zIndex(1) // 确保显示在图片的上方
-                
-                Spacer()
-                
-                // MARK: 底部工具栏
-                switch viewModel.imageState {
-                case .success(_), .empty:
-//                    ScrollView(.horizontal) {
-                    HStack(spacing: 2) {
-                        Spacer()
-                        ColorChangedButton(icon: "calendar", title: "日期")
-                            .frame(height: 20)
-                        Spacer()
-                        ColorChangedButton(icon: "location.fill", title: "经纬度")
-                        Spacer()
-                        ContentChangedButton(items: [
-                            ("circle.lefthalf.filled", "白底"), ("circle.righthalf.filled", "黑底")
-                        ])
-                        Spacer()
-//                        Button("设置", systemImage: "gearshape") {
-//                            print("pressed")
-//                        }
-//                        .buttonBorderShape(.circle)
-//                        Spacer()
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 10)
-                    .padding(.bottom, CommonUtils.safeBottomInset + 32)
-//                    .background(
-//                        Color.white
-//                            .opacity(0.8)
-//                            .background(.ultraThinMaterial) // 添加模糊效果
-//                            .cornerRadius(0)
-//                    ) // 下半部分背景颜色
-                    .zIndex(1) // 确保显示在图片的上方
-                    .alignmentGuide(.bottom) { _ in 0 }
+                    //                            .frame(height: geometry.size.height)
+                    //                        }
+                    //                        .frame(height: 100)
                     
-                default:
-                    Color.clear.frame(height: 50)
+                    ColorChangedButton(icon: "gearshape", title: "设置")
+                    
+                    //                        Button("设置", systemImage: "gearshape") {
+                    //                            print("pressed")
+                    //                        }
+                    //                        .buttonBorderShape(.circle)
+                    //                        .frame(height: 100)
                 }
+                .padding()
+                .padding(.bottom, CommonUtils.safeBottomInset + 10)
+                .background(
+                    Color.white
+                        .opacity(0.8)
+                        .background(.ultraThinMaterial) // 添加模糊效果
+                        .cornerRadius(0)
+                ) // 下半部分背景颜色
+                
+            default:
+                Color.clear.frame(height: 50)
             }
         }
         .toolbar {
@@ -221,7 +239,10 @@ struct EditPhotoPage: View {
                 .presentationDetents([.fraction(0.2), .medium, .large], selection: $settingsDetent)
                 .presentationDragIndicator(.visible)
         }
-        .background(Color(hex: "#020305")) // 页面背景颜色
+        .background(
+//            Color(hex: "#020305")
+            MeshGradientView()
+        ) // 页面背景颜色
         .ignoresSafeArea() // 忽略安全区
     }
 }

@@ -16,10 +16,12 @@ struct ColorChangedButton: View {
             HStack {
                 Image(systemName: icon) // 左边的符号
                     .foregroundColor(.white)
+//                    .frame(width: 10, height: 10)
 
                 Text(title) // 右边的文字
                     .foregroundColor(.white)
-                    .bold()
+//                    .bold()
+//                    .font(.system(size: 10))
             }
             .padding()
             .background(Capsule().fill(isPressed ? Color.blue : Color(hex: "#404040"))) // 胶囊形背景
