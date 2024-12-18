@@ -1,6 +1,32 @@
 import SwiftUI
 
 struct MeshGradientView: View {
+    
+    @Environment(\.colorScheme) private var colorScheme // 读取当前颜色模式
+    
+    private var colors: [Color] {
+        switch colorScheme {
+        case .light:
+            [
+                .init(hex: "#ffffff"), .init(hex: "#f2f9fd"), .init(hex: "#e5f3fb"),
+                .init(hex: "#d8edf9"), .init(hex: "#cbe7f8"), .init(hex: "#bee1f6"),
+                .init(hex: "#b1dbf4"), .init(hex: "#a4d5f2"), .init(hex: "#97cff0"),
+            ]
+        case .dark:
+            [
+                .init(hex: "#41b2d9"), .init(hex: "#3ba4cb"), .init(hex: "#3595be"),
+                .init(hex: "#2f87b0"), .init(hex: "#2a79a2"), .init(hex: "#246a94"),
+                .init(hex: "#1e5c87"), .init(hex: "#184d79"), .init(hex: "#123f6b"),
+            ]
+        @unknown default:
+            [
+                .purple, .red, .yellow,
+                .blue, .green, .orange,
+                .indigo, .teal, .cyan
+            ]
+        }
+    }
+    
     @State var positions: [SIMD2<Float>] = [
         .init(x: 0, y: 0), .init(x: 0.2, y: 0), .init(x: 1, y: 0),
         .init(x: 0, y: 0.7), .init(x: 0.1, y: 0.5), .init(x: 1, y: 0.2),
@@ -14,14 +40,11 @@ struct MeshGradientView: View {
             width: 3,
             height: 3,
             points: positions,
-            colors: [
-                .purple, .red, .yellow,
-                .blue, .green, .orange,
-                .indigo, .teal, .cyan
-            ]
+            colors: colors
         )
 //        .frame(width: 300, height: 200)
-        .overlay(.ultraThinMaterial)
+//        .overlay(.ultraThinMaterial)
+//        .overlay(.thinMaterial)
         .onReceive(timer, perform: { _ in
             positions[1] = randomizePosition(
                 currentPosition: positions[1],

@@ -1,39 +1,56 @@
 import SwiftUI
+import PhotosUI
 
 struct ContentView: View {
+    @Environment(\.colorScheme) private var colorScheme // 读取当前颜色模式
+    
     @State private var selectedTab: Tabs = .addWaterMark
     
     var body: some View {
         NavigationStack {
-//            AddTabView()
             VStack {
-                GeometryReader { geometry in
-//                    Text("Marker")
-//                        .font(.system(size: 48, weight: .medium))
-//                        .frame(maxWidth: geometry.size.width, maxHeight: geometry.size.height)
-//                        .foregroundStyle(.white)
-                    
+                HStack {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Marker")
                             .font(.largeTitle)
                             .fontWeight(.bold)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(
+                                colorScheme == .light ? .black : .white
+                            )
                         Text("创建带有水印的照片")
                             .font(.subheadline)
-                            .foregroundStyle(Color(hex: "#E2E3E5"))
+                            .foregroundStyle(
+                                colorScheme == .light ? Color(hex: "#101010") : Color(hex: "#E2E3E5")
+                            )
                     }
-                    .padding(.top, 42) // 上方留一些间距
-                    .padding(.horizontal, 42) // 左右留间距
-                    .frame(maxWidth: geometry.size.width, maxHeight: geometry.size.height)
+                    .padding(.top, CommonUtils.safeTopInset + 10)
+                    .padding(.leading, 42)
+                    
+                    Spacer()
                 }
-                .padding(.top, CommonUtils.safeTopInset)
+                
+                Spacer()
                 
                 VStack(spacing: 28) {
-                    CapsuleButton(icon: "photo.fill", title: "选择照片") {
+//                    PhotosPicker(selection: $viewModel.imageSelection,
+//                                 matching: .images,
+//                                 photoLibrary: .shared()) {
+                        CapsuleButton(icon: "photo.fill", title: "选择照片") {
+                            print("Button tapped!")
+                        }
+//                    }
+//                    .buttonStyle(.borderless)
+//                    
+//                    Button("移除图片") {
+//                        print("test")
+//                        viewModel.imageSelection = nil
+//                    }
+                    
+                    CapsuleButton(icon: "camera.fill", title: "拍摄照片") {
                         print("Button tapped!")
                     }
                     
-                    CapsuleButton(icon: "camera.fill", title: "拍摄照片") {
+                    CapsuleButton(icon: "photo.stack.fill", title: "批量处理") {
                         print("Button tapped!")
                     }
                     
@@ -49,10 +66,11 @@ struct ContentView: View {
                         Spacer()
                     }
                 }
-                .padding(EdgeInsets(top: 10, leading: 32, bottom: CommonUtils.safeBottomInset + 16, trailing: 32))
+                .padding(EdgeInsets(top: 10, leading: 32, bottom: 20, trailing: 32))
             }
             .background(
                 MeshGradientView()
+                    .edgesIgnoringSafeArea(.all)
             )
         }
     }

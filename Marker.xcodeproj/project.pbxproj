@@ -26,6 +26,7 @@
 		059CDC4E2CF6C63B008B8458 /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059CDC4D2CF6C626008B8458 /* Buttons.swift */; };
 		05AC15022CF6F91900EE8F9A /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AC15012CF6F91600EE8F9A /* Extensions.swift */; };
 		05AC15042CF71D5000EE8F9A /* EditPhotoPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AC15032CF71D4700EE8F9A /* EditPhotoPage.swift */; };
+		05BFE9F72D0C2BA000D02F12 /* ColorUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BFE9F62D0C2B9D00D02F12 /* ColorUtils.swift */; };
 		05C094652CFDBBAC00D07E22 /* MeshGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C094642CFDBBA200D07E22 /* MeshGradientView.swift */; };
 /* End PBXBuildFile section */
 
@@ -52,6 +53,7 @@
 		059CDC4D2CF6C626008B8458 /* Buttons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
 		05AC15012CF6F91600EE8F9A /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		05AC15032CF71D4700EE8F9A /* EditPhotoPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPhotoPage.swift; sourceTree = "<group>"; };
+		05BFE9F62D0C2B9D00D02F12 /* ColorUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorUtils.swift; sourceTree = "<group>"; };
 		05C094642CFDBBA200D07E22 /* MeshGradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshGradientView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -111,6 +113,7 @@
 				057E41062CEF1B2E0005E859 /* Common.swift */,
 				05576E652CF46AED00BE1DDD /* PhotoUtils.swift */,
 				05AC15012CF6F91600EE8F9A /* Extensions.swift */,
+				05BFE9F62D0C2B9D00D02F12 /* ColorUtils.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -120,8 +123,8 @@
 			children = (
 				0501865C2CEF1AE000EAEA64 /* MarkerApp.swift */,
 				0501865E2CEF1AE000EAEA64 /* ContentView.swift */,
-				05576E6A2CF46BAD00BE1DDD /* AddWatermarkTabView.swift */,
 				05AC15032CF71D4700EE8F9A /* EditPhotoPage.swift */,
+				05576E6A2CF46BAD00BE1DDD /* AddWatermarkTabView.swift */,
 				05576E682CF46B9F00BE1DDD /* RemoveWatermarkTabView.swift */,
 				05576E6C2CF46BB100BE1DDD /* SettingsTabView.swift */,
 				057E41082CEF1B2E0005E859 /* Views.swift */,
@@ -233,6 +236,7 @@
 				05576E6F2CF46C0900BE1DDD /* Logger.swift in Sources */,
 				05AC15022CF6F91900EE8F9A /* Extensions.swift in Sources */,
 				05AC15042CF71D5000EE8F9A /* EditPhotoPage.swift in Sources */,
+				05BFE9F72D0C2BA000D02F12 /* ColorUtils.swift in Sources */,
 				057E410C2CEF1B2E0005E859 /* Views.swift in Sources */,
 				0501865D2CEF1AE000EAEA64 /* MarkerApp.swift in Sources */,
 				05C094652CFDBBAC00D07E22 /* MeshGradientView.swift in Sources */,

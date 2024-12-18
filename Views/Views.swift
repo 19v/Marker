@@ -85,3 +85,44 @@ struct HalfTransparentSheetView: View {
         }
     }
 }
+
+struct ListOverlayView: View {
+    @Binding var isShowing: Bool
+
+    var body: some View {
+        VStack {
+            Spacer()
+            VStack(spacing: 0) {
+                HStack {
+                    Text("信息列表")
+                        .font(.headline)
+                        .padding()
+                    Spacer()
+                    Button(action: {
+                        isShowing = false
+                    }) {
+                        Image(systemName: "xmark")
+                            .foregroundColor(.gray)
+                            .padding()
+                    }
+                }
+                .background(Color(.systemGray6))
+                
+                Divider()
+                
+                List {
+                    ForEach(1..<11) { index in
+                        Text("信息 \(index)")
+                    }
+                }
+                .frame(height: 300)
+            }
+            .background(Color.white)
+            .cornerRadius(10)
+            .shadow(radius: 5)
+            .padding()
+        }
+        .transition(.move(edge: .bottom))
+        .animation(.spring(), value: isShowing)
+    }
+}

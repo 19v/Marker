@@ -99,5 +99,6 @@ struct AddTabView: View {
                 .presentationDetents([.large, .medium, .fraction(0.2)])
                 .presentationDragIndicator(.visible)
         }
+        .navigationTitle(CommonUtils.appName)
     }
 }

@@ -78,3 +78,117 @@ struct SingleSymbolButton: View {
         .shadow(radius: 5)                  // 阴影效果（可选）
     }
 }
+
+// 自定义的仿照 TabBar 的按钮
+struct CustomTabButton: View {
+    let iconName: String
+    let labelText: String
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: {
+            action()
+        }) {
+            VStack(spacing: 4) {
+                Image(systemName: iconName)
+                    .font(.system(size: 24))
+                    .foregroundColor(.blue)
+                Text(labelText)
+                    .font(.caption)
+                    .foregroundColor(.blue)
+            }
+            .padding(.vertical, 8)
+            .frame(maxWidth: .infinity)
+        }
+    }
+}
+
+struct ToolbarButton: View {
+    let icon: String
+    let title: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack {
+                Image(systemName: icon)
+                    .font(.system(size: 24)) // 图标大小
+                Text(title)
+                    .font(.caption) // 文字大小
+            }
+            .foregroundColor(.blue) // 图标和文字颜色
+        }
+    }
+}
+
+// 首页所使用的胶囊型按钮
+struct CapsuleButton: View {
+    var icon: String
+    var title: String
+    var action: () -> Void
+    
+//    let titleColor = Color.white
+    let titleColor = Color(hex: "333333")
+    
+//    let backgroundColor = Color.blue
+    let backgroundColor = Color.clear
+
+    var body: some View {
+        Button(action: action) {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundColor(titleColor)
+                    .padding(.leading, 16)
+                    .frame(width: 46)
+                Text(title)
+                    .foregroundColor(titleColor)
+                    .font(.system(size: 16, weight: .bold))
+                    .padding(.horizontal, 8)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .foregroundColor(titleColor)
+                    .padding(.trailing, 16)
+            }
+            .padding(.vertical, 12)
+            .frame(height: 58)
+//            .background(Capsule().fill(backgroundColor))
+            .background(
+                Color(hex: "#FFFFFF")
+                    .opacity(0.55)
+                    .background(.ultraThinMaterial) // 添加模糊效果
+                    .cornerRadius(0)
+                    .clipShape(Capsule())
+                    .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 0)
+            )
+        }
+    }
+}
+
+// 首页所使用的纯文字按钮
+struct TextButton: View {
+    var icon: String
+    var title: String
+    var action: () -> Void
+    
+    let titleColor = Color.white
+    
+//    let backgroundColor = Color.blue
+    let backgroundColor = Color.clear
+
+    var body: some View {
+        Button(action: action) {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundColor(titleColor)
+                    .padding(.leading, 16)
+                Text(title)
+                    .foregroundColor(titleColor)
+                    .font(.system(size: 16, weight: .bold))
+                    .padding(.trailing, 20)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .frame(height: 40)
+        }
+    }
+}
