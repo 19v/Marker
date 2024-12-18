@@ -31,17 +31,26 @@ class PhotoModel: ObservableObject {
     }
     @Published var displayCoordinate = false // 显示经纬度的开关
     
+    @Published var imageLoaded = false
+    
+    func reset() {
+        imageSelection = nil
+    }
+    
     @Published private(set) var imageState: ImageState = .empty
     
     @Published var imageSelection: PhotosPickerItem? = nil {
         didSet {
             if let imageSelection {
                 imageState = .loading(loadTransferable(from: imageSelection))
+                imageLoaded.toggle()
             } else {
                 imageState = .empty
             }
         }
     }
+    
+    @Published var imagesSelection: [PhotosPickerItem] = []
     
     @Published var imageModification: UIImage? = nil {
         didSet {

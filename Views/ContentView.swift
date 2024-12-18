@@ -4,7 +4,7 @@ import PhotosUI
 struct ContentView: View {
     @Environment(\.colorScheme) private var colorScheme // 读取当前颜色模式
     
-    @State private var selectedTab: Tabs = .addWaterMark
+    @StateObject var viewModel = PhotoModel()
     
     var body: some View {
         NavigationStack {
@@ -32,28 +32,22 @@ struct ContentView: View {
                 Spacer()
                 
                 VStack(spacing: 28) {
-//                    PhotosPicker(selection: $viewModel.imageSelection,
-//                                 matching: .images,
-//                                 photoLibrary: .shared()) {
-                        CapsuleButton(icon: "photo.fill", title: "选择照片") {
-                            print("Button tapped!")
-                        }
-//                    }
-//                    .buttonStyle(.borderless)
-//                    
-//                    Button("移除图片") {
-//                        print("test")
-//                        viewModel.imageSelection = nil
-//                    }
+                    // 单张照片
+                    PhotosPicker(selection: $viewModel.imageSelection, matching: .images, photoLibrary: .shared()) {
+                        CapsuleButton.Style(icon: "photo.fill", title: "选择照片")
+                    }
                     
                     CapsuleButton(icon: "camera.fill", title: "拍摄照片") {
                         print("Button tapped!")
+                        LoggerManager.shared.debug("view model is: \(viewModel.imageLoaded)")
                     }
                     
-                    CapsuleButton(icon: "photo.stack.fill", title: "批量处理") {
-                        print("Button tapped!")
+                    // 多张照片
+                    PhotosPicker(selection: $viewModel.imagesSelection, maxSelectionCount: 9, matching: .images, photoLibrary: .shared()) {
+                        CapsuleButton.Style(icon: "photo.stack.fill", title: "批量处理")
                     }
                     
+                    // 设置 & 反馈
                     HStack {
                         Spacer()
                         TextButton(icon: "gearshape.fill", title: "设置") {
@@ -72,6 +66,11 @@ struct ContentView: View {
                 MeshGradientView()
                     .edgesIgnoringSafeArea(.all)
             )
+            .navigationDestination(isPresented: $viewModel.imageLoaded) {
+                EditPhotoPage(viewModel: viewModel) {
+                    viewModel.reset()
+                }
+            }
         }
     }
 }

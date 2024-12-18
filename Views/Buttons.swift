@@ -91,7 +91,7 @@ struct CustomTabButton: View {
         }) {
             VStack(spacing: 4) {
                 Image(systemName: iconName)
-                    .font(.system(size: 24))
+                    .font(.system(size: 20))
                     .foregroundColor(.blue)
                 Text(labelText)
                     .font(.caption)
@@ -132,9 +132,20 @@ struct CapsuleButton: View {
     
 //    let backgroundColor = Color.blue
     let backgroundColor = Color.clear
-
+    
     var body: some View {
         Button(action: action) {
+            Style(icon: icon, title: title, titleColor: Color.black)
+        }
+    }
+    
+    struct Style: View {
+        var icon: String
+        var title: String
+        var titleColor = Color(hex: "333333")
+        var backgroundColor = Color.clear
+
+        var body: some View {
             HStack {
                 Image(systemName: icon)
                     .foregroundColor(titleColor)

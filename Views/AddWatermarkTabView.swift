@@ -88,9 +88,9 @@ struct AddTabView: View {
             }
             
             Section {
-                NavigationLink(destination: EditPhotoPage()) {
-                    Text("测试页面")
-                }
+//                NavigationLink(destination: EditPhotoPage()) {
+//                    Text("测试页面")
+//                }
             }
         }
         .sheet(isPresented: $isSheetPresented) {
