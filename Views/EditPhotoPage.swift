@@ -2,6 +2,7 @@ import SwiftUI
 import PhotosUI
 
 struct EditPhotoPage: View {
+    @Environment(\.colorScheme) private var colorScheme
     @ObservedObject var viewModel: PhotoModel
     
     let onDisappearAction: () -> Void
@@ -17,18 +18,18 @@ struct EditPhotoPage: View {
     @State private var isShowingListView = false
     
     var body: some View {
-        VStack {
+        ZStack {
             GeometryReader { geometry in
                 switch viewModel.imageState {
-                case .empty:
-                    VStack {
-                        Image(systemName: "questionmark.circle.dashed")
+                case .empty, .failure:
+                    VStack(spacing: 4) {
+                        Image(systemName: "photo.badge.exclamationmark.fill")
                             .scaledToFit()
-                            .font(.system(size: 40))
-                            .foregroundStyle(.gray)
+                            .font(.system(size: 50))
+                            .foregroundStyle(.secondary)
                         Text("图片未加载")
-                            .foregroundStyle(.gray)
-                            .padding([.top], 8)
+                            .font(.system(.footnote))
+                            .foregroundStyle(.secondary)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 case .loading:
@@ -36,18 +37,37 @@ struct EditPhotoPage: View {
                         .frame(width: geometry.size.width, height: geometry.size.height)
                 case .success(let image):
                     PhotoDisplayView(geometry: geometry, image: image)
-                case .failure:
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.system(size: 40))
-                        .foregroundColor(.white)
                 }
             }
             .frame(maxHeight: .infinity) // 占据剩余空间
+            .background(
+                colorScheme == .light
+                ? Color(hex: "#F2F3F5")
+                : Color(hex: "#101010")
+            )
             
-            PhotoEditingBar(viewModel: viewModel)
-                .frame(height: 44)
+            VStack {
+                Rectangle()
+                    .fill(colorScheme == .light ? .white : .black)
+                    .fill(.bar)
+                    .foregroundStyle(colorScheme == .light ? .white : .black)
+                    .opacity(0.8)
+                    .frame(height: CommonUtils.safeTopInset + 44)
+                
+                Spacer()
+                
+                PhotoEditingBar(viewModel: viewModel)
+                    .frame(height: 44)
+                    .padding(.top, 10)
+                    .padding(.bottom, CommonUtils.safeBottomInset)
+                    .background(
+                        Rectangle()
+                            .fill(.bar)
+                            .foregroundStyle(colorScheme == .light ? .white : .black)
+                            .opacity(0.8)
+                    )
+            }
         }
-        .background(Color(hex: "#282828"))
         .navigationBarBackButtonHidden(true)
         .toolbar {
             // 关闭按钮
@@ -76,6 +96,7 @@ struct EditPhotoPage: View {
                 .presentationDragIndicator(.visible)
         }
         .onDisappear(perform: onDisappearAction)
+        .ignoresSafeArea(.all)
     }
 }
 
@@ -92,7 +113,7 @@ struct PhotoDisplayView: View {
     var body: some View {
         ZStack {
             Color.white
-                .opacity(0.5)
+                .opacity(0)
                 .contentShape(Rectangle())
                 .gesture(
                     // 双击
@@ -172,7 +193,7 @@ struct PhotoEditingBar: View {
     
     var body: some View {
         HStack{
-            CustomTabButton(iconName: "text.below.photo", labelText: "显示水印") {
+            CustomTabButton(iconName: "photo.badge.plus.fill", labelText: "显示水印") {
                 LoggerManager.shared.debug("显示水印按钮点击")
                 if let uiImage = viewModel.uiImage,
                    let data = viewModel.watermarkData {
@@ -195,4 +216,8 @@ struct PhotoEditingBar: View {
             }
         }
     }
+}
+
+#Preview {
+    EditPhotoPage(viewModel: PhotoModel()) {}
 }

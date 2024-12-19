@@ -90,9 +90,17 @@ struct CustomTabButton: View {
             action()
         }) {
             VStack(spacing: 4) {
+                ZStack {
+                    Rectangle()
+                        .fill(Color.white.opacity(0))
                 Image(systemName: iconName)
-                    .font(.system(size: 20))
+                        .resizable()
+                        .scaledToFit()
+//                        .font(.system(size: 20))
+                        .frame(height: 20)
                     .foregroundColor(.blue)
+                }
+                .frame(/*width: 20, */height: 20)
                 Text(labelText)
                     .font(.caption)
                     .foregroundColor(.blue)
