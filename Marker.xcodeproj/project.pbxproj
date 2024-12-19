@@ -13,16 +13,13 @@
 		05576E622CF469C800BE1DDD /* Watermark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05576E612CF469C600BE1DDD /* Watermark.swift */; };
 		05576E642CF46A8200BE1DDD /* ExifData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05576E632CF46A7F00BE1DDD /* ExifData.swift */; };
 		05576E662CF46AEE00BE1DDD /* PhotoUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05576E652CF46AED00BE1DDD /* PhotoUtils.swift */; };
-		05576E692CF46BA700BE1DDD /* RemoveWatermarkTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05576E682CF46B9F00BE1DDD /* RemoveWatermarkTabView.swift */; };
-		05576E6B2CF46BAD00BE1DDD /* AddWatermarkTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05576E6A2CF46BAD00BE1DDD /* AddWatermarkTabView.swift */; };
-		05576E6D2CF46BB100BE1DDD /* SettingsTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05576E6C2CF46BB100BE1DDD /* SettingsTabView.swift */; };
+		05576E6D2CF46BB100BE1DDD /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05576E6C2CF46BB100BE1DDD /* SettingsView.swift */; };
 		05576E6F2CF46C0900BE1DDD /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05576E6E2CF46C0700BE1DDD /* Logger.swift */; };
 		05576E712CF46C3800BE1DDD /* Tabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05576E702CF46C3600BE1DDD /* Tabs.swift */; };
 		05576E792CF47A3600BE1DDD /* MiSans-Demibold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 05576E772CF47A3600BE1DDD /* MiSans-Demibold.ttf */; };
 		05576E7A2CF47A3600BE1DDD /* MiSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 05576E782CF47A3600BE1DDD /* MiSans-Regular.ttf */; };
 		057E41092CEF1B2E0005E859 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057E41072CEF1B2E0005E859 /* Photo.swift */; };
 		057E410B2CEF1B2E0005E859 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057E41062CEF1B2E0005E859 /* Common.swift */; };
-		057E410C2CEF1B2E0005E859 /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057E41082CEF1B2E0005E859 /* Views.swift */; };
 		059CDC4E2CF6C63B008B8458 /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059CDC4D2CF6C626008B8458 /* Buttons.swift */; };
 		05AC15022CF6F91900EE8F9A /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AC15012CF6F91600EE8F9A /* Extensions.swift */; };
 		05AC15042CF71D5000EE8F9A /* EditPhotoPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AC15032CF71D4700EE8F9A /* EditPhotoPage.swift */; };
@@ -39,16 +36,13 @@
 		05576E612CF469C600BE1DDD /* Watermark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Watermark.swift; sourceTree = "<group>"; };
 		05576E632CF46A7F00BE1DDD /* ExifData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExifData.swift; sourceTree = "<group>"; };
 		05576E652CF46AED00BE1DDD /* PhotoUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoUtils.swift; sourceTree = "<group>"; };
-		05576E682CF46B9F00BE1DDD /* RemoveWatermarkTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveWatermarkTabView.swift; sourceTree = "<group>"; };
-		05576E6A2CF46BAD00BE1DDD /* AddWatermarkTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddWatermarkTabView.swift; sourceTree = "<group>"; };
-		05576E6C2CF46BB100BE1DDD /* SettingsTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTabView.swift; sourceTree = "<group>"; };
+		05576E6C2CF46BB100BE1DDD /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		05576E6E2CF46C0700BE1DDD /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		05576E702CF46C3600BE1DDD /* Tabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tabs.swift; sourceTree = "<group>"; };
 		05576E772CF47A3600BE1DDD /* MiSans-Demibold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "MiSans-Demibold.ttf"; sourceTree = "<group>"; };
 		05576E782CF47A3600BE1DDD /* MiSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "MiSans-Regular.ttf"; sourceTree = "<group>"; };
 		057E41062CEF1B2E0005E859 /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 		057E41072CEF1B2E0005E859 /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
-		057E41082CEF1B2E0005E859 /* Views.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views.swift; sourceTree = "<group>"; };
 		057E410D2CF079B80005E859 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		059CDC4D2CF6C626008B8458 /* Buttons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
 		05AC15012CF6F91600EE8F9A /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
@@ -124,10 +118,7 @@
 				0501865C2CEF1AE000EAEA64 /* MarkerApp.swift */,
 				0501865E2CEF1AE000EAEA64 /* ContentView.swift */,
 				05AC15032CF71D4700EE8F9A /* EditPhotoPage.swift */,
-				05576E6A2CF46BAD00BE1DDD /* AddWatermarkTabView.swift */,
-				05576E682CF46B9F00BE1DDD /* RemoveWatermarkTabView.swift */,
-				05576E6C2CF46BB100BE1DDD /* SettingsTabView.swift */,
-				057E41082CEF1B2E0005E859 /* Views.swift */,
+				05576E6C2CF46BB100BE1DDD /* SettingsView.swift */,
 				059CDC4D2CF6C626008B8458 /* Buttons.swift */,
 				05C094642CFDBBA200D07E22 /* MeshGradientView.swift */,
 			);
@@ -230,17 +221,14 @@
 				05576E662CF46AEE00BE1DDD /* PhotoUtils.swift in Sources */,
 				059CDC4E2CF6C63B008B8458 /* Buttons.swift in Sources */,
 				057E410B2CEF1B2E0005E859 /* Common.swift in Sources */,
-				05576E692CF46BA700BE1DDD /* RemoveWatermarkTabView.swift in Sources */,
-				05576E6D2CF46BB100BE1DDD /* SettingsTabView.swift in Sources */,
+				05576E6D2CF46BB100BE1DDD /* SettingsView.swift in Sources */,
 				05576E622CF469C800BE1DDD /* Watermark.swift in Sources */,
 				05576E6F2CF46C0900BE1DDD /* Logger.swift in Sources */,
 				05AC15022CF6F91900EE8F9A /* Extensions.swift in Sources */,
 				05AC15042CF71D5000EE8F9A /* EditPhotoPage.swift in Sources */,
 				05BFE9F72D0C2BA000D02F12 /* ColorUtils.swift in Sources */,
-				057E410C2CEF1B2E0005E859 /* Views.swift in Sources */,
 				0501865D2CEF1AE000EAEA64 /* MarkerApp.swift in Sources */,
 				05C094652CFDBBAC00D07E22 /* MeshGradientView.swift in Sources */,
-				05576E6B2CF46BAD00BE1DDD /* AddWatermarkTabView.swift in Sources */,
 				05576E642CF46A8200BE1DDD /* ExifData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
