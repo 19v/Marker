@@ -44,18 +44,8 @@ struct EditPhotoPage: View {
             }
             .frame(maxHeight: .infinity) // 占据剩余空间
             
-            HStack{
-                CustomTabButton(iconName: "calendar", labelText: "日期") {
-                    print("Home button tapped")
-                    isShowingListView.toggle()
-                }
-                CustomTabButton(iconName: "location.fill", labelText: "经纬度") {
-                    print("Favorite button tapped")
-                }
-                CustomTabButton(iconName: "person", labelText: "Profile") {
-                    print("Profile button tapped")
-                }
-            }
+            PhotoEditingBar(viewModel: viewModel)
+                .frame(height: 44)
         }
         .background(Color(hex: "#282828"))
         .navigationBarBackButtonHidden(true)
@@ -102,8 +92,8 @@ struct PhotoDisplayView: View {
     var body: some View {
         ZStack {
             Color.white
-                .opacity(0.01)
-                .frame(width: geometry.size.width, height: geometry.size.height)
+                .opacity(0.5)
+                .contentShape(Rectangle())
                 .gesture(
                     // 双击
                     TapGesture(count: 2)
@@ -174,5 +164,35 @@ struct PhotoDisplayView: View {
                 .listRowInsets(EdgeInsets())
         }
         .clipped()
+    }
+}
+
+struct PhotoEditingBar: View {
+    @ObservedObject var viewModel: PhotoModel
+    
+    var body: some View {
+        HStack{
+            CustomTabButton(iconName: "text.below.photo", labelText: "显示水印") {
+                LoggerManager.shared.debug("显示水印按钮点击")
+                if let uiImage = viewModel.uiImage,
+                   let data = viewModel.watermarkData {
+                    viewModel.imageModification = PhotoUtils.addWhiteAreaToBottom(of: uiImage, data: data)
+                }
+            }
+            
+            CustomTabButton(iconName: "calendar", labelText: "日期") {
+                print("Home button tapped")
+                viewModel.displayTime.toggle()
+            }
+            
+            CustomTabButton(iconName: "location.fill", labelText: "经纬度") {
+                print("Favorite button tapped")
+                viewModel.displayCoordinate.toggle()
+            }
+            
+            CustomTabButton(iconName: "person", labelText: "测试") {
+                print("Profile button tapped")
+            }
+        }
     }
 }
