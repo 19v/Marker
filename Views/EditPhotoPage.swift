@@ -57,7 +57,7 @@ struct EditPhotoPage: View {
                 Spacer()
                 
                 HStack{
-                    CustomTabButton(iconName: "photo.badge.plus.fill", labelText: "显示水印") {
+                    CustomTabButton(iconName: "photo.circle.fill", labelText: "水印开关") {
                         LoggerManager.shared.debug("显示水印按钮点击")
                         if let uiImage = viewModel.uiImage,
                            let data = viewModel.watermarkData {
@@ -65,23 +65,29 @@ struct EditPhotoPage: View {
                         }
                     }
                     
-                    CustomTabButton(iconName: "calendar", labelText: "日期") {
+                    CustomTabButton(iconName: "circle.tophalf.filled.inverse", labelText: "背景颜色") {
+                        print("Profile button tapped")
+                    }
+                    
+                    CustomTabButton(iconName: "calendar.circle.fill", labelText: "日期时间") {
                         print("Home button tapped")
                         viewModel.displayTime.toggle()
                     }
                     
-                    CustomTabButton(iconName: "location.fill", labelText: "经纬度") {
+                    // 经纬度按钮
+                    CustomTabButton(iconName: "location.circle.fill", labelText: "地理位置") {
                         print("Favorite button tapped")
                         viewModel.displayCoordinate.toggle()
                     }
                     
-                    CustomTabButton(iconName: "person", labelText: "测试") {
+                    CustomTabButton(iconName: "info.circle.fill", labelText: "照片信息") {
                         print("Profile button tapped")
                     }
                 }
                 .frame(height: 44)
                 .padding(.top, 10)
                 .padding(.bottom, CommonUtils.safeBottomInset)
+                .padding(.horizontal, 10)
                 .background(
                     Rectangle()
                         .fill(.bar)
