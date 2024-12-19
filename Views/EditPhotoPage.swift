@@ -36,7 +36,7 @@ struct EditPhotoPage: View {
                     ProgressView()
                         .frame(width: geometry.size.width, height: geometry.size.height)
                 case .success(let image):
-                    PhotoDisplayView(geometry: geometry, image: image)
+                    EditPhotoDisplayView(geometry: geometry, image: image)
                 }
             }
             .frame(maxHeight: .infinity) // 占据剩余空间
@@ -56,16 +56,38 @@ struct EditPhotoPage: View {
                 
                 Spacer()
                 
-                PhotoEditingBar(viewModel: viewModel)
-                    .frame(height: 44)
-                    .padding(.top, 10)
-                    .padding(.bottom, CommonUtils.safeBottomInset)
-                    .background(
-                        Rectangle()
-                            .fill(.bar)
-                            .foregroundStyle(colorScheme == .light ? .white : .black)
-                            .opacity(0.8)
-                    )
+                HStack{
+                    CustomTabButton(iconName: "photo.badge.plus.fill", labelText: "显示水印") {
+                        LoggerManager.shared.debug("显示水印按钮点击")
+                        if let uiImage = viewModel.uiImage,
+                           let data = viewModel.watermarkData {
+                            viewModel.imageModification = PhotoUtils.addWhiteAreaToBottom(of: uiImage, data: data)
+                        }
+                    }
+                    
+                    CustomTabButton(iconName: "calendar", labelText: "日期") {
+                        print("Home button tapped")
+                        viewModel.displayTime.toggle()
+                    }
+                    
+                    CustomTabButton(iconName: "location.fill", labelText: "经纬度") {
+                        print("Favorite button tapped")
+                        viewModel.displayCoordinate.toggle()
+                    }
+                    
+                    CustomTabButton(iconName: "person", labelText: "测试") {
+                        print("Profile button tapped")
+                    }
+                }
+                .frame(height: 44)
+                .padding(.top, 10)
+                .padding(.bottom, CommonUtils.safeBottomInset)
+                .background(
+                    Rectangle()
+                        .fill(.bar)
+                        .foregroundStyle(colorScheme == .light ? .white : .black)
+                        .opacity(0.8)
+                )
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -100,7 +122,7 @@ struct EditPhotoPage: View {
     }
 }
 
-struct PhotoDisplayView: View {
+struct EditPhotoDisplayView: View {
     let geometry: GeometryProxy
     let image: Image
     
@@ -185,36 +207,6 @@ struct PhotoDisplayView: View {
                 .listRowInsets(EdgeInsets())
         }
         .clipped()
-    }
-}
-
-struct PhotoEditingBar: View {
-    @ObservedObject var viewModel: PhotoModel
-    
-    var body: some View {
-        HStack{
-            CustomTabButton(iconName: "photo.badge.plus.fill", labelText: "显示水印") {
-                LoggerManager.shared.debug("显示水印按钮点击")
-                if let uiImage = viewModel.uiImage,
-                   let data = viewModel.watermarkData {
-                    viewModel.imageModification = PhotoUtils.addWhiteAreaToBottom(of: uiImage, data: data)
-                }
-            }
-            
-            CustomTabButton(iconName: "calendar", labelText: "日期") {
-                print("Home button tapped")
-                viewModel.displayTime.toggle()
-            }
-            
-            CustomTabButton(iconName: "location.fill", labelText: "经纬度") {
-                print("Favorite button tapped")
-                viewModel.displayCoordinate.toggle()
-            }
-            
-            CustomTabButton(iconName: "person", labelText: "测试") {
-                print("Profile button tapped")
-            }
-        }
     }
 }
 
