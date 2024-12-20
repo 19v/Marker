@@ -3,6 +3,7 @@ import PhotosUI
 
 struct EditPhotoPage: View {
     @Environment(\.colorScheme) private var colorScheme
+    
     @ObservedObject var viewModel: PhotoModel
     
     let onDisappearAction: () -> Void
@@ -10,12 +11,6 @@ struct EditPhotoPage: View {
     // 设置页面 Sheet 的设置
     @State private var isSheetPresented = false
     @State private var settingsDetent = PresentationDetent.large
-    
-    // 控制开关
-    @State private var displayTime = false // 显示时间的开关
-    @State private var displayCoordinate = false // 显示经纬度的开关
-    
-    @State private var isShowingListView = false
     
     var body: some View {
         ZStack {
@@ -36,7 +31,7 @@ struct EditPhotoPage: View {
                     ProgressView()
                         .frame(width: geometry.size.width, height: geometry.size.height)
                 case .success(let image):
-                    EditPhotoDisplayView(geometry: geometry, image: image, watermark: viewModel.watermarkImage)
+                    EditPhotoDisplayView(geometry: geometry, image: image, watermark: viewModel.watermarkImage, displayWatermark: viewModel.displayWatermark)
                 }
             }
             .frame(maxHeight: .infinity) // 占据剩余空间
@@ -59,10 +54,7 @@ struct EditPhotoPage: View {
                 HStack{
                     CustomTabButton(iconName: "photo.circle.fill", labelText: "水印开关") {
                         LoggerManager.shared.debug("显示水印按钮点击")
-//                        if let uiImage = viewModel.uiImage,
-//                           let data = viewModel.watermarkData {
-//                            viewModel.imageModification = PhotoUtils.addWhiteAreaToBottom(of: uiImage, data: data)
-//                        }
+                        viewModel.displayWatermark.toggle()
                     }
                     
                     CustomTabButton(iconName: "circle.tophalf.filled.inverse", labelText: "背景颜色") {
@@ -135,6 +127,7 @@ struct EditPhotoDisplayView: View {
     let geometry: GeometryProxy
     let image: Image
     let watermark: Image?
+    let displayWatermark: Bool
     
     // 控制图片显示的参数
     private static let defaultScale: CGFloat = 0.95 // 初始缩放比例，为1.0时左右填满屏幕
@@ -168,7 +161,8 @@ struct EditPhotoDisplayView: View {
                     .frame(width: geometry.size.width)
                     .listRowInsets(EdgeInsets())
                 
-                if let watermark {
+                if let watermark,
+                   displayWatermark {
                     watermark
                         .resizable()
                         .scaledToFit()

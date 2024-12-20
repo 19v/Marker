@@ -19,25 +19,17 @@ class PhotoModel: ObservableObject {
         case importFailed
     }
     
-    @Published var firstName: String = ""
-    @Published var lastName: String = ""
-    @Published var aboutMe: String = ""
-    
+    @Published var deviceName: String = "" // 自定义设备名（默认样式下左侧的名称）
+    @Published var displayWatermark = true // 显示水印的开关
     @Published var displayTime = false // 显示时间的开关
-    {
-        didSet {
-            displayCoordinate.toggle()
-        }
-    }
     @Published var displayCoordinate = false // 显示经纬度的开关
-    
-    @Published var imageLoaded = false
     
     func reset() {
         imageSelection = nil
     }
     
     @Published private(set) var imageState: ImageState = .empty /*.success(Image("Example1"))*/  // 注释部分用于Preview使用
+    @Published var imageLoaded = false
     
     @Published var imageSelection: PhotosPickerItem? = nil {
         didSet {
