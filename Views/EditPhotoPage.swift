@@ -154,64 +154,64 @@ struct EditPhotoDisplayView: View {
                                     lastOffset = .zero
                                 }
                             }
-                    }
+                        }
                 )
             
-            image
-                .resizable()
-                .scaledToFit()
-                .scaleEffect(scale) // 缩放
-                .offset(offset) // 偏移
-                .gesture(
-                    // 拖拽
-                    DragGesture()
-                        .onChanged { value in
-                            offset = CGSize(
-                                width: lastOffset.width + value.translation.width,
-                                height: lastOffset.height + value.translation.height
-                            )
-                        }
-                        .onEnded { _ in
-                            lastOffset = offset
-                        }
-                        .simultaneously(
-                            with: MagnificationGesture()
-                                .onChanged { value in
-                                    scale = lastScale * value
-                                }
-                                .onEnded { _ in
-                                    lastScale = scale
-                                }
-                        )
-                )
-                .gesture(
-                    // 双指放大
-                    MagnificationGesture()
-                        .onChanged { value in
-                            scale = lastScale * value // 动态更新缩放比例
-                        }
-                        .onEnded { _ in
-                            lastScale = scale // 保存最终缩放比例
-                        }
-                )
-                .gesture(
-                    // 双击
-                    TapGesture(count: 2)
-                        .onEnded {
-                            withAnimation {
-                                if offset != .zero {
-                                    offset = .zero
-                                    lastOffset = .zero
-                                } else {
-                                    scale = scale == 1.0 ? 2.0 : 1.0
-                                }
+            VStack(spacing: 0) {
+                image
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .listRowInsets(EdgeInsets())
+            }
+            .scaleEffect(scale) // 缩放
+            .offset(offset) // 偏移
+            .gesture(
+                // 双击
+                TapGesture(count: 2)
+                    .onEnded {
+                        withAnimation {
+                            if offset != .zero {
+                                offset = .zero
+                                lastOffset = .zero
+                            } else {
+                                scale = scale == EditPhotoDisplayView.defaultScale ? 2.0 : EditPhotoDisplayView.defaultScale
                             }
                         }
-                )
-//                .aspectRatio(contentMode: .fill)
-                .frame(width: geometry.size.width, height: geometry.size.height)
-//                .draggable(image)
-                .listRowInsets(EdgeInsets())
+                    }
+            )
+            .gesture(
+                // 拖拽
+                DragGesture()
+                    .onChanged { value in
+                        offset = CGSize(
+                            width: lastOffset.width + value.translation.width,
+                            height: lastOffset.height + value.translation.height
+                        )
+                    }
+                    .onEnded { _ in
+                        lastOffset = offset
+                    }
+                    .simultaneously(
+                        with: MagnificationGesture()
+                            .onChanged { value in
+                                scale = lastScale * value
+                            }
+                            .onEnded { _ in
+                                lastScale = scale
+                            }
+                    )
+            )
+            .gesture(
+                // 双指放大
+                MagnificationGesture()
+                    .onChanged { value in
+                        scale = lastScale * value // 动态更新缩放比例
+                    }
+                    .onEnded { _ in
+                        lastScale = scale // 保存最终缩放比例
+                    }
+            )
         }
         .clipped()
     }
