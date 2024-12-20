@@ -37,7 +37,7 @@ class PhotoModel: ObservableObject {
         imageSelection = nil
     }
     
-    @Published private(set) var imageState: ImageState = .empty
+    @Published private(set) var imageState: ImageState = .empty /*.success(Image("Example1"))*/  // 注释部分用于Preview使用
     
     @Published var imageSelection: PhotosPickerItem? = nil {
         didSet {
@@ -75,11 +75,31 @@ class PhotoModel: ObservableObject {
     var exifData: ExifData? {
         didSet {
             if let exifData {
-                watermarkData = WatermarkData(exifData: exifData)
+                watermark = Watermark(exifData: exifData)
             }
         }
     }
-    var watermarkData: WatermarkData?
+    
+    // 水印信息，包含样式信息和数据
+    var watermark: Watermark? {
+        didSet {
+            if let watermark,
+               let uiImage = PhotoUtils.generateWhiteArea(with: watermark) {
+                watermarkImage = Image(uiImage: uiImage)
+            }
+        }
+    }
+    var watermarkImage: Image?/* = Image(uiImage: PhotoUtils.generateWhiteArea(with: Watermark(exifData: ExifData(image: UIImage(named: "Example1")!)))!)*/  // 注释部分用于Preview使用
+    
+    // 将水印和原图拼合起来……
+    var fullImage: UIImage? {
+        if let uiImage,
+           let watermark,
+           let watermarkUiImage = PhotoUtils.generateWhiteArea(with: watermark) {
+            return PhotoUtils.combine(photo: uiImage, watermark: watermarkUiImage)
+        }
+        return nil
+    }
     
     struct Photo: Transferable {
         let id = UUID()

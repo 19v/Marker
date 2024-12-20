@@ -7,6 +7,20 @@ enum InputFonts: String {
 
 class Watermark {
     
+    init(exifData: ExifData) {
+        data = Data(exifData: exifData)
+    }
+    
+    var style = Style.basic
+    
+    let data: Data
+    
+}
+
+// MARK: - 样式定义
+
+extension Watermark {
+    
     enum Style {
         case basic     // 仅包含拍摄设备、Logo、照片信息的版本
         case detailed  // 在 basic 基础上，需要显示日期、经纬度等信息的版本
@@ -71,9 +85,9 @@ class Watermark {
         var uiColor: UIColor {
             switch self {
             case .white:
-                .white
+                    .white
             case .black:
-                .black
+                    .black
             }
         }
     }
@@ -82,62 +96,63 @@ class Watermark {
         
     }
     
-    var style = Style.basic
-    
-    init() {
-        
-    }
-    
 }
 
-class WatermarkData {
-    let deviceName: String // 设备名称
-    let fNumber: String // 光圈值
-    let focalLenIn35mmFilm: String // 35mm胶片的等效焦距
-    let exposureTime: String // 曝光时间
-    let isoSpeedRatings: String // 感光度
-    let dateTime: String // 水印时间
+
+// MARK: - 信息定义
+
+extension Watermark {
     
-    init(exifData: ExifData?) {
-        if let model = exifData?.model {
-            deviceName = model
-        } else {
-            deviceName = UIDevice.current.name // 默认使用当前设备名称
-        }
+    class Data {
+        let deviceName: String // 设备名称
+        let fNumber: String // 光圈值
+        let focalLenIn35mmFilm: String // 35mm胶片的等效焦距
+        let exposureTime: String // 曝光时间
+        let isoSpeedRatings: String // 感光度
+        let dateTime: String // 水印时间
         
-        if let fNum = exifData?.fNumber {
-            fNumber = String(format: "%.1f", fNum)
-        } else {
-            fNumber = "0"
-        }
-        
-        if let focalLenIn35mmFilm = exifData?.focalLenIn35mmFilm {
-            self.focalLenIn35mmFilm = String(focalLenIn35mmFilm)
-        } else {
-            self.focalLenIn35mmFilm = "0"
-        }
-        
-        if let exposureTime = exifData?.exposureTime {
-            let denominator = CommonUtils.decimalToFractionDenominator(decimal: exposureTime)
-            self.exposureTime = "1/\(denominator)"
-        } else {
-            self.exposureTime = "1/1"
-        }
-        
-        if let arr = exifData?.isoSpeedRatings,
-           let v = arr.first,
-           let v {
-            self.isoSpeedRatings = String(v)
-        } else {
-            self.isoSpeedRatings = "0"
-        }
-        
-        if let dateTimeOriginal = exifData?.dateTimeOriginal,
-           let offsetTimeOriginal = exifData?.offsetTimeOriginal,
-           let date = CommonUtils.convertToDate(dateTime: dateTimeOriginal, timeZone: offsetTimeOriginal) {
-            self.dateTime = CommonUtils.getTimestamp(date: date)
-        } else {
-            self.dateTime = CommonUtils.getCurrentTimestamp()
+        init(exifData: ExifData?) {
+            if let model = exifData?.model {
+                deviceName = model
+            } else {
+                deviceName = UIDevice.current.name // 默认使用当前设备名称
+            }
+            
+            if let fNum = exifData?.fNumber {
+                fNumber = String(format: "%.1f", fNum)
+            } else {
+                fNumber = "0"
+            }
+            
+            if let focalLenIn35mmFilm = exifData?.focalLenIn35mmFilm {
+                self.focalLenIn35mmFilm = String(focalLenIn35mmFilm)
+            } else {
+                self.focalLenIn35mmFilm = "0"
+            }
+            
+            if let exposureTime = exifData?.exposureTime {
+                let denominator = CommonUtils.decimalToFractionDenominator(decimal: exposureTime)
+                self.exposureTime = "1/\(denominator)"
+            } else {
+                self.exposureTime = "1/1"
+            }
+            
+            if let arr = exifData?.isoSpeedRatings,
+               let v = arr.first,
+               let v {
+                self.isoSpeedRatings = String(v)
+            } else {
+                self.isoSpeedRatings = "0"
+            }
+            
+            if let dateTimeOriginal = exifData?.dateTimeOriginal,
+               let offsetTimeOriginal = exifData?.offsetTimeOriginal,
+               let date = CommonUtils.convertToDate(dateTime: dateTimeOriginal, timeZone: offsetTimeOriginal) {
+                self.dateTime = CommonUtils.getTimestamp(date: date)
+            } else {
+                self.dateTime = CommonUtils.getCurrentTimestamp()
+            }
         }
     }
+    
 }

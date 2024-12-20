@@ -36,7 +36,7 @@ struct EditPhotoPage: View {
                     ProgressView()
                         .frame(width: geometry.size.width, height: geometry.size.height)
                 case .success(let image):
-                    EditPhotoDisplayView(geometry: geometry, image: image)
+                    EditPhotoDisplayView(geometry: geometry, image: image, watermark: viewModel.watermarkImage)
                 }
             }
             .frame(maxHeight: .infinity) // 占据剩余空间
@@ -59,10 +59,10 @@ struct EditPhotoPage: View {
                 HStack{
                     CustomTabButton(iconName: "photo.circle.fill", labelText: "水印开关") {
                         LoggerManager.shared.debug("显示水印按钮点击")
-                        if let uiImage = viewModel.uiImage,
-                           let data = viewModel.watermarkData {
-                            viewModel.imageModification = PhotoUtils.addWhiteAreaToBottom(of: uiImage, data: data)
-                        }
+//                        if let uiImage = viewModel.uiImage,
+//                           let data = viewModel.watermarkData {
+//                            viewModel.imageModification = PhotoUtils.addWhiteAreaToBottom(of: uiImage, data: data)
+//                        }
                     }
                     
                     CustomTabButton(iconName: "circle.tophalf.filled.inverse", labelText: "背景颜色") {
@@ -111,7 +111,10 @@ struct EditPhotoPage: View {
             // 保存按钮
             ToolbarItem {
                 Button {
-                    print("pressed")
+                    LoggerManager.shared.debug("保存按钮点击")
+                    if let uiImage = viewModel.fullImage {
+                        PhotoSaver.with(uiImage: uiImage)
+                    }
                 } label: {
                     Image(systemName: "square.and.arrow.down")
                 }
@@ -131,6 +134,7 @@ struct EditPhotoPage: View {
 struct EditPhotoDisplayView: View {
     let geometry: GeometryProxy
     let image: Image
+    let watermark: Image?
     
     // 控制图片显示的参数
     private static let defaultScale: CGFloat = 0.95 // 初始缩放比例，为1.0时左右填满屏幕
@@ -161,9 +165,17 @@ struct EditPhotoDisplayView: View {
                 image
                     .resizable()
                     .scaledToFit()
-                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .frame(width: geometry.size.width)
                     .listRowInsets(EdgeInsets())
+                
+                if let watermark {
+                    watermark
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: geometry.size.width)
+                }
             }
+            .frame(width: geometry.size.width)
             .scaleEffect(scale) // 缩放
             .offset(offset) // 偏移
             .gesture(
