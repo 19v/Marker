@@ -133,8 +133,9 @@ struct EditPhotoDisplayView: View {
     let image: Image
     
     // 控制图片显示的参数
-    @State private var scale: CGFloat = 1.0 // 控制缩放比例
-    @State private var lastScale: CGFloat = 1.0 // 保存上一次的缩放比例
+    private static let defaultScale: CGFloat = 0.95 // 初始缩放比例，为1.0时左右填满屏幕
+    @State private var scale: CGFloat = defaultScale // 控制缩放比例
+    @State private var lastScale: CGFloat = defaultScale // 保存上一次的缩放比例
     @State private var offset: CGSize = .zero // 偏移量
     @State private var lastOffset: CGSize = .zero // 上一次偏移量
     
