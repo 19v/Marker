@@ -44,7 +44,7 @@ extension Watermark {
             let leftText = NSString(string: data.deviceName)
             let leftTextAttributes: [NSAttributedString.Key: Any] = [
                 .font: UIFont(name: "MiSans-Demibold", size: deviceNameTextSize) ?? UIFont.systemFont(ofSize: deviceNameTextSize, weight: .medium),
-                .foregroundColor: Watermark.Information.deviceName.fontColor
+                .foregroundColor: Watermark.Information.deviceName.getFontColor(backgroundColor: backgroundColor)
             ]
             let leftTextSize = leftText.size(withAttributes: leftTextAttributes)
             leftText.draw(at: CGPoint(
@@ -56,7 +56,7 @@ extension Watermark {
             let rightText = NSString(string: "\(data.focalLenIn35mmFilm)mm  f/\(data.fNumber)  \(data.exposureTime)s  ISO\(data.isoSpeedRatings)") // Example: 35mm  f/2.0  1/88s  ISO400
             let rightTextAttributes: [NSAttributedString.Key: Any] = [
                 .font: UIFont(name: "MiSans-Demibold", size: paramsTextSize) ?? UIFont.systemFont(ofSize: paramsTextSize, weight: .medium),
-                .foregroundColor: Information.shootingParameters.fontColor
+                .foregroundColor: Information.shootingParameters.getFontColor(backgroundColor: backgroundColor)
             ]
             let rightTextSize = rightText.size(withAttributes: rightTextAttributes)
             

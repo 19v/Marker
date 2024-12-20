@@ -68,13 +68,23 @@ extension Watermark {
             }
         }
         
-        // 该信息所使用的字体颜色
-        var fontColor: UIColor {
+        // 该信息所使用的字体颜色，该属性受 BackgroundColor 影响
+        func getFontColor(backgroundColor: BackgroundColor) -> UIColor {
             switch self {
             case .deviceName, .shootingParameters:
-                UIColor.black // 黑色
+                switch backgroundColor {
+                case .white:
+                    UIColor.black
+                case .black:
+                    UIColor.white
+                }
             case .time, .coordinate:
-                UIColor(red: 115/255, green: 115/255, blue: 115/255, alpha: 1) // 浅灰色
+                switch backgroundColor {
+                case .white:
+                    UIColor(red: 115/255, green: 115/255, blue: 115/255, alpha: 1)
+                case .black:
+                    UIColor(red: 127/255, green: 127/255, blue: 127/255, alpha: 1)
+                }
             }
         }
         
