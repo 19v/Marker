@@ -58,22 +58,27 @@ struct EditPhotoPage: View {
                     }
                     
                     CustomTabButton(iconName: "circle.tophalf.filled.inverse", labelText: "背景颜色") {
-                        print("Profile button tapped")
+                        LoggerManager.shared.debug("背景颜色按钮点击")
+                        viewModel.backgroundColor = switch viewModel.backgroundColor {
+                        case .black: .white
+                        case .white: .black
+                        }
                     }
                     
                     CustomTabButton(iconName: "calendar.circle.fill", labelText: "日期时间") {
-                        print("Home button tapped")
+                        LoggerManager.shared.debug("日期时间按钮点击")
                         viewModel.displayTime.toggle()
                     }
                     
                     // 经纬度按钮
                     CustomTabButton(iconName: "location.circle.fill", labelText: "地理位置") {
-                        print("Favorite button tapped")
+                        LoggerManager.shared.debug("地理位置按钮点击")
                         viewModel.displayCoordinate.toggle()
                     }
                     
                     CustomTabButton(iconName: "info.circle.fill", labelText: "照片信息") {
-                        print("Profile button tapped")
+                        LoggerManager.shared.debug("照片信息按钮点击")
+                        isSheetPresented.toggle()
                     }
                 }
                 .frame(height: 44)
@@ -126,7 +131,7 @@ struct EditPhotoPage: View {
 struct EditPhotoDisplayView: View {
     let geometry: GeometryProxy
     let image: Image
-    let watermark: Image?
+    let watermark: UIImage?
     let displayWatermark: Bool
     
     // 控制图片显示的参数
@@ -163,7 +168,7 @@ struct EditPhotoDisplayView: View {
                 
                 if let watermark,
                    displayWatermark {
-                    watermark
+                    Image(uiImage: watermark)
                         .resizable()
                         .scaledToFit()
                         .frame(width: geometry.size.width)

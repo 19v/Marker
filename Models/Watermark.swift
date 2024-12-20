@@ -11,9 +11,13 @@ class Watermark {
         data = Data(exifData: exifData)
     }
     
+    // 基本数据
+    let data: Data
+    
     var style = Style.basic
     
-    let data: Data
+    // 背景色
+    var backgroundColor = BackgroundColor.white
     
 }
 
@@ -90,10 +94,8 @@ extension Watermark {
                     .black
             }
         }
-    }
-    
-    enum HeightRatio {
         
+        var cgColor: CGColor { uiColor.cgColor }
     }
     
 }

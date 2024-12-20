@@ -20,9 +20,23 @@ class PhotoModel: ObservableObject {
     }
     
     @Published var deviceName: String = "" // 自定义设备名（默认样式下左侧的名称）
-    @Published var displayWatermark = true // 显示水印的开关
-    @Published var displayTime = false // 显示时间的开关
-    @Published var displayCoordinate = false // 显示经纬度的开关
+    
+    // 显示水印的开关
+    @Published var displayWatermark = true
+    
+    // 切换背景颜色的按钮
+    @Published var backgroundColor = Watermark.BackgroundColor.white {
+        didSet {
+            watermark?.backgroundColor = backgroundColor
+            refreshWatermarkImage()
+        }
+    }
+    
+    // 显示时间的开关
+    @Published var displayTime = false
+    
+    // 显示经纬度的开关
+    @Published var displayCoordinate = false
     
     func reset() {
         imageSelection = nil
@@ -31,6 +45,7 @@ class PhotoModel: ObservableObject {
     @Published private(set) var imageState: ImageState = .empty /*.success(Image("Example1"))*/  // 注释部分用于Preview使用
     @Published var imageLoaded = false
     
+    // 单张照片适用
     @Published var imageSelection: PhotosPickerItem? = nil {
         didSet {
             if let imageSelection {
@@ -42,17 +57,8 @@ class PhotoModel: ObservableObject {
         }
     }
     
+    // 多张照片适用
     @Published var imagesSelection: [PhotosPickerItem] = []
-    
-    @Published var imageModification: UIImage? = nil {
-        didSet {
-            if let imageModification {
-                imageState = .success(Image(uiImage: imageModification))
-            } else {
-                imageState = .empty
-            }
-        }
-    }
     
     var uiImage: UIImage?
     
@@ -75,20 +81,19 @@ class PhotoModel: ObservableObject {
     // 水印信息，包含样式信息和数据
     var watermark: Watermark? {
         didSet {
-            if let watermark,
-               let uiImage = PhotoUtils.generateWhiteArea(with: watermark) {
-                watermarkImage = Image(uiImage: uiImage)
-            }
+            refreshWatermarkImage()
         }
     }
-    var watermarkImage: Image?/* = Image(uiImage: PhotoUtils.generateWhiteArea(with: Watermark(exifData: ExifData(image: UIImage(named: "Example1")!)))!)*/  // 注释部分用于Preview使用
+    var watermarkImage: UIImage?/* = Image(uiImage: PhotoUtils.generateWhiteArea(with: Watermark(exifData: ExifData(image: UIImage(named: "Example1")!)))!)*/  // 注释部分用于Preview使用
+    func refreshWatermarkImage() {
+        watermarkImage = watermark?.uiImage
+    }
     
     // 将水印和原图拼合起来……
     var fullImage: UIImage? {
         if let uiImage,
-           let watermark,
-           let watermarkUiImage = PhotoUtils.generateWhiteArea(with: watermark) {
-            return PhotoUtils.combine(photo: uiImage, watermark: watermarkUiImage)
+           let watermarkImage {
+            return PhotoUtils.combine(photo: uiImage, watermark: watermarkImage)
         }
         return nil
     }
