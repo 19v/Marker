@@ -27,7 +27,7 @@ extension Watermark {
     
     enum Style {
         case basic     // 仅包含拍摄设备、Logo、照片信息的版本
-        case detailed  // 在 basic 基础上，需要显示日期、经纬度等信息的版本
+        case detailed  // 在 basic 基础上，需要显示日期或经纬度等信息的版本，此时高度也会增加一些
         
         // 按照原始照片高度计算水印区域应该有的高度
         // 比如 4096*3072 的照片，水印区域高度为 3072*0.156=472px，照片总高度即为 4096*3544
