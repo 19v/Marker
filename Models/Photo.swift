@@ -25,9 +25,15 @@ class PhotoModel: ObservableObject {
     @Published var displayWatermark = true
     
     // 切换背景颜色的按钮
-    @Published var backgroundColor = Watermark.BackgroundColor.white {
+    @Published var backgroundColorIndex = 0 {
         didSet {
-            watermark?.backgroundColor = backgroundColor
+            guard let vw = watermark as? BackgroundEditable else {
+                LoggerManager.shared.warning("该协议未遵循协议 BackgroundEditable")
+                return
+            }
+            let colors = vw.enabledBackgroundColors
+            let index = backgroundColorIndex % colors.count
+            vw.setBackgroundColor(newColor: colors[index])
             refreshWatermarkImage()
         }
     }
@@ -58,6 +64,7 @@ class PhotoModel: ObservableObject {
     }
     
     // 多张照片适用
+    // TODO: 这部分我认为应当用一个单独的类去做，单张和多张不宜放在一块
     @Published var imagesSelection: [PhotosPickerItem] = []
     
     var uiImage: UIImage?
@@ -73,7 +80,7 @@ class PhotoModel: ObservableObject {
     var exifData: ExifData? {
         didSet {
             if let exifData {
-                watermark = Watermark(exifData: exifData)
+                watermark = BasicWatermark(exifData: exifData)
             }
         }
     }

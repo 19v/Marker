@@ -57,14 +57,14 @@ struct EditPhotoPage: View {
                         viewModel.displayWatermark.toggle()
                     }
                     
+                    // 背景颜色按钮
                     CustomTabButton(iconName: "circle.tophalf.filled.inverse", labelText: "背景颜色") {
                         LoggerManager.shared.debug("背景颜色按钮点击")
-                        viewModel.backgroundColor = switch viewModel.backgroundColor {
-                        case .black: .white
-                        case .white: .black
-                        }
+                        viewModel.backgroundColorIndex += 1
                     }
+                    .disabled(viewModel.watermark is BackgroundEditable)
                     
+                    // 日期时间按钮
                     CustomTabButton(iconName: "calendar.circle.fill", labelText: "日期时间") {
                         LoggerManager.shared.debug("日期时间按钮点击")
                         viewModel.displayTime.toggle()
