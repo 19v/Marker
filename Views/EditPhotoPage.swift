@@ -37,8 +37,8 @@ struct EditPhotoPage: View {
             .frame(maxHeight: .infinity) // 占据剩余空间
             .background(
                 colorScheme == .light
-                ? Color(hex: "#F2F3F5")
-                : Color(hex: "#101010")
+                ? Color(hex: 0xF2F3F5)
+                : Color(hex: 0x101010)
             )
             
             VStack {

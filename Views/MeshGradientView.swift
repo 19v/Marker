@@ -8,15 +8,15 @@ struct MeshGradientView: View {
         switch colorScheme {
         case .light:
             [
-                .init(hex: "#ffffff"), .init(hex: "#f2f9fd"), .init(hex: "#e5f3fb"),
-                .init(hex: "#d8edf9"), .init(hex: "#cbe7f8"), .init(hex: "#bee1f6"),
-                .init(hex: "#b1dbf4"), .init(hex: "#a4d5f2"), .init(hex: "#97cff0"),
+                .init(hexString: "#ffffff"), .init(hexString: "#f2f9fd"), .init(hexString: "#e5f3fb"),
+                .init(hexString: "#d8edf9"), .init(hexString: "#cbe7f8"), .init(hexString: "#bee1f6"),
+                .init(hexString: "#b1dbf4"), .init(hexString: "#a4d5f2"), .init(hexString: "#97cff0"),
             ]
         case .dark:
             [
-                .init(hex: "#41b2d9"), .init(hex: "#3ba4cb"), .init(hex: "#3595be"),
-                .init(hex: "#2f87b0"), .init(hex: "#2a79a2"), .init(hex: "#246a94"),
-                .init(hex: "#1e5c87"), .init(hex: "#184d79"), .init(hex: "#123f6b"),
+                .init(hexString: "#41b2d9"), .init(hexString: "#3ba4cb"), .init(hexString: "#3595be"),
+                .init(hexString: "#2f87b0"), .init(hexString: "#2a79a2"), .init(hexString: "#246a94"),
+                .init(hexString: "#1e5c87"), .init(hexString: "#184d79"), .init(hexString: "#123f6b"),
             ]
         @unknown default:
             [

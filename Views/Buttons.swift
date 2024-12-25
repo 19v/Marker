@@ -24,7 +24,7 @@ struct ColorChangedButton: View {
 //                    .font(.system(size: 10))
             }
             .padding()
-            .background(Capsule().fill(isPressed ? Color.blue : Color(hex: "#404040"))) // 胶囊形背景
+            .background(Capsule().fill(isPressed ? Color.blue : Color(hexString: "#404040"))) // 胶囊形背景
             .shadow(radius: 1) // 添加阴影效果（可选）
         }
     }
@@ -51,7 +51,7 @@ struct ContentChangedButton: View {
                     .bold()
             }
             .padding()
-            .background(Capsule().fill(Color(hex: "#404040")))
+            .background(Capsule().fill(Color(hexString: "#404040")))
             .shadow(radius: 1) // 添加阴影效果（可选）
         }
     }
@@ -137,7 +137,7 @@ struct CapsuleButton: View {
     var action: () -> Void
     
 //    let titleColor = Color.white
-    let titleColor = Color(hex: "333333")
+    let titleColor = Color(hexString: "333333")
     
 //    let backgroundColor = Color.blue
     let backgroundColor = Color.clear
@@ -151,7 +151,7 @@ struct CapsuleButton: View {
     struct Style: View {
         var icon: String
         var title: String
-        var titleColor = Color(hex: "333333")
+        var titleColor = Color(hexString: "333333")
         var backgroundColor = Color.clear
 
         var body: some View {
@@ -173,7 +173,7 @@ struct CapsuleButton: View {
             .frame(height: 58)
 //            .background(Capsule().fill(backgroundColor))
             .background(
-                Color(hex: "#FFFFFF")
+                Color(hexString: "#FFFFFF")
                     .opacity(0.55)
                     .background(.ultraThinMaterial) // 添加模糊效果
                     .cornerRadius(0)

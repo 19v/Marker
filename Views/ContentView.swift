@@ -20,7 +20,7 @@ struct ContentView: View {
                         Text("创建带有水印的照片")
                             .font(.subheadline)
                             .foregroundStyle(
-                                colorScheme == .light ? Color(hex: "#101010") : Color(hex: "#E2E3E5")
+                                colorScheme == .light ? Color(hex: 0x101010) : Color(hex: 0xE2E3E5)
                             )
                     }
                     .padding(.top, CommonUtils.safeTopInset + 10)

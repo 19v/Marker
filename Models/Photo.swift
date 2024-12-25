@@ -31,9 +31,7 @@ class PhotoModel: ObservableObject {
                 LoggerManager.shared.warning("未遵循协议 BackgroundEditable")
                 return
             }
-            let colors = vw.enabledBackgroundColors
-            let index = backgroundColorIndex % colors.count
-            vw.setBackgroundColor(newColor: colors[index])
+            vw.backgroundColorIndex += 1
             refreshWatermarkImage()
         }
     }

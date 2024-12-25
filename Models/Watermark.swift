@@ -22,7 +22,7 @@ protocol InfoDisplayable {
 
 protocol BackgroundEditable: AnyObject {
     var enabledBackgroundColors: [BackgroundColor] { get } // 该方法返回允许设置的颜色
-    func setBackgroundColor(newColor: BackgroundColor)
+    var backgroundColorIndex: Int { get set }
 }
 
 protocol HeightEditable: AnyObject {
@@ -43,13 +43,25 @@ protocol CoordinateEditable: AnyObject {
 enum Orientation {
     case horizontal
     case vertical
+    
+    init(rawValue: Int) {
+        let orientation = UIImage.Orientation(rawValue: rawValue) ?? .up
+        switch orientation {
+        case .up, .down, .left, .right:
+            self = .horizontal
+        case .upMirrored, .downMirrored, .leftMirrored, .rightMirrored:
+            self = .vertical
+        @unknown default:
+            self = .horizontal
+        }
+    }
 }
 
 enum BackgroundColor {
     case white
     case black
     case blue
-    case custom(String)
+    case custom(Int)
     
     var cgColor: CGColor { uiColor.cgColor }
     var uiColor: UIColor {
@@ -57,19 +69,59 @@ enum BackgroundColor {
         case .white: .white
         case .black: .black
         case .blue: .blue
-        case .custom(let hex): .init(Color(hex: hex))
+        case .custom(let hex): .init(hex: hex)
         }
+    }
+}
+
+enum ForegroundColor {
+    case black
+    case white
+    case custom(Int)
+    
+    var cgColor: CGColor { uiColor.cgColor }
+    var uiColor: UIColor {
+        switch self {
+        case .black: .black
+        case .white: .white
+        case .custom(let hex): .init(hex: hex)
+        }
+    }
+}
+
+@propertyWrapper
+struct ClampedModulo {
+    private var value: Int
+    private let maxValue: Int
+    
+    var wrappedValue: Int {
+        get { value }
+        set { value = newValue % maxValue }
+    }
+    
+    init(wrappedValue: Int, maxValue: Int) {
+        self.value = wrappedValue % maxValue
+        self.maxValue = maxValue
     }
 }
 
 final class DisplayItem {
     // 原始值
-    let rawValue: String
+    private let rawValue: String
     // 当用户设定自定义参数后为true
     var isCustomized: Bool { !customValue.isEmpty }
     // 用户自定义的参数
     var customValue: String = ""
+    // 颜色
+    private let foregroundColors: [ForegroundColor]
+    func foregroundColor(index: Int) -> UIColor {
+        let index = index % foregroundColors.count
+        return foregroundColors[index].uiColor
+    }
     
-    init(value: String) { rawValue = value }
+    init(value: String, colors: [ForegroundColor]) {
+        rawValue = value
+        foregroundColors = colors
+    }
     var value: String { isCustomized ? customValue : rawValue }
 }

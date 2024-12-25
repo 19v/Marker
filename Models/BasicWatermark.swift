@@ -17,98 +17,99 @@ import UIKit
 class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, TimeEditable, CoordinateEditable {
     
     // 需要显示的信息
-    var deviceName: String = ""          // 设备名称，通常在左侧
-    var shootingTime: String = ""        // 拍摄时间
-    var shootingParameters: String = ""  // 拍摄参数
-    var coordinate: String = ""          // 经纬度信息
+    var deviceName: DisplayItem         // 设备名称，通常在左侧
+    var shootingTime: DisplayItem       // 拍摄时间
+    var shootingParameters: DisplayItem // 拍摄参数
+    var coordinate: DisplayItem         // 经纬度信息
     
     // 图片方向，该属性决定了水印的默认使用宽度
     var orientation: Orientation = .horizontal
-    var defaultWidth: CGFloat {
-        switch orientation {
-        case .horizontal: 4096
-        case .vertical: 3072
-        }
-    }
-    var defaultHeight: CGFloat {
-        if displayTime || displayCoordinate {
-            472
-        } else {
-            393
-        }
-    }
     
     // 初始化
     required init(exifData: ExifData?) {
         // 设备名
-        deviceName = if let model = exifData?.model {
-            model
-        } else {
-            UIDevice.current.name // 默认使用当前设备名称
-        }
+        deviceName = DisplayItem(
+            value: exifData?.model ?? UIDevice.current.name, // 默认使用当前设备名称
+            colors: foregroundColors1
+        )
         
         // 拍摄时间
-        shootingTime = if let dateTimeOriginal = exifData?.dateTimeOriginal,
-           let offsetTimeOriginal = exifData?.offsetTimeOriginal,
-           let date = CommonUtils.convertToDate(dateTime: dateTimeOriginal, timeZone: offsetTimeOriginal) {
-            CommonUtils.getTimestamp(date: date)
-        } else {
-            CommonUtils.getCurrentTimestamp()
-        }
+        shootingTime = DisplayItem(
+            value: { () -> String in
+                if let dateTimeOriginal = exifData?.dateTimeOriginal,
+                   let offsetTimeOriginal = exifData?.offsetTimeOriginal,
+                   let date = CommonUtils.convertToDate(dateTime: dateTimeOriginal, timeZone: offsetTimeOriginal) {
+                    CommonUtils.getTimestamp(date: date)
+                } else {
+                    CommonUtils.getCurrentTimestamp()
+                }
+            }(),
+            colors: foregroundColors2
+        )
         
-        // 光圈值
-        let fNumber = if let fNum = exifData?.fNumber {
-            String(format: "%.1f", fNum)
-        } else {
-            "0"
-        }
-        // 35mm胶片的等效焦距
-        let focalLenIn35mmFilm = if let focalLenIn35mmFilm = exifData?.focalLenIn35mmFilm {
-            String(focalLenIn35mmFilm)
-        } else {
-            "0"
-        }
-        // 曝光时间
-        let exposureTime = if let exposureTime = exifData?.exposureTime {
-            "1/\(CommonUtils.decimalToFractionDenominator(decimal: exposureTime))"
-        } else {
-            "1/1"
-        }
-        // 感光度
-        let isoSpeedRatings = if let v = exifData?.isoSpeedRatings?.first,
-                                 let v {
-            String(v)
-        } else {
-            "0"
-        }
         // 拍摄参数
         // Example: `35mm  f/2.0  1/88s  ISO400`
-        shootingParameters = "\(focalLenIn35mmFilm)mm  f/\(fNumber)  \(exposureTime)s  ISO\(isoSpeedRatings)"
+        shootingParameters = DisplayItem(
+            value: { () -> String in
+                // 光圈值
+                let fNumber = if let fNum = exifData?.fNumber {
+                    String(format: "%.1f", fNum)
+                } else {
+                    "0"
+                }
+                // 35mm胶片的等效焦距
+                let focalLenIn35mmFilm = if let focalLenIn35mmFilm = exifData?.focalLenIn35mmFilm {
+                    String(focalLenIn35mmFilm)
+                } else {
+                    "0"
+                }
+                // 曝光时间
+                let exposureTime = if let exposureTime = exifData?.exposureTime {
+                    "1/\(CommonUtils.decimalToFractionDenominator(decimal: exposureTime))"
+                } else {
+                    "1/1"
+                }
+                // 感光度
+                let isoSpeedRatings = if let v = exifData?.isoSpeedRatings?.first,
+                                         let v {
+                    String(v)
+                } else {
+                    "0"
+                }
+                return "\(focalLenIn35mmFilm)mm  f/\(fNumber)  \(exposureTime)s  ISO\(isoSpeedRatings)"
+            }(),
+            colors: foregroundColors1
+        )
+         
         
         // 位置信息
         // Example: `31°58'19.92"N  118°45'24.93"E` (latitude & longitude)
-        coordinate = if let latitude = exifData?.latitude,
-                        let longitude = exifData?.longitude {
-            "\(latitude)  \(longitude)"
-        } else {
-            "未能获取到位置信息"
-        }
+        coordinate = DisplayItem(
+            value: { () -> String in
+                if let latitude = exifData?.latitude,
+                                let longitude = exifData?.longitude {
+                    "\(latitude)  \(longitude)"
+                } else {
+                    "未能获取到位置信息"
+                }
+            }(),
+            colors: foregroundColors2
+        )
         
         // 照片方向
         // 参考：https://jdhao.github.io/2019/07/31/image_rotation_exif_info/
-        orientation = switch exifData?.orientation {
-        case 1,2,3,4: .horizontal
-        case 5,6,7,8: .vertical
-        default: .horizontal
-        }
+        // 默认视作横向
+        orientation = Orientation(rawValue: exifData?.orientation ?? UIImage.Orientation.up.rawValue)
     }
     
     // 背景色
-    var backgroundColor = BackgroundColor.white
     let enabledBackgroundColors: [BackgroundColor] = [.white, .black]
-    func setBackgroundColor(newColor: BackgroundColor) {
-        self.backgroundColor = newColor
-    }
+    @ClampedModulo(maxValue: 2) var backgroundColorIndex: Int = 0
+    private var backgroundColor: UIColor { enabledBackgroundColors[backgroundColorIndex].uiColor }
+    
+    // 字体颜色，需要与背景色配套
+    private let foregroundColors1: [ForegroundColor] = [.black, .white]
+    private let foregroundColors2: [ForegroundColor] = [.custom(0x737373), .custom(0x7F7F7F)]
     
     // 控制显示元素的开关
     var displayTime = false          // 显示时间的开关
@@ -190,6 +191,21 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
             basicVersion
         }
     }
+
+    private var defaultWidth: CGFloat {
+        switch orientation {
+        case .horizontal: 4096
+        case .vertical: 3072
+        }
+    }
+    
+    private var defaultHeight: CGFloat {
+        if displayTime || displayCoordinate {
+            472
+        } else {
+            393
+        }
+    }
     
     private var basicVersion: UIImage? {
         let defaultWidth = defaultWidth
@@ -218,15 +234,15 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
         let size = CGSize(width: defaultWidth, height: defaultHeight)
         let renderer = UIGraphicsImageRenderer(size: size)
         return renderer.image { context in
-            // 绘制底部白色区域
+            // 绘制背景
             context.cgContext.setFillColor(backgroundColor.cgColor)
             context.cgContext.fill(CGRect(x: 0, y: 0, width: defaultWidth, height: defaultHeight))
             
             // 绘制左侧信息
-            let leftText = NSString(string: deviceName)
+            let leftText = NSString(string: deviceName.value)
             let leftTextAttributes: [NSAttributedString.Key: Any] = [
                 .font: UIFont(name: InputFonts.miSansDemibold.rawValue, size: deviceNameTextSize) ?? UIFont.systemFont(ofSize: deviceNameTextSize, weight: .medium),
-                .foregroundColor: BasicWatermark.Information.deviceName.getFontColor(backgroundColor: backgroundColor)
+                .foregroundColor: deviceName.foregroundColor(index: backgroundColorIndex)
             ]
             let leftTextSize = leftText.size(withAttributes: leftTextAttributes)
             leftText.draw(at: CGPoint(
@@ -235,17 +251,17 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
             ), withAttributes: leftTextAttributes)
             
             // 绘制右侧信息
-            let rightText = NSString(string: shootingParameters)
+            let rightText = NSString(string: shootingParameters.value)
             let rightTextAttributes: [NSAttributedString.Key: Any] = [
                 .font: UIFont(name: InputFonts.miSansDemibold.rawValue, size: paramsTextSize) ?? UIFont.systemFont(ofSize: paramsTextSize, weight: .medium),
-                .foregroundColor: Information.shootingParameters.getFontColor(backgroundColor: backgroundColor)
+                .foregroundColor: shootingParameters.foregroundColor(index: backgroundColorIndex)
             ]
             let rightTextSize = rightText.size(withAttributes: rightTextAttributes)
             
             let iconText = NSString("")
             let iconTextAttributes: [NSAttributedString.Key: Any] = [
                 .font: UIFont.systemFont(ofSize: iconHeight),
-                .foregroundColor: UIColor.black
+                .foregroundColor: foregroundColors1[backgroundColorIndex].uiColor // TODO: 这个颜色暂时和文字用一个颜色，后面再改
             ]
             let iconTextSize = iconText.size(withAttributes: iconTextAttributes)
             
@@ -301,15 +317,15 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
         let size = CGSize(width: defaultWidth, height: defaultHeight)
         let renderer = UIGraphicsImageRenderer(size: size)
         return renderer.image { context in
-            // 绘制底部白色区域
+            // 绘制背景
             context.cgContext.setFillColor(backgroundColor.cgColor)
             context.cgContext.fill(CGRect(x: 0, y: 0, width: defaultWidth, height: defaultHeight))
             
             // 绘制左侧信息
-            let leftText = NSString(string: deviceName)
+            let leftText = NSString(string: deviceName.value)
             let leftTextAttributes: [NSAttributedString.Key: Any] = [
                 .font: UIFont(name: InputFonts.miSansDemibold.rawValue, size: deviceNameTextSize) ?? UIFont.systemFont(ofSize: deviceNameTextSize, weight: .medium),
-                .foregroundColor: BasicWatermark.Information.deviceName.getFontColor(backgroundColor: backgroundColor)
+                .foregroundColor: deviceName.foregroundColor(index: backgroundColorIndex)
             ]
             let leftTextSize = leftText.size(withAttributes: leftTextAttributes)
             leftText.draw(at: CGPoint(
@@ -318,17 +334,17 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
             ), withAttributes: leftTextAttributes)
             
             // 绘制右侧信息
-            let rightText = NSString(string: shootingParameters)
+            let rightText = NSString(string: shootingParameters.value)
             let rightTextAttributes: [NSAttributedString.Key: Any] = [
                 .font: UIFont(name: InputFonts.miSansDemibold.rawValue, size: paramsTextSize) ?? UIFont.systemFont(ofSize: paramsTextSize, weight: .medium),
-                .foregroundColor: Information.shootingParameters.getFontColor(backgroundColor: backgroundColor)
+                .foregroundColor: shootingParameters.foregroundColor(index: backgroundColorIndex)
             ]
             let rightTextSize = rightText.size(withAttributes: rightTextAttributes)
             
             let iconText = NSString("")
             let iconTextAttributes: [NSAttributedString.Key: Any] = [
                 .font: UIFont.systemFont(ofSize: iconHeight),
-                .foregroundColor: UIColor.black
+                .foregroundColor: foregroundColors1[backgroundColorIndex].uiColor // TODO: 这个颜色暂时和文字用一个颜色，后面再改
             ]
             let iconTextSize = iconText.size(withAttributes: iconTextAttributes)
             

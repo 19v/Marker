@@ -3,21 +3,51 @@ import SwiftUI
 
 extension Color {
     
-    init(hex: String) {
-        let scanner = Scanner(string: hex.trimmingCharacters(in: .whitespacesAndNewlines))
-        scanner.currentIndex = hex.hasPrefix("#") ? hex.index(after: hex.startIndex) : hex.startIndex
+    init(hex: Int, alpha: Double = 1.0) {
+        self.init(
+            .sRGB,
+            red: Double((hex >> 16) & 0xFF) / 255.0,
+            green: Double((hex >> 8) & 0xFF) / 255.0,
+            blue: Double(hex & 0xFF) / 255.0,
+            opacity: alpha
+        )
+    }
+    
+    init(hexString: String, alpha: Double = 1.0) {
+        var hexFormatted = hexString.trimmingCharacters(in: .whitespacesAndNewlines)
+        hexFormatted = hexFormatted.replacingOccurrences(of: "#", with: "")
         
-        var rgbValue: UInt64 = 0
-        scanner.scanHexInt64(&rgbValue)
+        var hexValue: UInt64 = 0
+        Scanner(string: hexFormatted).scanHexInt64(&hexValue)
         
-        let red = Double((rgbValue & 0xFF0000) >> 16) / 255.0
-        let green = Double((rgbValue & 0x00FF00) >> 8) / 255.0
-        let blue = Double(rgbValue & 0x0000FF) / 255.0
-        
-        self.init(red: red, green: green, blue: blue)
+        self.init(hex: Int(hexValue), alpha: alpha)
     }
     
 }
+
+extension UIColor {
+    
+    convenience init(hex: Int, alpha: CGFloat = 1.0) {
+        self.init(
+            red: CGFloat((hex >> 16) & 0xFF) / 255.0,
+            green: CGFloat((hex >> 8) & 0xFF) / 255.0,
+            blue: CGFloat(hex & 0xFF) / 255.0,
+            alpha: alpha
+        )
+    }
+
+    convenience init(hexString: String, alpha: CGFloat = 1.0) {
+        var hexFormatted = hexString.trimmingCharacters(in: .whitespacesAndNewlines)
+        hexFormatted = hexFormatted.replacingOccurrences(of: "#", with: "")
+
+        var hexValue: UInt64 = 0
+        Scanner(string: hexFormatted).scanHexInt64(&hexValue)
+
+        self.init(hex: Int(hexValue), alpha: alpha)
+    }
+    
+}
+
 
 class GradientColorsGenerater {
     
