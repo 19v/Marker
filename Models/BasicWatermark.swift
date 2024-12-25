@@ -241,7 +241,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
             // 绘制左侧信息
             let leftText = NSString(string: deviceName.value)
             let leftTextAttributes: [NSAttributedString.Key: Any] = [
-                .font: UIFont(name: InputFonts.miSansDemibold.rawValue, size: deviceNameTextSize) ?? UIFont.systemFont(ofSize: deviceNameTextSize, weight: .medium),
+                .font: InputFonts.miSansDemibold.uiFont(textSize: paramsTextSize),
                 .foregroundColor: deviceName.foregroundColor(index: backgroundColorIndex)
             ]
             let leftTextSize = leftText.size(withAttributes: leftTextAttributes)
@@ -253,7 +253,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
             // 绘制右侧信息
             let rightText = NSString(string: shootingParameters.value)
             let rightTextAttributes: [NSAttributedString.Key: Any] = [
-                .font: UIFont(name: InputFonts.miSansDemibold.rawValue, size: paramsTextSize) ?? UIFont.systemFont(ofSize: paramsTextSize, weight: .medium),
+                .font: InputFonts.miSansDemibold.uiFont(textSize: paramsTextSize),
                 .foregroundColor: shootingParameters.foregroundColor(index: backgroundColorIndex)
             ]
             let rightTextSize = rightText.size(withAttributes: rightTextAttributes)
@@ -324,7 +324,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
             // 绘制左侧信息
             let leftText = NSString(string: deviceName.value)
             let leftTextAttributes: [NSAttributedString.Key: Any] = [
-                .font: UIFont(name: InputFonts.miSansDemibold.rawValue, size: deviceNameTextSize) ?? UIFont.systemFont(ofSize: deviceNameTextSize, weight: .medium),
+                .font: InputFonts.miSansDemibold.uiFont(textSize: paramsTextSize),
                 .foregroundColor: deviceName.foregroundColor(index: backgroundColorIndex)
             ]
             let leftTextSize = leftText.size(withAttributes: leftTextAttributes)
@@ -336,7 +336,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
             // 绘制右侧信息
             let rightText = NSString(string: shootingParameters.value)
             let rightTextAttributes: [NSAttributedString.Key: Any] = [
-                .font: UIFont(name: InputFonts.miSansDemibold.rawValue, size: paramsTextSize) ?? UIFont.systemFont(ofSize: paramsTextSize, weight: .medium),
+                .font: InputFonts.miSansDemibold.uiFont(textSize: paramsTextSize),
                 .foregroundColor: shootingParameters.foregroundColor(index: backgroundColorIndex)
             ]
             let rightTextSize = rightText.size(withAttributes: rightTextAttributes)
