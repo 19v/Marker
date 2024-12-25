@@ -10,7 +10,7 @@ import UIKit
  TODO...
  */
 
-struct BlurBackgroundWatermark: Watermark {
+struct BlurBackgroundWatermark: WatermarkProtocol {
     init(exifData: ExifData?) {}
     var uiImage: UIImage? { nil }
 }

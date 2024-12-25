@@ -14,7 +14,7 @@ import UIKit
  图片缩小水印也等比例缩小
  */
 
-class BasicWatermark: Watermark, BackgroundEditable {
+class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, TimeEditable, CoordinateEditable {
     
     // 需要显示的信息
     var deviceName: String = ""          // 设备名称，通常在左侧
@@ -22,8 +22,21 @@ class BasicWatermark: Watermark, BackgroundEditable {
     var shootingParameters: String = ""  // 拍摄参数
     var coordinate: String = ""          // 经纬度信息
     
-    // 图片方向，该属性决定了水印的宽度
+    // 图片方向，该属性决定了水印的默认使用宽度
     var orientation: Orientation = .horizontal
+    var defaultWidth: CGFloat {
+        switch orientation {
+        case .horizontal: 4096
+        case .vertical: 3072
+        }
+    }
+    var defaultHeight: CGFloat {
+        if displayTime || displayCoordinate {
+            472
+        } else {
+            393
+        }
+    }
     
     // 初始化
     required init(exifData: ExifData?) {
@@ -179,11 +192,8 @@ class BasicWatermark: Watermark, BackgroundEditable {
     }
     
     private var basicVersion: UIImage? {
-        // 默认照片尺寸（横向）：4096*3072
-        // 水印尺寸（带时间或经纬度）：4096 * 472
-        // 水印尺寸（不带时间经纬度）：4096 * 393
-        let defaultWidth: CGFloat = 4096
-        let defaultHeight: CGFloat = 393
+        let defaultWidth = defaultWidth
+        let defaultHeight = defaultHeight
         
         // 在默认尺寸下，左右的边距
         // 以下尺寸全部按照默认尺寸设定
@@ -265,13 +275,86 @@ class BasicWatermark: Watermark, BackgroundEditable {
     }
     
     private var largeVersion: UIImage? {
-        // 默认照片尺寸（横向）：4096*3072
-        // 水印尺寸（带时间或经纬度）：4096 * 472
-        // 水印尺寸（不带时间经纬度）：4096 * 393
-        let defaultWidth: CGFloat = 4096
-        let defaultHeight: CGFloat = 472
+        let defaultWidth = defaultWidth
+        let defaultHeight = defaultHeight
         
-        return nil
+        // 在默认尺寸下，左右的边距
+        // 以下尺寸全部按照默认尺寸设定
+        let leftPadding: CGFloat = 144
+        let rightPadding: CGFloat = 144
+        
+        // 左侧部分信息
+        // 拍摄设备 字体大小
+        let deviceNameTextSize: CGFloat = 66
+        
+        // 右侧部分信息
+        // 图标高度
+        let iconHeight: CGFloat = 165
+        // 分割线尺寸
+        let rightDeliverWidth: CGFloat = 6
+        let rightDeliverHeight: CGFloat = 142
+        // 右边几个参数的间距
+        let rightSpacing: CGFloat = 56
+        // 拍摄参数 文字大小
+        let paramsTextSize: CGFloat = 66
+        
+        let size = CGSize(width: defaultWidth, height: defaultHeight)
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { context in
+            // 绘制底部白色区域
+            context.cgContext.setFillColor(backgroundColor.cgColor)
+            context.cgContext.fill(CGRect(x: 0, y: 0, width: defaultWidth, height: defaultHeight))
+            
+            // 绘制左侧信息
+            let leftText = NSString(string: deviceName)
+            let leftTextAttributes: [NSAttributedString.Key: Any] = [
+                .font: UIFont(name: InputFonts.miSansDemibold.rawValue, size: deviceNameTextSize) ?? UIFont.systemFont(ofSize: deviceNameTextSize, weight: .medium),
+                .foregroundColor: BasicWatermark.Information.deviceName.getFontColor(backgroundColor: backgroundColor)
+            ]
+            let leftTextSize = leftText.size(withAttributes: leftTextAttributes)
+            leftText.draw(at: CGPoint(
+                x: leftPadding,
+                y: (defaultHeight - leftTextSize.height) / 2
+            ), withAttributes: leftTextAttributes)
+            
+            // 绘制右侧信息
+            let rightText = NSString(string: shootingParameters)
+            let rightTextAttributes: [NSAttributedString.Key: Any] = [
+                .font: UIFont(name: InputFonts.miSansDemibold.rawValue, size: paramsTextSize) ?? UIFont.systemFont(ofSize: paramsTextSize, weight: .medium),
+                .foregroundColor: Information.shootingParameters.getFontColor(backgroundColor: backgroundColor)
+            ]
+            let rightTextSize = rightText.size(withAttributes: rightTextAttributes)
+            
+            let iconText = NSString("")
+            let iconTextAttributes: [NSAttributedString.Key: Any] = [
+                .font: UIFont.systemFont(ofSize: iconHeight),
+                .foregroundColor: UIColor.black
+            ]
+            let iconTextSize = iconText.size(withAttributes: iconTextAttributes)
+            
+            let totalRightContentWidth = iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing + rightTextSize.width
+            let rightStartX = defaultWidth - rightPadding - totalRightContentWidth
+            
+            iconText.draw(at: CGPoint(
+                x: rightStartX,
+                y: (defaultHeight - iconTextSize.height) / 2
+            ), withAttributes: iconTextAttributes)
+            
+            // 绘制竖线
+            let verticalLineRect = CGRect(
+                x: rightStartX + iconTextSize.width + rightSpacing,
+                y: (defaultHeight - rightDeliverHeight) / 2,
+                width: rightDeliverWidth,
+                height: rightDeliverHeight
+            )
+            UIColor(red: 204/255, green: 204/255, blue: 204/255, alpha: 1).setFill()
+            context.fill(verticalLineRect)
+            
+            rightText.draw(at: CGPoint(
+                x: rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing,
+                y: (defaultHeight - rightTextSize.height) / 2
+            ), withAttributes: rightTextAttributes)
+        }
     }
     
 }

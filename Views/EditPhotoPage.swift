@@ -62,24 +62,27 @@ struct EditPhotoPage: View {
                         LoggerManager.shared.debug("背景颜色按钮点击")
                         viewModel.backgroundColorIndex += 1
                     }
-                    .disabled(viewModel.watermark is BackgroundEditable)
+                    .disabled(!(viewModel.watermark is BackgroundEditable))
                     
                     // 日期时间按钮
                     CustomTabButton(iconName: "calendar.circle.fill", labelText: "日期时间") {
                         LoggerManager.shared.debug("日期时间按钮点击")
                         viewModel.displayTime.toggle()
                     }
+                    .disabled(!(viewModel.watermark is TimeEditable))
                     
                     // 经纬度按钮
                     CustomTabButton(iconName: "location.circle.fill", labelText: "地理位置") {
                         LoggerManager.shared.debug("地理位置按钮点击")
                         viewModel.displayCoordinate.toggle()
                     }
+                    .disabled(!(viewModel.watermark is CoordinateEditable))
                     
                     CustomTabButton(iconName: "info.circle.fill", labelText: "照片信息") {
                         LoggerManager.shared.debug("照片信息按钮点击")
                         isSheetPresented.toggle()
                     }
+                    .disabled(!(viewModel.watermark is InfoDisplayable))
                 }
                 .frame(height: 44)
                 .padding(.top, 10)

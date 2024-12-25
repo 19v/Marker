@@ -28,7 +28,7 @@ class PhotoModel: ObservableObject {
     @Published var backgroundColorIndex = 0 {
         didSet {
             guard let vw = watermark as? BackgroundEditable else {
-                LoggerManager.shared.warning("该协议未遵循协议 BackgroundEditable")
+                LoggerManager.shared.warning("未遵循协议 BackgroundEditable")
                 return
             }
             let colors = vw.enabledBackgroundColors
@@ -39,7 +39,16 @@ class PhotoModel: ObservableObject {
     }
     
     // 显示时间的开关
-    @Published var displayTime = false
+    @Published var displayTime = false {
+        didSet {
+            guard let vw = watermark as? TimeEditable else {
+                LoggerManager.shared.warning("未遵循协议 TimeEditable")
+                return
+            }
+            vw.displayTime.toggle()
+            refreshWatermarkImage()
+        }
+    }
     
     // 显示经纬度的开关
     @Published var displayCoordinate = false
@@ -86,7 +95,7 @@ class PhotoModel: ObservableObject {
     }
     
     // 水印信息，包含样式信息和数据
-    var watermark: Watermark? {
+    var watermark: WatermarkProtocol? {
         didSet {
             refreshWatermarkImage()
         }
