@@ -49,7 +49,16 @@ class PhotoModel: ObservableObject {
     }
     
     // 显示经纬度的开关
-    @Published var displayCoordinate = false
+    @Published var displayCoordinate = false{
+        didSet {
+            guard let vw = watermark as? CoordinateEditable else {
+                LoggerManager.shared.warning("未遵循协议 CoordinateEditable")
+                return
+            }
+            vw.displayCoordinate.toggle()
+            refreshWatermarkImage()
+        }
+    }
     
     func reset() {
         imageSelection = nil

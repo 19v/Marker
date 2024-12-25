@@ -22,6 +22,23 @@ class PhotoUtils {
         return mergedImage
     }
     
+    static func convertDecimalCoordinateToDMS(latitude: Double, longitude: Double) -> (latitudeDMS: String, longitudeDMS: String) {
+        func dmsString(from decimal: Double, directionPositive: String, directionNegative: String) -> String {
+            let degrees = Int(decimal)
+            let minutesDecimal = abs(decimal - Double(degrees)) * 60
+            let minutes = Int(minutesDecimal)
+            let seconds = (minutesDecimal - Double(minutes)) * 60
+            
+            let direction = decimal >= 0 ? directionPositive : directionNegative
+            return String(format: "%d°%d'%05.2f\"%@", abs(degrees), minutes, seconds, direction)
+        }
+        
+        let latitudeDMS = dmsString(from: latitude, directionPositive: "N", directionNegative: "S")
+        let longitudeDMS = dmsString(from: longitude, directionPositive: "E", directionNegative: "W")
+        
+        return (latitudeDMS, longitudeDMS)
+    }
+    
 }
 
 class PhotoSaver: NSObject {

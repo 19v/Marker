@@ -106,12 +106,17 @@ struct ClampedModulo {
 }
 
 final class DisplayItem {
-    // 原始值
+    // 存储的值
     private let rawValue: String
-    // 当用户设定自定义参数后为true
-    var isCustomized: Bool { !customValue.isEmpty }
+    var value: String { isCustomized ? customValue : rawValue }
+    
     // 用户自定义的参数
     var customValue: String = ""
+    var isCustomized: Bool { !customValue.isEmpty }
+    func clearCustomValue() {
+        customValue.removeAll()
+    }
+    
     // 颜色
     private let foregroundColors: [ForegroundColor]
     func foregroundColor(index: Int) -> UIColor {
@@ -119,9 +124,19 @@ final class DisplayItem {
         return foregroundColors[index].uiColor
     }
     
-    init(value: String, colors: [ForegroundColor]) {
-        rawValue = value
-        foregroundColors = colors
+    // 字体
+    let fontName: InputFont // TODO: 或许后期加入自定义字体功能？
+    let fontSize: CGFloat
+    var uiFont: UIFont { fontName.uiFont(textSize: fontSize) }
+    func getTextAttributes(colorIndex: Int = 0) -> [NSAttributedString.Key: Any] {[
+        .font: uiFont,
+        .foregroundColor: foregroundColor(index: colorIndex)
+    ]}
+    
+    init(value: String, colors: [ForegroundColor], fontName: InputFont, fontSize: CGFloat) {
+        self.rawValue = value
+        self.foregroundColors = colors
+        self.fontName = fontName
+        self.fontSize = fontSize
     }
-    var value: String { isCustomized ? customValue : rawValue }
 }

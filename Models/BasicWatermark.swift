@@ -30,7 +30,9 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
         // 设备名
         deviceName = DisplayItem(
             value: exifData?.model ?? UIDevice.current.name, // 默认使用当前设备名称
-            colors: foregroundColors1
+            colors: foregroundColors1,
+            fontName: .miSansDemibold,
+            fontSize: 87
         )
         
         // 拍摄时间
@@ -44,7 +46,9 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                     CommonUtils.getCurrentTimestamp()
                 }
             }(),
-            colors: foregroundColors2
+            colors: foregroundColors2,
+            fontName: .miSansRegular,
+            fontSize: 66
         )
         
         // 拍摄参数
@@ -78,7 +82,9 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                 }
                 return "\(focalLenIn35mmFilm)mm  f/\(fNumber)  \(exposureTime)s  ISO\(isoSpeedRatings)"
             }(),
-            colors: foregroundColors1
+            colors: foregroundColors1,
+            fontName: .miSansDemibold,
+            fontSize: 92
         )
          
         
@@ -87,13 +93,16 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
         coordinate = DisplayItem(
             value: { () -> String in
                 if let latitude = exifData?.latitude,
-                                let longitude = exifData?.longitude {
-                    "\(latitude)  \(longitude)"
+                   let longitude = exifData?.longitude {
+                    let result = PhotoUtils.convertDecimalCoordinateToDMS(latitude: latitude, longitude: longitude)
+                    return "\(result.latitudeDMS)  \(result.longitudeDMS)"
                 } else {
-                    "未能获取到位置信息"
+                    return "未能获取到位置信息"
                 }
             }(),
-            colors: foregroundColors2
+            colors: foregroundColors2,
+            fontName: .miSansRegular,
+            fontSize: 66
         )
         
         // 照片方向
@@ -111,265 +120,272 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
     private let foregroundColors1: [ForegroundColor] = [.black, .white]
     private let foregroundColors2: [ForegroundColor] = [.custom(0x737373), .custom(0x7F7F7F)]
     
+    // 分割线颜色
+    private let deliverColors: [UIColor] = [.init(hex: 0xCCCCCC), .white]
+    private var deliverColor: UIColor { deliverColors[backgroundColorIndex] }
+    
     // 控制显示元素的开关
     var displayTime = false          // 显示时间的开关
     var displayCoordinate = false    // 显示经纬度的开关
     
-    enum Style {
-        case basic     // 仅包含拍摄设备、Logo、照片信息的版本
-        case detailed  // 在 basic 基础上，需要显示日期或经纬度等信息的版本，此时高度也会增加一些
-        
-        // 按照原始照片高度计算水印区域应该有的高度
-        // 比如 4096*3072 的照片，水印区域高度为 3072*0.156=472px，照片总高度即为 4096*3544
-        var ratio: Double {
-            switch self {
-            case .basic:
-                0.128
-            case .detailed:
-                0.156
-            }
-        }
-        
-        // 返回该样式应显示的页面元素
-        var elements: [Information] {
-            switch self {
-            case .basic:
-                [.deviceName, .shootingParameters]
-            case .detailed:
-                [.deviceName, .time, .shootingParameters, .coordinate]
-            }
-        }
-        
-    }
-    
-    enum Information: CaseIterable {
-        case deviceName          // 设备名称
-        case time                // 时间
-        case shootingParameters  // 拍摄参数
-        case coordinate          // 经纬度
-        
-        // 该信息所使用的字体名称
-        var fontName: String {
-            switch self {
-            case .deviceName, .shootingParameters:
-                InputFonts.miSansDemibold.rawValue
-            case .time, .coordinate:
-                InputFonts.miSansRegular.rawValue
-            }
-        }
-        
-        // 该信息所使用的字体颜色，该属性受 BackgroundColor 影响
-        func getFontColor(backgroundColor: BackgroundColor) -> UIColor {
-            switch self {
-            case .deviceName, .shootingParameters:
-                switch backgroundColor {
-                case .white:
-                    UIColor.black
-                case .black:
-                    UIColor.white
-                default: .black
-                }
-            case .time, .coordinate:
-                switch backgroundColor {
-                case .white:
-                    UIColor(red: 115/255, green: 115/255, blue: 115/255, alpha: 1)
-                case .black:
-                    UIColor(red: 127/255, green: 127/255, blue: 127/255, alpha: 1)
-                default: .black
-                }
-            }
-        }
-        
-        // 在根据 ratio 计算出水印区域高度后
-        // 大部分元素的尺寸都根据水印区域高度来决定（乘以比例）
-    }
-    
     var uiImage: UIImage? {
-        if displayTime || displayCoordinate {
-            largeVersion
-        } else {
-            basicVersion
-        }
-    }
-
-    private var defaultWidth: CGFloat {
-        switch orientation {
+        let defaultWidth: CGFloat = switch orientation {
         case .horizontal: 4096
         case .vertical: 3072
         }
-    }
-    
-    private var defaultHeight: CGFloat {
-        if displayTime || displayCoordinate {
-            472
+        let defaultHeight: CGFloat = (displayTime || displayCoordinate) ? 472 : 393
+        let watermarkSize = CGSize(width: defaultWidth, height: defaultHeight)
+        let renderer = UIGraphicsImageRenderer(size: watermarkSize)
+        
+        // NOTE: 以下尺寸全部按照默认尺寸设定
+        
+        // 在默认尺寸下，左右的边距
+        let leftPadding: CGFloat = 144
+        let rightPadding: CGFloat = 144
+        
+        // 双行时，纵向的间距
+        let leftVerticalPadding: CGFloat = 60
+        let rightVerticalPadding: CGFloat = 66
+        
+        // 图标
+        let iconHeight: CGFloat = (displayTime || displayCoordinate) ? 182 : 165
+        let iconText = NSString("")
+        let iconTextAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: iconHeight),
+            .foregroundColor: foregroundColors1[backgroundColorIndex].uiColor // TODO: 这个颜色暂时和文字用一个颜色，后面再改
+        ]
+        let iconTextSize = iconText.size(withAttributes: iconTextAttributes)
+        
+        // 分割线尺寸
+        let rightDeliverWidth: CGFloat = (displayTime || displayCoordinate) ? 5 : 6
+        let rightDeliverHeight: CGFloat = (displayTime || displayCoordinate) ? 178 : 142
+        
+        // 右边图标、分割线和拍摄参数的间距
+        let rightSpacing: CGFloat = (displayTime || displayCoordinate) ? 65 : 56
+        
+        // 开始绘制
+        if displayTime && displayCoordinate {
+            // 时间和经纬度都显示
+            return renderer.image { context in
+                // 绘制背景
+                context.cgContext.setFillColor(backgroundColor.cgColor)
+                context.cgContext.fill(CGRect(x: 0, y: 0, width: defaultWidth, height: defaultHeight))
+                
+                // 绘制左侧信息
+                let deviceNameText = NSString(string: deviceName.value)
+                let deviceNameTextAttributes = deviceName.getTextAttributes(colorIndex: backgroundColorIndex)
+                let deviceNameTextSize = deviceNameText.size(withAttributes: deviceNameTextAttributes)
+                
+                let shootingTimeText = NSString(string: shootingTime.value)
+                let shootingTimeTextAttributes = shootingTime.getTextAttributes(colorIndex: backgroundColorIndex)
+                let shootingTimeTextSize = shootingTimeText.size(withAttributes: shootingTimeTextAttributes)
+                
+                let totalLeftContentHeight = deviceNameTextSize.height + leftVerticalPadding + shootingTimeTextSize.height
+                
+                deviceNameText.draw(at: CGPoint(
+                    x: leftPadding,
+                    y: (defaultHeight - totalLeftContentHeight) / 2
+                ), withAttributes: deviceNameTextAttributes)
+                
+                shootingTimeText.draw(at: CGPoint(
+                    x: leftPadding,
+                    y: (defaultHeight + leftVerticalPadding) / 2
+                ), withAttributes: shootingTimeTextAttributes)
+                
+                // 绘制右侧信息
+                let shootingParametersText = NSString(string: shootingParameters.value)
+                let shootingParametersTextAttributes = shootingParameters.getTextAttributes(colorIndex: backgroundColorIndex)
+                let shootingParametersTextSize = shootingParametersText.size(withAttributes: shootingParametersTextAttributes)
+                
+                let coordinateText = NSString(string: coordinate.value)
+                let coordinateTextAttributes = coordinate.getTextAttributes(colorIndex: backgroundColorIndex)
+                let coordinateTextSize = coordinateText.size(withAttributes: coordinateTextAttributes)
+                
+                let totalRightContentWidth = iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing + max(shootingParametersTextSize.width, coordinateTextSize.width)
+                let totalRightContentHeight = shootingParametersTextSize.height + rightVerticalPadding + coordinateTextSize.height
+                
+                let rightStartX = defaultWidth - rightPadding - totalRightContentWidth
+                
+                iconText.draw(at: CGPoint(
+                    x: rightStartX,
+                    y: (defaultHeight - iconTextSize.height) / 2
+                ), withAttributes: iconTextAttributes)
+                
+                // 绘制分割线
+                deliverColor.setFill()
+                context.fill(CGRect(
+                    x: rightStartX + iconTextSize.width + rightSpacing,
+                    y: (defaultHeight - rightDeliverHeight) / 2,
+                    width: rightDeliverWidth,
+                    height: rightDeliverHeight
+                ))
+                
+                shootingParametersText.draw(at: CGPoint(
+                    x: rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing,
+                    y: (defaultHeight - totalRightContentHeight) / 2
+                ), withAttributes: shootingParametersTextAttributes)
+                
+                coordinateText.draw(at: CGPoint(
+                    x: rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing,
+                    y: (defaultHeight + rightVerticalPadding) / 2
+                ), withAttributes: coordinateTextAttributes)
+            }
+        } else if displayTime && !displayCoordinate {
+            // 只显示时间
+            return renderer.image { context in
+                // 绘制背景
+                context.cgContext.setFillColor(backgroundColor.cgColor)
+                context.cgContext.fill(CGRect(x: 0, y: 0, width: defaultWidth, height: defaultHeight))
+                
+                // 绘制左侧信息
+                let deviceNameText = NSString(string: deviceName.value)
+                let deviceNameTextAttributes = deviceName.getTextAttributes(colorIndex: backgroundColorIndex)
+                let deviceNameTextSize = deviceNameText.size(withAttributes: deviceNameTextAttributes)
+                
+                deviceNameText.draw(at: CGPoint(
+                    x: leftPadding,
+                    y: (defaultHeight - deviceNameTextSize.height) / 2
+                ), withAttributes: deviceNameTextAttributes)
+                
+                // 绘制右侧信息
+                let shootingParametersText = NSString(string: shootingParameters.value)
+                let shootingParametersTextAttributes = shootingParameters.getTextAttributes(colorIndex: backgroundColorIndex)
+                let shootingParametersTextSize = shootingParametersText.size(withAttributes: shootingParametersTextAttributes)
+                
+                let shootingTimeText = NSString(string: shootingTime.value)
+                let shootingTimeTextAttributes = shootingTime.getTextAttributes(colorIndex: backgroundColorIndex)
+                let shootingTimeTextSize = shootingTimeText.size(withAttributes: shootingTimeTextAttributes)
+                
+                let totalRightContentWidth = iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing + max(shootingParametersTextSize.width, shootingTimeTextSize.width)
+                let totalRightContentHeight = shootingParametersTextSize.height + rightVerticalPadding + shootingTimeTextSize.height
+                
+                let rightStartX = defaultWidth - rightPadding - totalRightContentWidth
+                
+                iconText.draw(at: CGPoint(
+                    x: rightStartX,
+                    y: (defaultHeight - iconTextSize.height) / 2
+                ), withAttributes: iconTextAttributes)
+                
+                // 绘制分割线
+                deliverColor.setFill()
+                context.fill(CGRect(
+                    x: rightStartX + iconTextSize.width + rightSpacing,
+                    y: (defaultHeight - rightDeliverHeight) / 2,
+                    width: rightDeliverWidth,
+                    height: rightDeliverHeight
+                ))
+                
+                shootingParametersText.draw(at: CGPoint(
+                    x: rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing,
+                    y: (defaultHeight - totalRightContentHeight) / 2
+                ), withAttributes: shootingParametersTextAttributes)
+                
+                shootingTimeText.draw(at: CGPoint(
+                    x: rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing,
+                    y: (defaultHeight + rightVerticalPadding) / 2
+                ), withAttributes: shootingTimeTextAttributes)
+            }
+        } else if !displayTime && displayCoordinate {
+            // 只显示经纬度
+            return renderer.image { context in
+                // 绘制背景
+                context.cgContext.setFillColor(backgroundColor.cgColor)
+                context.cgContext.fill(CGRect(x: 0, y: 0, width: defaultWidth, height: defaultHeight))
+                
+                // 绘制左侧信息
+                let deviceNameText = NSString(string: deviceName.value)
+                let deviceNameTextAttributes = deviceName.getTextAttributes(colorIndex: backgroundColorIndex)
+                let deviceNameTextSize = deviceNameText.size(withAttributes: deviceNameTextAttributes)
+                
+                deviceNameText.draw(at: CGPoint(
+                    x: leftPadding,
+                    y: (defaultHeight - deviceNameTextSize.height) / 2
+                ), withAttributes: deviceNameTextAttributes)
+                
+                // 绘制右侧信息
+                let shootingParametersText = NSString(string: shootingParameters.value)
+                let shootingParametersTextAttributes = shootingParameters.getTextAttributes(colorIndex: backgroundColorIndex)
+                let shootingParametersTextSize = shootingParametersText.size(withAttributes: shootingParametersTextAttributes)
+                
+                let coordinateText = NSString(string: coordinate.value)
+                let coordinateTextAttributes = coordinate.getTextAttributes(colorIndex: backgroundColorIndex)
+                let coordinateTextSize = coordinateText.size(withAttributes: coordinateTextAttributes)
+                
+                let totalRightContentWidth = iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing + max(shootingParametersTextSize.width, coordinateTextSize.width)
+                let totalRightContentHeight = shootingParametersTextSize.height + rightVerticalPadding + coordinateTextSize.height
+                
+                let rightStartX = defaultWidth - rightPadding - totalRightContentWidth
+                
+                iconText.draw(at: CGPoint(
+                    x: rightStartX,
+                    y: (defaultHeight - iconTextSize.height) / 2
+                ), withAttributes: iconTextAttributes)
+                
+                // 绘制分割线
+                deliverColor.setFill()
+                context.fill(CGRect(
+                    x: rightStartX + iconTextSize.width + rightSpacing,
+                    y: (defaultHeight - rightDeliverHeight) / 2,
+                    width: rightDeliverWidth,
+                    height: rightDeliverHeight
+                ))
+                
+                shootingParametersText.draw(at: CGPoint(
+                    x: rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing,
+                    y: (defaultHeight - totalRightContentHeight) / 2
+                ), withAttributes: shootingParametersTextAttributes)
+                
+                coordinateText.draw(at: CGPoint(
+                    x: rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing,
+                    y: (defaultHeight + rightVerticalPadding) / 2
+                ), withAttributes: coordinateTextAttributes)
+            }
+        } else if !displayTime && !displayCoordinate {
+            // 时间和经纬度都不显示
+            return renderer.image { context in
+                // 绘制背景
+                context.cgContext.setFillColor(backgroundColor.cgColor)
+                context.cgContext.fill(CGRect(x: 0, y: 0, width: defaultWidth, height: defaultHeight))
+                
+                // 绘制左侧信息
+                let deviceNameText = NSString(string: deviceName.value)
+                let deviceNameTextAttributes = deviceName.getTextAttributes(colorIndex: backgroundColorIndex)
+                let deviceNameTextSize = deviceNameText.size(withAttributes: deviceNameTextAttributes)
+                deviceNameText.draw(at: CGPoint(
+                    x: leftPadding,
+                    y: (defaultHeight - deviceNameTextSize.height) / 2
+                ), withAttributes: deviceNameTextAttributes)
+                
+                // 绘制右侧信息
+                let shootingParametersText = NSString(string: shootingParameters.value)
+                let shootingParametersTextAttributes = shootingParameters.getTextAttributes(colorIndex: backgroundColorIndex)
+                let shootingParametersTextSize = shootingParametersText.size(withAttributes: shootingParametersTextAttributes)
+                
+                let totalRightContentWidth = iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing + shootingParametersTextSize.width
+                let rightStartX = defaultWidth - rightPadding - totalRightContentWidth
+                
+                iconText.draw(at: CGPoint(
+                    x: rightStartX,
+                    y: (defaultHeight - iconTextSize.height) / 2
+                ), withAttributes: iconTextAttributes)
+                
+                // 绘制分割线
+                deliverColor.setFill()
+                context.fill(CGRect(
+                    x: rightStartX + iconTextSize.width + rightSpacing,
+                    y: (defaultHeight - rightDeliverHeight) / 2,
+                    width: rightDeliverWidth,
+                    height: rightDeliverHeight
+                ))
+                
+                shootingParametersText.draw(at: CGPoint(
+                    x: rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing,
+                    y: (defaultHeight - shootingParametersTextSize.height) / 2
+                ), withAttributes: shootingParametersTextAttributes)
+            }
         } else {
-            393
-        }
-    }
-    
-    private var basicVersion: UIImage? {
-        let defaultWidth = defaultWidth
-        let defaultHeight = defaultHeight
-        
-        // 在默认尺寸下，左右的边距
-        // 以下尺寸全部按照默认尺寸设定
-        let leftPadding: CGFloat = 144
-        let rightPadding: CGFloat = 144
-        
-        // 左侧部分信息
-        // 拍摄设备 字体大小
-        let deviceNameTextSize: CGFloat = 66
-        
-        // 右侧部分信息
-        // 图标高度
-        let iconHeight: CGFloat = 165
-        // 分割线尺寸
-        let rightDeliverWidth: CGFloat = 6
-        let rightDeliverHeight: CGFloat = 142
-        // 右边几个参数的间距
-        let rightSpacing: CGFloat = 56
-        // 拍摄参数 文字大小
-        let paramsTextSize: CGFloat = 66
-        
-        let size = CGSize(width: defaultWidth, height: defaultHeight)
-        let renderer = UIGraphicsImageRenderer(size: size)
-        return renderer.image { context in
-            // 绘制背景
-            context.cgContext.setFillColor(backgroundColor.cgColor)
-            context.cgContext.fill(CGRect(x: 0, y: 0, width: defaultWidth, height: defaultHeight))
-            
-            // 绘制左侧信息
-            let leftText = NSString(string: deviceName.value)
-            let leftTextAttributes: [NSAttributedString.Key: Any] = [
-                .font: InputFonts.miSansDemibold.uiFont(textSize: paramsTextSize),
-                .foregroundColor: deviceName.foregroundColor(index: backgroundColorIndex)
-            ]
-            let leftTextSize = leftText.size(withAttributes: leftTextAttributes)
-            leftText.draw(at: CGPoint(
-                x: leftPadding,
-                y: (defaultHeight - leftTextSize.height) / 2
-            ), withAttributes: leftTextAttributes)
-            
-            // 绘制右侧信息
-            let rightText = NSString(string: shootingParameters.value)
-            let rightTextAttributes: [NSAttributedString.Key: Any] = [
-                .font: InputFonts.miSansDemibold.uiFont(textSize: paramsTextSize),
-                .foregroundColor: shootingParameters.foregroundColor(index: backgroundColorIndex)
-            ]
-            let rightTextSize = rightText.size(withAttributes: rightTextAttributes)
-            
-            let iconText = NSString("")
-            let iconTextAttributes: [NSAttributedString.Key: Any] = [
-                .font: UIFont.systemFont(ofSize: iconHeight),
-                .foregroundColor: foregroundColors1[backgroundColorIndex].uiColor // TODO: 这个颜色暂时和文字用一个颜色，后面再改
-            ]
-            let iconTextSize = iconText.size(withAttributes: iconTextAttributes)
-            
-            let totalRightContentWidth = iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing + rightTextSize.width
-            let rightStartX = defaultWidth - rightPadding - totalRightContentWidth
-            
-            iconText.draw(at: CGPoint(
-                x: rightStartX,
-                y: (defaultHeight - iconTextSize.height) / 2
-            ), withAttributes: iconTextAttributes)
-            
-            // 绘制竖线
-            let verticalLineRect = CGRect(
-                x: rightStartX + iconTextSize.width + rightSpacing,
-                y: (defaultHeight - rightDeliverHeight) / 2,
-                width: rightDeliverWidth,
-                height: rightDeliverHeight
-            )
-            UIColor(red: 204/255, green: 204/255, blue: 204/255, alpha: 1).setFill()
-            context.fill(verticalLineRect)
-            
-            rightText.draw(at: CGPoint(
-                x: rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing,
-                y: (defaultHeight - rightTextSize.height) / 2
-            ), withAttributes: rightTextAttributes)
-        }
-    }
-    
-    private var largeVersion: UIImage? {
-        let defaultWidth = defaultWidth
-        let defaultHeight = defaultHeight
-        
-        // 在默认尺寸下，左右的边距
-        // 以下尺寸全部按照默认尺寸设定
-        let leftPadding: CGFloat = 144
-        let rightPadding: CGFloat = 144
-        
-        // 左侧部分信息
-        // 拍摄设备 字体大小
-        let deviceNameTextSize: CGFloat = 66
-        
-        // 右侧部分信息
-        // 图标高度
-        let iconHeight: CGFloat = 165
-        // 分割线尺寸
-        let rightDeliverWidth: CGFloat = 6
-        let rightDeliverHeight: CGFloat = 142
-        // 右边几个参数的间距
-        let rightSpacing: CGFloat = 56
-        // 拍摄参数 文字大小
-        let paramsTextSize: CGFloat = 66
-        
-        let size = CGSize(width: defaultWidth, height: defaultHeight)
-        let renderer = UIGraphicsImageRenderer(size: size)
-        return renderer.image { context in
-            // 绘制背景
-            context.cgContext.setFillColor(backgroundColor.cgColor)
-            context.cgContext.fill(CGRect(x: 0, y: 0, width: defaultWidth, height: defaultHeight))
-            
-            // 绘制左侧信息
-            let leftText = NSString(string: deviceName.value)
-            let leftTextAttributes: [NSAttributedString.Key: Any] = [
-                .font: InputFonts.miSansDemibold.uiFont(textSize: paramsTextSize),
-                .foregroundColor: deviceName.foregroundColor(index: backgroundColorIndex)
-            ]
-            let leftTextSize = leftText.size(withAttributes: leftTextAttributes)
-            leftText.draw(at: CGPoint(
-                x: leftPadding,
-                y: (defaultHeight - leftTextSize.height) / 2
-            ), withAttributes: leftTextAttributes)
-            
-            // 绘制右侧信息
-            let rightText = NSString(string: shootingParameters.value)
-            let rightTextAttributes: [NSAttributedString.Key: Any] = [
-                .font: InputFonts.miSansDemibold.uiFont(textSize: paramsTextSize),
-                .foregroundColor: shootingParameters.foregroundColor(index: backgroundColorIndex)
-            ]
-            let rightTextSize = rightText.size(withAttributes: rightTextAttributes)
-            
-            let iconText = NSString("")
-            let iconTextAttributes: [NSAttributedString.Key: Any] = [
-                .font: UIFont.systemFont(ofSize: iconHeight),
-                .foregroundColor: foregroundColors1[backgroundColorIndex].uiColor // TODO: 这个颜色暂时和文字用一个颜色，后面再改
-            ]
-            let iconTextSize = iconText.size(withAttributes: iconTextAttributes)
-            
-            let totalRightContentWidth = iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing + rightTextSize.width
-            let rightStartX = defaultWidth - rightPadding - totalRightContentWidth
-            
-            iconText.draw(at: CGPoint(
-                x: rightStartX,
-                y: (defaultHeight - iconTextSize.height) / 2
-            ), withAttributes: iconTextAttributes)
-            
-            // 绘制竖线
-            let verticalLineRect = CGRect(
-                x: rightStartX + iconTextSize.width + rightSpacing,
-                y: (defaultHeight - rightDeliverHeight) / 2,
-                width: rightDeliverWidth,
-                height: rightDeliverHeight
-            )
-            UIColor(red: 204/255, green: 204/255, blue: 204/255, alpha: 1).setFill()
-            context.fill(verticalLineRect)
-            
-            rightText.draw(at: CGPoint(
-                x: rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing,
-                y: (defaultHeight - rightTextSize.height) / 2
-            ), withAttributes: rightTextAttributes)
+            LoggerManager.shared.error("参数有误！")
+            return nil
         }
     }
     
