@@ -21,7 +21,7 @@ protocol InfoDisplayable {
 }
 
 protocol BackgroundEditable: AnyObject {
-    var enabledBackgroundColors: [BackgroundColor] { get } // 该方法返回允许设置的颜色
+    var enabledBackgroundColors: [WatermarkColor] { get } // 该方法返回允许设置的颜色
     var backgroundColorIndex: Int { get set }
 }
 
@@ -57,11 +57,7 @@ enum Orientation {
     }
 }
 
-protocol WatermarkColor {
-    var uiColor: UIColor { get }
-}
-
-enum BackgroundColor: WatermarkColor {
+enum WatermarkColor {
     case white
     case black
     case blue
@@ -73,21 +69,6 @@ enum BackgroundColor: WatermarkColor {
         case .white: .white
         case .black: .black
         case .blue: .blue
-        case .custom(let hex): .init(hex: hex)
-        }
-    }
-}
-
-enum ForegroundColor: WatermarkColor {
-    case black
-    case white
-    case custom(Int)
-    
-    var cgColor: CGColor { uiColor.cgColor }
-    var uiColor: UIColor {
-        switch self {
-        case .black: .black
-        case .white: .white
         case .custom(let hex): .init(hex: hex)
         }
     }
@@ -122,7 +103,7 @@ final class DisplayItem {
     }
     
     // 颜色
-    private let foregroundColors: [ForegroundColor]
+    private let foregroundColors: [WatermarkColor]
     func foregroundColor(index: Int) -> UIColor {
         let index = index % foregroundColors.count
         return foregroundColors[index].uiColor
@@ -153,7 +134,7 @@ final class DisplayItem {
         return DrawingParameter(text: text, attributes: textAttributes, size: textSize)
     }
     
-    init(value: String, colors: [ForegroundColor], fontName: InputFont, fontSize: CGFloat) {
+    init(value: String, colors: [WatermarkColor], fontName: InputFont, fontSize: CGFloat) {
         self.rawValue = value
         self.foregroundColors = colors
         self.fontName = fontName

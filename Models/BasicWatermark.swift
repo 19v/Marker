@@ -112,13 +112,13 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
     }
     
     // 背景色
-    let enabledBackgroundColors: [BackgroundColor] = [.white, .black]
+    let enabledBackgroundColors: [WatermarkColor] = [.white, .black]
     @ClampedModulo(maxValue: 2) var backgroundColorIndex: Int = 0
     private var backgroundColor: UIColor { enabledBackgroundColors[backgroundColorIndex].uiColor }
     
     // 字体颜色，需要与背景色配套
-    private let foregroundColors1: [ForegroundColor] = [.black, .white]
-    private let foregroundColors2: [ForegroundColor] = [.custom(0x737373), .custom(0x7F7F7F)]
+    private let foregroundColors1: [WatermarkColor] = [.black, .white]
+    private let foregroundColors2: [WatermarkColor] = [.custom(0x737373), .custom(0x7F7F7F)]
     
     // 分割线颜色
     private let deliverColors: [UIColor] = [.init(hex: 0xCCCCCC), .white]
