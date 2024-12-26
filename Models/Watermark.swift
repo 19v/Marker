@@ -57,7 +57,11 @@ enum Orientation {
     }
 }
 
-enum BackgroundColor {
+protocol WatermarkColor {
+    var uiColor: UIColor { get }
+}
+
+enum BackgroundColor: WatermarkColor {
     case white
     case black
     case blue
@@ -74,7 +78,7 @@ enum BackgroundColor {
     }
 }
 
-enum ForegroundColor {
+enum ForegroundColor: WatermarkColor {
     case black
     case white
     case custom(Int)
@@ -128,10 +132,26 @@ final class DisplayItem {
     let fontName: InputFont // TODO: 或许后期加入自定义字体功能？
     let fontSize: CGFloat
     var uiFont: UIFont { fontName.uiFont(textSize: fontSize) }
-    func getTextAttributes(colorIndex: Int = 0) -> [NSAttributedString.Key: Any] {[
-        .font: uiFont,
-        .foregroundColor: foregroundColor(index: colorIndex)
-    ]}
+    
+    // 获取用于绘图的变量
+    struct DrawingParameter {
+        let text: NSString
+        let attributes: [NSAttributedString.Key: Any]
+        let size: CGSize
+        
+        func draw(x: CGFloat, y: CGFloat) {
+            text.draw(at: CGPoint(x: x, y: y), withAttributes: attributes)
+        }
+    }
+    func getText(colorIndex: Int = 0) -> DrawingParameter {
+        let text = NSString(string: value)
+        let textAttributes: [NSAttributedString.Key: Any] = [
+            .font: uiFont,
+            .foregroundColor: foregroundColor(index: colorIndex)
+        ]
+        let textSize = text.size(withAttributes: textAttributes)
+        return DrawingParameter(text: text, attributes: textAttributes, size: textSize)
+    }
     
     init(value: String, colors: [ForegroundColor], fontName: InputFont, fontSize: CGFloat) {
         self.rawValue = value

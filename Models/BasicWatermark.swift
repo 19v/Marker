@@ -172,46 +172,30 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                 context.cgContext.fill(CGRect(x: 0, y: 0, width: defaultWidth, height: defaultHeight))
                 
                 // 绘制左侧信息
-                let deviceNameText = NSString(string: deviceName.value)
-                let deviceNameTextAttributes = deviceName.getTextAttributes(colorIndex: backgroundColorIndex)
-                let deviceNameTextSize = deviceNameText.size(withAttributes: deviceNameTextAttributes)
+                let deviceName = deviceName.getText()
+                let shootingTime = shootingTime.getText()
                 
-                let shootingTimeText = NSString(string: shootingTime.value)
-                let shootingTimeTextAttributes = shootingTime.getTextAttributes(colorIndex: backgroundColorIndex)
-                let shootingTimeTextSize = shootingTimeText.size(withAttributes: shootingTimeTextAttributes)
+                let totalLeftContentHeight = deviceName.size.height + leftVerticalPadding + shootingTime.size.height
                 
-                let totalLeftContentHeight = deviceNameTextSize.height + leftVerticalPadding + shootingTimeTextSize.height
-                
-                deviceNameText.draw(at: CGPoint(
-                    x: leftPadding,
-                    y: (defaultHeight - totalLeftContentHeight) / 2
-                ), withAttributes: deviceNameTextAttributes)
-                
-                shootingTimeText.draw(at: CGPoint(
-                    x: leftPadding,
-                    y: (defaultHeight + leftVerticalPadding) / 2
-                ), withAttributes: shootingTimeTextAttributes)
+                deviceName.draw(x: leftPadding, y: (defaultHeight - totalLeftContentHeight) / 2)
+                shootingTime.draw(x: leftPadding, y: (defaultHeight + leftVerticalPadding) / 2)
                 
                 // 绘制右侧信息
-                let shootingParametersText = NSString(string: shootingParameters.value)
-                let shootingParametersTextAttributes = shootingParameters.getTextAttributes(colorIndex: backgroundColorIndex)
-                let shootingParametersTextSize = shootingParametersText.size(withAttributes: shootingParametersTextAttributes)
+                let shootingParameters = shootingParameters.getText()
+                let coordinate = coordinate.getText()
                 
-                let coordinateText = NSString(string: coordinate.value)
-                let coordinateTextAttributes = coordinate.getTextAttributes(colorIndex: backgroundColorIndex)
-                let coordinateTextSize = coordinateText.size(withAttributes: coordinateTextAttributes)
-                
-                let totalRightContentWidth = iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing + max(shootingParametersTextSize.width, coordinateTextSize.width)
-                let totalRightContentHeight = shootingParametersTextSize.height + rightVerticalPadding + coordinateTextSize.height
-                
+                let totalRightContentWidth = iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing + max(shootingParameters.size.width, coordinate.size.width)
+                let totalRightContentHeight = shootingParameters.size.height + rightVerticalPadding + coordinate.size.height
                 let rightStartX = defaultWidth - rightPadding - totalRightContentWidth
+                let rightTextStartX = rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing
                 
-                iconText.draw(at: CGPoint(
-                    x: rightStartX,
-                    y: (defaultHeight - iconTextSize.height) / 2
-                ), withAttributes: iconTextAttributes)
+                shootingParameters.draw(x: rightTextStartX, y: (defaultHeight - totalRightContentHeight) / 2)
+                coordinate.draw(x: rightTextStartX, y: (defaultHeight + rightVerticalPadding) / 2)
                 
-                // 绘制分割线
+                // 绘制右侧图标
+                iconText.draw(at: CGPoint(x: rightStartX, y: (defaultHeight - iconTextSize.height) / 2 ), withAttributes: iconTextAttributes)
+                
+                // 绘制右侧分割线
                 deliverColor.setFill()
                 context.fill(CGRect(
                     x: rightStartX + iconTextSize.width + rightSpacing,
@@ -219,16 +203,6 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                     width: rightDeliverWidth,
                     height: rightDeliverHeight
                 ))
-                
-                shootingParametersText.draw(at: CGPoint(
-                    x: rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing,
-                    y: (defaultHeight - totalRightContentHeight) / 2
-                ), withAttributes: shootingParametersTextAttributes)
-                
-                coordinateText.draw(at: CGPoint(
-                    x: rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing,
-                    y: (defaultHeight + rightVerticalPadding) / 2
-                ), withAttributes: coordinateTextAttributes)
             }
         } else if displayTime && !displayCoordinate {
             // 只显示时间
@@ -238,35 +212,25 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                 context.cgContext.fill(CGRect(x: 0, y: 0, width: defaultWidth, height: defaultHeight))
                 
                 // 绘制左侧信息
-                let deviceNameText = NSString(string: deviceName.value)
-                let deviceNameTextAttributes = deviceName.getTextAttributes(colorIndex: backgroundColorIndex)
-                let deviceNameTextSize = deviceNameText.size(withAttributes: deviceNameTextAttributes)
-                
-                deviceNameText.draw(at: CGPoint(
-                    x: leftPadding,
-                    y: (defaultHeight - deviceNameTextSize.height) / 2
-                ), withAttributes: deviceNameTextAttributes)
+                let deviceName = deviceName.getText()
+                deviceName.draw(x: leftPadding, y: (defaultHeight - deviceName.size.height) / 2)
                 
                 // 绘制右侧信息
-                let shootingParametersText = NSString(string: shootingParameters.value)
-                let shootingParametersTextAttributes = shootingParameters.getTextAttributes(colorIndex: backgroundColorIndex)
-                let shootingParametersTextSize = shootingParametersText.size(withAttributes: shootingParametersTextAttributes)
+                let shootingParameters = shootingParameters.getText()
+                let shootingTime = shootingTime.getText()
                 
-                let shootingTimeText = NSString(string: shootingTime.value)
-                let shootingTimeTextAttributes = shootingTime.getTextAttributes(colorIndex: backgroundColorIndex)
-                let shootingTimeTextSize = shootingTimeText.size(withAttributes: shootingTimeTextAttributes)
-                
-                let totalRightContentWidth = iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing + max(shootingParametersTextSize.width, shootingTimeTextSize.width)
-                let totalRightContentHeight = shootingParametersTextSize.height + rightVerticalPadding + shootingTimeTextSize.height
-                
+                let totalRightContentWidth = iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing + max(shootingParameters.size.width, shootingTime.size.width)
+                let totalRightContentHeight = shootingParameters.size.height + rightVerticalPadding + shootingTime.size.height
                 let rightStartX = defaultWidth - rightPadding - totalRightContentWidth
+                let rightTextStartX = rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing
                 
-                iconText.draw(at: CGPoint(
-                    x: rightStartX,
-                    y: (defaultHeight - iconTextSize.height) / 2
-                ), withAttributes: iconTextAttributes)
+                shootingParameters.draw(x: rightTextStartX, y: (defaultHeight - totalRightContentHeight) / 2)
+                shootingTime.draw(x: rightTextStartX, y: (defaultHeight + rightVerticalPadding) / 2)
                 
-                // 绘制分割线
+                // 绘制右侧图标
+                iconText.draw(at: CGPoint(x: rightStartX, y: (defaultHeight - iconTextSize.height) / 2 ), withAttributes: iconTextAttributes)
+                
+                // 绘制右侧分割线
                 deliverColor.setFill()
                 context.fill(CGRect(
                     x: rightStartX + iconTextSize.width + rightSpacing,
@@ -274,16 +238,6 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                     width: rightDeliverWidth,
                     height: rightDeliverHeight
                 ))
-                
-                shootingParametersText.draw(at: CGPoint(
-                    x: rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing,
-                    y: (defaultHeight - totalRightContentHeight) / 2
-                ), withAttributes: shootingParametersTextAttributes)
-                
-                shootingTimeText.draw(at: CGPoint(
-                    x: rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing,
-                    y: (defaultHeight + rightVerticalPadding) / 2
-                ), withAttributes: shootingTimeTextAttributes)
             }
         } else if !displayTime && displayCoordinate {
             // 只显示经纬度
@@ -293,35 +247,25 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                 context.cgContext.fill(CGRect(x: 0, y: 0, width: defaultWidth, height: defaultHeight))
                 
                 // 绘制左侧信息
-                let deviceNameText = NSString(string: deviceName.value)
-                let deviceNameTextAttributes = deviceName.getTextAttributes(colorIndex: backgroundColorIndex)
-                let deviceNameTextSize = deviceNameText.size(withAttributes: deviceNameTextAttributes)
-                
-                deviceNameText.draw(at: CGPoint(
-                    x: leftPadding,
-                    y: (defaultHeight - deviceNameTextSize.height) / 2
-                ), withAttributes: deviceNameTextAttributes)
+                let deviceName = deviceName.getText()
+                deviceName.draw(x: leftPadding, y: (defaultHeight - deviceName.size.height) / 2)
                 
                 // 绘制右侧信息
-                let shootingParametersText = NSString(string: shootingParameters.value)
-                let shootingParametersTextAttributes = shootingParameters.getTextAttributes(colorIndex: backgroundColorIndex)
-                let shootingParametersTextSize = shootingParametersText.size(withAttributes: shootingParametersTextAttributes)
+                let shootingParameters = shootingParameters.getText()
+                let coordinate = coordinate.getText()
                 
-                let coordinateText = NSString(string: coordinate.value)
-                let coordinateTextAttributes = coordinate.getTextAttributes(colorIndex: backgroundColorIndex)
-                let coordinateTextSize = coordinateText.size(withAttributes: coordinateTextAttributes)
-                
-                let totalRightContentWidth = iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing + max(shootingParametersTextSize.width, coordinateTextSize.width)
-                let totalRightContentHeight = shootingParametersTextSize.height + rightVerticalPadding + coordinateTextSize.height
-                
+                let totalRightContentWidth = iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing + max(shootingParameters.size.width, coordinate.size.width)
+                let totalRightContentHeight = shootingParameters.size.height + rightVerticalPadding + coordinate.size.height
                 let rightStartX = defaultWidth - rightPadding - totalRightContentWidth
+                let rightTextStartX = rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing
                 
-                iconText.draw(at: CGPoint(
-                    x: rightStartX,
-                    y: (defaultHeight - iconTextSize.height) / 2
-                ), withAttributes: iconTextAttributes)
+                shootingParameters.draw(x: rightTextStartX, y: (defaultHeight - totalRightContentHeight) / 2)
+                coordinate.draw(x: rightTextStartX, y: (defaultHeight + rightVerticalPadding) / 2)
                 
-                // 绘制分割线
+                // 绘制右侧图标
+                iconText.draw(at: CGPoint(x: rightStartX, y: (defaultHeight - iconTextSize.height) / 2 ), withAttributes: iconTextAttributes)
+                
+                // 绘制右侧分割线
                 deliverColor.setFill()
                 context.fill(CGRect(
                     x: rightStartX + iconTextSize.width + rightSpacing,
@@ -329,16 +273,6 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                     width: rightDeliverWidth,
                     height: rightDeliverHeight
                 ))
-                
-                shootingParametersText.draw(at: CGPoint(
-                    x: rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing,
-                    y: (defaultHeight - totalRightContentHeight) / 2
-                ), withAttributes: shootingParametersTextAttributes)
-                
-                coordinateText.draw(at: CGPoint(
-                    x: rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing,
-                    y: (defaultHeight + rightVerticalPadding) / 2
-                ), withAttributes: coordinateTextAttributes)
             }
         } else if !displayTime && !displayCoordinate {
             // 时间和经纬度都不显示
@@ -348,28 +282,22 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                 context.cgContext.fill(CGRect(x: 0, y: 0, width: defaultWidth, height: defaultHeight))
                 
                 // 绘制左侧信息
-                let deviceNameText = NSString(string: deviceName.value)
-                let deviceNameTextAttributes = deviceName.getTextAttributes(colorIndex: backgroundColorIndex)
-                let deviceNameTextSize = deviceNameText.size(withAttributes: deviceNameTextAttributes)
-                deviceNameText.draw(at: CGPoint(
-                    x: leftPadding,
-                    y: (defaultHeight - deviceNameTextSize.height) / 2
-                ), withAttributes: deviceNameTextAttributes)
+                let deviceName = deviceName.getText()
+                deviceName.draw(x: leftPadding, y: (defaultHeight - deviceName.size.height) / 2)
                 
                 // 绘制右侧信息
-                let shootingParametersText = NSString(string: shootingParameters.value)
-                let shootingParametersTextAttributes = shootingParameters.getTextAttributes(colorIndex: backgroundColorIndex)
-                let shootingParametersTextSize = shootingParametersText.size(withAttributes: shootingParametersTextAttributes)
+                let shootingParameters = shootingParameters.getText()
                 
-                let totalRightContentWidth = iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing + shootingParametersTextSize.width
+                let totalRightContentWidth = iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing + shootingParameters.size.width
                 let rightStartX = defaultWidth - rightPadding - totalRightContentWidth
+                let rightTextStartX = rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing
                 
-                iconText.draw(at: CGPoint(
-                    x: rightStartX,
-                    y: (defaultHeight - iconTextSize.height) / 2
-                ), withAttributes: iconTextAttributes)
+                shootingParameters.draw(x: rightTextStartX, y: (defaultHeight - shootingParameters.size.height) / 2)
                 
-                // 绘制分割线
+                // 绘制右侧图标
+                iconText.draw(at: CGPoint(x: rightStartX, y: (defaultHeight - iconTextSize.height) / 2 ), withAttributes: iconTextAttributes)
+                
+                // 绘制右侧分割线
                 deliverColor.setFill()
                 context.fill(CGRect(
                     x: rightStartX + iconTextSize.width + rightSpacing,
@@ -377,11 +305,6 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                     width: rightDeliverWidth,
                     height: rightDeliverHeight
                 ))
-                
-                shootingParametersText.draw(at: CGPoint(
-                    x: rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing,
-                    y: (defaultHeight - shootingParametersTextSize.height) / 2
-                ), withAttributes: shootingParametersTextAttributes)
             }
         } else {
             LoggerManager.shared.error("参数有误！")
