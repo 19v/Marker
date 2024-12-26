@@ -84,7 +84,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
             }(),
             colors: foregroundColors1,
             fontName: .miSansDemibold,
-            fontSize: 92
+            fontSize: 87
         )
          
         
@@ -106,23 +106,28 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
         )
         
         // 照片方向
-        // 参考：https://jdhao.github.io/2019/07/31/image_rotation_exif_info/
+        // 参考 Founcation 中的 UIImage.imageOrientation 枚举的定义
         // 默认视作横向
         orientation = Orientation(rawValue: exifData?.orientation ?? UIImage.Orientation.up.rawValue)
     }
     
     // 背景色
-    let enabledBackgroundColors: [WatermarkColor] = [.white, .black]
-    @ClampedModulo(maxValue: 2) var backgroundColorIndex: Int = 0
-    private var backgroundColor: UIColor { enabledBackgroundColors[backgroundColorIndex].uiColor }
+    private var backgroundColors = WatermarkColors(colors: [.white, .black])
+    private var backgroundColor: UIColor { backgroundColors.uiColor }
+    func changeColor(withIndex newColorIndex: Int) {
+        WatermarkColors.index = newColorIndex
+    }
+    var enabledBackgroundColors: [WatermarkColor] {
+        backgroundColors.colors
+    }
     
     // 字体颜色，需要与背景色配套
-    private let foregroundColors1: [WatermarkColor] = [.black, .white]
-    private let foregroundColors2: [WatermarkColor] = [.custom(0x737373), .custom(0x7F7F7F)]
+    private var foregroundColors1 = WatermarkColors(colors: [.black, .white])
+    private var foregroundColors2 = WatermarkColors(colors: [.custom(0x737373), .custom(0x7F7F7F)])
     
     // 分割线颜色
-    private let deliverColors: [UIColor] = [.init(hex: 0xCCCCCC), .white]
-    private var deliverColor: UIColor { deliverColors[backgroundColorIndex] }
+    private let deliverColors = WatermarkColors(colors: [.custom(0xCCCCCC), .white])
+    private var deliverColor: UIColor { deliverColors.uiColor }
     
     // 控制显示元素的开关
     var displayTime = false          // 显示时间的开关
@@ -152,7 +157,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
         let iconText = NSString("")
         let iconTextAttributes: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: iconHeight),
-            .foregroundColor: foregroundColors1[backgroundColorIndex].uiColor // TODO: 这个颜色暂时和文字用一个颜色，后面再改
+            .foregroundColor: foregroundColors1.uiColor // TODO: 这个颜色暂时和文字用一个颜色，后面再改
         ]
         let iconTextSize = iconText.size(withAttributes: iconTextAttributes)
         

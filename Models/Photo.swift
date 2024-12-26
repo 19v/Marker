@@ -31,7 +31,7 @@ class PhotoModel: ObservableObject {
                 LoggerManager.shared.warning("未遵循协议 BackgroundEditable")
                 return
             }
-            vw.backgroundColorIndex += 1
+            vw.changeColor(withIndex: backgroundColorIndex)
             refreshWatermarkImage()
         }
     }

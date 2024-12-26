@@ -22,7 +22,7 @@ protocol InfoDisplayable {
 
 protocol BackgroundEditable: AnyObject {
     var enabledBackgroundColors: [WatermarkColor] { get } // 该方法返回允许设置的颜色
-    var backgroundColorIndex: Int { get set }
+    func changeColor(withIndex newColorIndex: Int)
 }
 
 protocol HeightEditable: AnyObject {
@@ -74,19 +74,13 @@ enum WatermarkColor {
     }
 }
 
-@propertyWrapper
-struct ClampedModulo {
-    private var value: Int
-    private let maxValue: Int
+struct WatermarkColors {
+    static var index: Int = 0
     
-    var wrappedValue: Int {
-        get { value }
-        set { value = newValue % maxValue }
-    }
-    
-    init(wrappedValue: Int, maxValue: Int) {
-        self.value = wrappedValue % maxValue
-        self.maxValue = maxValue
+    var colors: [WatermarkColor]
+    var uiColor: UIColor {
+        let index = WatermarkColors.index % colors.count
+        return colors[index].uiColor
     }
 }
 
@@ -103,11 +97,8 @@ final class DisplayItem {
     }
     
     // 颜色
-    private let foregroundColors: [WatermarkColor]
-    func foregroundColor(index: Int) -> UIColor {
-        let index = index % foregroundColors.count
-        return foregroundColors[index].uiColor
-    }
+    private var foregroundColors: WatermarkColors
+    var foregroundColor: UIColor { foregroundColors.uiColor }
     
     // 字体
     let fontName: InputFont // TODO: 或许后期加入自定义字体功能？
@@ -128,13 +119,13 @@ final class DisplayItem {
         let text = NSString(string: value)
         let textAttributes: [NSAttributedString.Key: Any] = [
             .font: uiFont,
-            .foregroundColor: foregroundColor(index: colorIndex)
+            .foregroundColor: foregroundColor
         ]
         let textSize = text.size(withAttributes: textAttributes)
         return DrawingParameter(text: text, attributes: textAttributes, size: textSize)
     }
     
-    init(value: String, colors: [WatermarkColor], fontName: InputFont, fontSize: CGFloat) {
+    init(value: String, colors: WatermarkColors, fontName: InputFont, fontSize: CGFloat) {
         self.rawValue = value
         self.foregroundColors = colors
         self.fontName = fontName
