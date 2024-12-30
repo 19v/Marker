@@ -56,12 +56,14 @@ struct EditPhotoPage: View {
                 
                 Spacer()
                 
-                if viewModel.watermark is BackgroundEditable {
-                    BackgroundColorSelectSubView(isOn: $viewModel.displayBackgroundColorSubview, colors: viewModel.enabledColors, selectedIndex: $viewModel.backgroundColorIndex)
-                }
-                
-                if viewModel.watermark is BackgroundEditable {
-                    TimeEditSubView(isOn: $viewModel.displayTimeEditSubview)
+                ZStack(alignment: .bottom) {
+                    if viewModel.watermark is BackgroundEditable {
+                        BackgroundColorSelectSubView(isOn: $viewModel.displayBackgroundColorSubview, colors: viewModel.enabledColors, selectedIndex: $viewModel.backgroundColorIndex)
+                    }
+                    
+                    if viewModel.watermark is BackgroundEditable {
+                        TimeEditSubView(isOn: $viewModel.displayTimeEditSubview)
+                    }
                 }
                 
                 HStack{
