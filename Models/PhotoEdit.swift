@@ -178,6 +178,7 @@ class PhotoModel: ObservableObject {
     }
     
     // 显示时间的开关
+    @Published var displayTimeEditSubview = false
     @Published var displayTime = false {
         didSet {
             guard let vw = watermark as? TimeEditable else {
