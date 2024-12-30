@@ -25,6 +25,14 @@ class PhotoModel: ObservableObject {
     @Published var displayWatermark = true
     
     // 切换背景颜色的按钮
+    var enabledColors: [Color] {
+        if let vm = watermark as? BackgroundEditable {
+            vm.enabledBackgroundColors.map { $0.color }
+        } else {
+            []
+        }
+    }
+    @Published var displayBackgroundColorSubview = false
     @Published var backgroundColorIndex = 0 {
         didSet {
             guard let vw = watermark as? BackgroundEditable else {
@@ -64,7 +72,7 @@ class PhotoModel: ObservableObject {
         imageSelection = nil
     }
     
-    @Published private(set) var imageState: ImageState = .empty /*.success(Image("Example1"))*/  // 注释部分用于Preview使用
+    @Published private(set) var imageState: ImageState = /*.empty*/ .success(Image("Example1"))  // 注释部分用于Preview使用
     @Published var imageLoaded = false
     
     // 单张照片适用

@@ -32,6 +32,11 @@ struct EditPhotoPage: View {
                         .frame(width: geometry.size.width, height: geometry.size.height)
                 case .success(let image):
                     EditPhotoDisplayView(geometry: geometry, image: image, watermark: viewModel.watermarkImage, displayWatermark: viewModel.displayWatermark)
+                        .shadow(
+                            color: colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.2),
+                            radius: colorScheme == .dark ? 20 : 10,
+                            x: 0, y: 0
+                        )
                 }
             }
             .frame(maxHeight: .infinity) // 占据剩余空间
@@ -41,7 +46,7 @@ struct EditPhotoPage: View {
                 : Color(hex: 0x101010)
             )
             
-            VStack {
+            VStack(spacing: 0) {
                 Rectangle()
                     .fill(colorScheme == .light ? .white : .black)
                     .fill(.bar)
@@ -50,6 +55,10 @@ struct EditPhotoPage: View {
                     .frame(height: CommonUtils.safeTopInset + 44)
                 
                 Spacer()
+                
+                if viewModel.watermark is BackgroundEditable {
+                    BackgroundColorSelectSubView(isOn: $viewModel.displayBackgroundColorSubview, colors: viewModel.enabledColors, selectedIndex: $viewModel.backgroundColorIndex)
+                }
                 
                 HStack{
                     CustomTabButton(iconName: "photo.circle.fill", labelText: "水印开关") {
@@ -60,7 +69,7 @@ struct EditPhotoPage: View {
                     // 背景颜色按钮
                     CustomTabButton(iconName: "circle.tophalf.filled.inverse", labelText: "背景颜色") {
                         LoggerManager.shared.debug("背景颜色按钮点击")
-                        viewModel.backgroundColorIndex += 1
+                        viewModel.displayBackgroundColorSubview.toggle()
                     }
                     .disabled(!(viewModel.watermark is BackgroundEditable))
                     
@@ -138,7 +147,7 @@ struct EditPhotoDisplayView: View {
     let displayWatermark: Bool
     
     // 控制图片显示的参数
-    private static let defaultScale: CGFloat = 0.95 // 初始缩放比例，为1.0时左右填满屏幕
+    private static let defaultScale: CGFloat = 0.9 // 初始缩放比例，为1.0时左右填满屏幕
     @State private var scale: CGFloat = defaultScale // 控制缩放比例
     @State private var lastScale: CGFloat = defaultScale // 保存上一次的缩放比例
     @State private var offset: CGSize = .zero // 偏移量

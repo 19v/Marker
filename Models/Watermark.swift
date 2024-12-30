@@ -72,6 +72,14 @@ enum WatermarkColor {
         case .custom(let hex): .init(hex: hex)
         }
     }
+    var color: Color {
+        switch self {
+        case .white: .white
+        case .black: .black
+        case .blue: .blue
+        case .custom(let hex): .init(hex: hex)
+        }
+    }
 }
 
 struct WatermarkColors {
