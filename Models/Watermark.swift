@@ -31,7 +31,7 @@ protocol HeightEditable: AnyObject {
 }
 
 protocol TimeEditable: AnyObject {
-    var displayTime: Bool { get set }
+    var displayTime: Bool { get set } // 是否显示时间
 }
 
 protocol CoordinateEditable: AnyObject {

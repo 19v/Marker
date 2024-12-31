@@ -13,6 +13,10 @@
 		0532ECA62D192E36003635B3 /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECA52D192E34003635B3 /* Fonts.swift */; };
 		0532ECA82D193A67003635B3 /* BasicWatermark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECA72D193A67003635B3 /* BasicWatermark.swift */; };
 		0532ECAA2D193A6F003635B3 /* BlurBackgroundWatermark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECA92D193A6F003635B3 /* BlurBackgroundWatermark.swift */; };
+		0532ECAE2D23E147003635B3 /* BackgroundColorSelectSubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECAD2D23E138003635B3 /* BackgroundColorSelectSubView.swift */; };
+		0532ECB02D23E16A003635B3 /* TimeEditSubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECAF2D23E169003635B3 /* TimeEditSubView.swift */; };
+		0532ECB22D23E18B003635B3 /* MeshGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECB12D23E189003635B3 /* MeshGradientView.swift */; };
+		0532ECB82D23E32F003635B3 /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECB52D23E1F3003635B3 /* Buttons.swift */; };
 		05576E622CF469C800BE1DDD /* Watermark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05576E612CF469C600BE1DDD /* Watermark.swift */; };
 		05576E642CF46A8200BE1DDD /* ExifData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05576E632CF46A7F00BE1DDD /* ExifData.swift */; };
 		05576E662CF46AEE00BE1DDD /* PhotoUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05576E652CF46AED00BE1DDD /* PhotoUtils.swift */; };
@@ -36,6 +40,10 @@
 		0532ECA52D192E34003635B3 /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
 		0532ECA72D193A67003635B3 /* BasicWatermark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicWatermark.swift; sourceTree = "<group>"; };
 		0532ECA92D193A6F003635B3 /* BlurBackgroundWatermark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurBackgroundWatermark.swift; sourceTree = "<group>"; };
+		0532ECAD2D23E138003635B3 /* BackgroundColorSelectSubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundColorSelectSubView.swift; sourceTree = "<group>"; };
+		0532ECAF2D23E169003635B3 /* TimeEditSubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeEditSubView.swift; sourceTree = "<group>"; };
+		0532ECB12D23E189003635B3 /* MeshGradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshGradientView.swift; sourceTree = "<group>"; };
+		0532ECB52D23E1F3003635B3 /* Buttons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
 		05576E612CF469C600BE1DDD /* Watermark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Watermark.swift; sourceTree = "<group>"; };
 		05576E632CF46A7F00BE1DDD /* ExifData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExifData.swift; sourceTree = "<group>"; };
 		05576E652CF46AED00BE1DDD /* PhotoUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoUtils.swift; sourceTree = "<group>"; };
@@ -73,7 +81,10 @@
 		050186502CEF1AE000EAEA64 = {
 			isa = PBXGroup;
 			children = (
+				0501865C2CEF1AE000EAEA64 /* MarkerApp.swift */,
+				0532ECB32D23E1C4003635B3 /* Pages */,
 				05576E672CF46B8100BE1DDD /* Views */,
+				0532ECB42D23E1E4003635B3 /* Widgets */,
 				05576E602CF469B300BE1DDD /* Utils */,
 				05576E5F2CF468FC00BE1DDD /* Models */,
 				05576E742CF4770600BE1DDD /* Resources */,
@@ -87,6 +98,24 @@
 				050186592CEF1AE000EAEA64 /* Marker.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		0532ECB32D23E1C4003635B3 /* Pages */ = {
+			isa = PBXGroup;
+			children = (
+				0501865E2CEF1AE000EAEA64 /* ContentView.swift */,
+				05AC15032CF71D4700EE8F9A /* EditPhotoPage.swift */,
+				05576E6C2CF46BB100BE1DDD /* SettingsView.swift */,
+			);
+			path = Pages;
+			sourceTree = "<group>";
+		};
+		0532ECB42D23E1E4003635B3 /* Widgets */ = {
+			isa = PBXGroup;
+			children = (
+				0532ECB52D23E1F3003635B3 /* Buttons.swift */,
+			);
+			path = Widgets;
 			sourceTree = "<group>";
 		};
 		05576E5F2CF468FC00BE1DDD /* Models */ = {
@@ -117,10 +146,9 @@
 		05576E672CF46B8100BE1DDD /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				0501865C2CEF1AE000EAEA64 /* MarkerApp.swift */,
-				0501865E2CEF1AE000EAEA64 /* ContentView.swift */,
-				05AC15032CF71D4700EE8F9A /* EditPhotoPage.swift */,
-				05576E6C2CF46BB100BE1DDD /* SettingsView.swift */,
+				0532ECB12D23E189003635B3 /* MeshGradientView.swift */,
+				0532ECAD2D23E138003635B3 /* BackgroundColorSelectSubView.swift */,
+				0532ECAF2D23E169003635B3 /* TimeEditSubView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -215,19 +243,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0532ECB82D23E32F003635B3 /* Buttons.swift in Sources */,
 				0532ECA62D192E36003635B3 /* Fonts.swift in Sources */,
 				05576E712CF46C3800BE1DDD /* Tabs.swift in Sources */,
 				0532ECA82D193A67003635B3 /* BasicWatermark.swift in Sources */,
 				0501865F2CEF1AE000EAEA64 /* ContentView.swift in Sources */,
 				057E41092CEF1B2E0005E859 /* PhotoEdit.swift in Sources */,
+				0532ECAE2D23E147003635B3 /* BackgroundColorSelectSubView.swift in Sources */,
 				0532ECAA2D193A6F003635B3 /* BlurBackgroundWatermark.swift in Sources */,
 				05576E662CF46AEE00BE1DDD /* PhotoUtils.swift in Sources */,
 				057E410B2CEF1B2E0005E859 /* Common.swift in Sources */,
 				05576E6D2CF46BB100BE1DDD /* SettingsView.swift in Sources */,
 				05576E622CF469C800BE1DDD /* Watermark.swift in Sources */,
 				05576E6F2CF46C0900BE1DDD /* Logger.swift in Sources */,
+				0532ECB02D23E16A003635B3 /* TimeEditSubView.swift in Sources */,
 				05AC15042CF71D5000EE8F9A /* EditPhotoPage.swift in Sources */,
 				05BFE9F72D0C2BA000D02F12 /* ColorUtils.swift in Sources */,
+				0532ECB22D23E18B003635B3 /* MeshGradientView.swift in Sources */,
 				0501865D2CEF1AE000EAEA64 /* MarkerApp.swift in Sources */,
 				05576E642CF46A8200BE1DDD /* ExifData.swift in Sources */,
 			);

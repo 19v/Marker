@@ -30,38 +30,6 @@ class CommonUtils {
         return denominator
     }
     
-    // 获取时间戳
-    static func getTimestamp(date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy.MM.dd HH:mm:ss"
-        dateFormatter.timeZone = TimeZone.current
-        return dateFormatter.string(from: date)
-    }
-    static func getCurrentTimestamp() -> String {
-        getTimestamp(date: Date())
-    }
-    
-    // 传入时间和时区的字符串，返回一个 Date 实例
-    // 举例："2024:11:04 15:36:08" & "+09:00"
-    static func convertToDate(dateTime: String, timeZone: String) -> Date? {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy:MM:dd HH:mm:ss"
-        dateFormatter.timeZone = TimeZone(secondsFromGMT: parseTimeZoneOffset(offset: timeZone))
-        return dateFormatter.date(from: dateTime)
-    }
-    
-    // 将 "+09:00" 或 "-08:00" 转为秒偏移量
-    static func parseTimeZoneOffset(offset: String) -> Int {
-        let sign = offset.hasPrefix("-") ? -1 : 1
-        let parts = offset.dropFirst().split(separator: ":").compactMap { Int($0) }
-        if parts.count == 2 {
-            let hours = parts[0]
-            let minutes = parts[1]
-            return sign * (hours * 3600 + minutes * 60)
-        }
-        return 0
-    }
-    
     // 获取所有可用的字体名称
     static func getAllFontName() {
         for familyName in UIFont.familyNames {
@@ -86,4 +54,60 @@ class CommonUtils {
             .first ?? 0
     }
     
+}
+
+extension Date {
+    
+    // 适用于水印显示的时间戳格式
+    var timestamp: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy.MM.dd HH:mm:ss"
+        dateFormatter.timeZone = TimeZone.current
+        return dateFormatter.string(from: self)
+    }
+    
+    // 适用于水印显示的时间戳格式（当前时间）
+    static var currentTimestamp: String {
+        Date().timestamp
+    }
+    
+    /// 根据指定的时间字符串和时区字符串创建 Date 对象
+    /// - Parameters:
+    ///   - dateString: 时间字符串
+    ///   - timeZoneString: 时区字符串
+    /// - Returns: 创建成功的 `Date` 对象，或 `nil` 如果解析失败
+    /// - Example: "2024:11:04 15:36:08" & "+09:00"
+    static func from(dateString: String, timeZoneString: String) -> Date? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy:MM:dd HH:mm:ss"
+        formatter.timeZone = TimeZone.from(offsetString: timeZoneString)
+        return formatter.date(from: dateString)
+    }
+    
+}
+
+extension TimeZone {
+    /// 根据字符串（例如 "+09:00"）创建 `TimeZone`
+    /// - Parameter offsetString: 时区偏移字符串
+    /// - Returns: 对应的 `TimeZone` 对象，或 `nil` 如果解析失败
+    static func from(offsetString: String) -> TimeZone? {
+        // 正则匹配 "+HH:mm" 或 "-HH:mm"
+        let pattern = #"^([+-])(\d{2}):(\d{2})$"#
+        guard let regex = try? NSRegularExpression(pattern: pattern),
+              let match = regex.firstMatch(in: offsetString, range: NSRange(location: 0, length: offsetString.utf16.count)),
+              match.numberOfRanges == 4 else {
+            return nil
+        }
+        
+        // 提取符号、小时和分钟
+        let sign = (offsetString as NSString).substring(with: match.range(at: 1))
+        let hours = (offsetString as NSString).substring(with: match.range(at: 2))
+        let minutes = (offsetString as NSString).substring(with: match.range(at: 3))
+        
+        // 计算总秒数偏移
+        guard let hourValue = Int(hours), let minuteValue = Int(minutes) else { return nil }
+        let totalSeconds = (hourValue * 3600 + minuteValue * 60) * (sign == "+" ? 1 : -1)
+        
+        return TimeZone(secondsFromGMT: totalSeconds)
+    }
 }

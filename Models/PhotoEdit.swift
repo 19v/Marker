@@ -168,10 +168,7 @@ class PhotoModel: ObservableObject {
     @Published var displayBackgroundColorSubview = false
     @Published var backgroundColorIndex = 0 {
         didSet {
-            guard let vw = watermark as? BackgroundEditable else {
-                LoggerManager.shared.warning("未遵循协议 BackgroundEditable")
-                return
-            }
+            guard let vw = watermark as? BackgroundEditable else { return }
             vw.changeColor(withIndex: backgroundColorIndex)
             refreshWatermarkImage()
         }
@@ -181,22 +178,28 @@ class PhotoModel: ObservableObject {
     @Published var displayTimeEditSubview = false
     @Published var displayTime = false {
         didSet {
-            guard let vw = watermark as? TimeEditable else {
-                LoggerManager.shared.warning("未遵循协议 TimeEditable")
-                return
-            }
+            guard let vw = watermark as? TimeEditable else { return }
             vw.displayTime.toggle()
             refreshWatermarkImage()
         }
     }
+//    @Published var customTime: Date {
+//        didSet {
+//            guard let vw = watermark as? TimeEditable else { return }
+//            vw.setCustomTime(customTime)
+//            refreshWatermarkImage()
+//        }
+//    }
+//    func restoreDefaultTime() {
+//        guard let vw = watermark as? TimeEditable else { return }
+//        vw.restoreDefaultTime()
+//        refreshWatermarkImage()
+//    }
     
     // 显示经纬度的开关
     @Published var displayCoordinate = false{
         didSet {
-            guard let vw = watermark as? CoordinateEditable else {
-                LoggerManager.shared.warning("未遵循协议 CoordinateEditable")
-                return
-            }
+            guard let vw = watermark as? CoordinateEditable else { return }
             vw.displayCoordinate.toggle()
             refreshWatermarkImage()
         }

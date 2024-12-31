@@ -36,16 +36,17 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
         )
         
         // 拍摄时间
+        originalTime = { () -> Date in
+            if let dateTimeOriginal = exifData?.dateTimeOriginal,
+               let offsetTimeOriginal = exifData?.offsetTimeOriginal,
+               let date = Date.from(dateString: dateTimeOriginal, timeZoneString: offsetTimeOriginal) {
+                date
+            } else {
+                Date()
+            }
+        }()
         shootingTime = DisplayItem(
-            value: { () -> String in
-                if let dateTimeOriginal = exifData?.dateTimeOriginal,
-                   let offsetTimeOriginal = exifData?.offsetTimeOriginal,
-                   let date = CommonUtils.convertToDate(dateTime: dateTimeOriginal, timeZone: offsetTimeOriginal) {
-                    CommonUtils.getTimestamp(date: date)
-                } else {
-                    CommonUtils.getCurrentTimestamp()
-                }
-            }(),
+            value: originalTime.timestamp,
             colors: foregroundColors2,
             fontName: .miSansRegular,
             fontSize: 66
@@ -126,12 +127,21 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
     private var foregroundColors2 = WatermarkColors(colors: [.custom(0x737373), .custom(0x7F7F7F)])
     
     // 分割线颜色
-    private let deliverColors = WatermarkColors(colors: [.custom(0xCCCCCC), .white])
-    private var deliverColor: UIColor { deliverColors.uiColor }
+    private let dividerColors = WatermarkColors(colors: [.custom(0xCCCCCC), .white])
+    private var dividerColor: UIColor { dividerColors.uiColor }
     
-    // 控制显示元素的开关
-    var displayTime = false          // 显示时间的开关
-    var displayCoordinate = false    // 显示经纬度的开关
+    // 显示时间的开关
+    var displayTime = false
+    private(set) var originalTime: Date
+    func setCustomTime(_ time: Date) {
+        shootingTime.customValue = time.timestamp
+    }
+    func restoreDefaultTime() {
+        shootingTime.clearCustomValue()
+    }
+    
+    // 显示经纬度的开关
+    var displayCoordinate = false
     
     var uiImage: UIImage? {
         let defaultWidth: CGFloat = switch orientation {
@@ -201,7 +211,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                 iconText.draw(at: CGPoint(x: rightStartX, y: (defaultHeight - iconTextSize.height) / 2 ), withAttributes: iconTextAttributes)
                 
                 // 绘制右侧分割线
-                deliverColor.setFill()
+                dividerColor.setFill()
                 context.fill(CGRect(
                     x: rightStartX + iconTextSize.width + rightSpacing,
                     y: (defaultHeight - rightDeliverHeight) / 2,
@@ -236,7 +246,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                 iconText.draw(at: CGPoint(x: rightStartX, y: (defaultHeight - iconTextSize.height) / 2 ), withAttributes: iconTextAttributes)
                 
                 // 绘制右侧分割线
-                deliverColor.setFill()
+                dividerColor.setFill()
                 context.fill(CGRect(
                     x: rightStartX + iconTextSize.width + rightSpacing,
                     y: (defaultHeight - rightDeliverHeight) / 2,
@@ -271,7 +281,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                 iconText.draw(at: CGPoint(x: rightStartX, y: (defaultHeight - iconTextSize.height) / 2 ), withAttributes: iconTextAttributes)
                 
                 // 绘制右侧分割线
-                deliverColor.setFill()
+                dividerColor.setFill()
                 context.fill(CGRect(
                     x: rightStartX + iconTextSize.width + rightSpacing,
                     y: (defaultHeight - rightDeliverHeight) / 2,
@@ -303,7 +313,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                 iconText.draw(at: CGPoint(x: rightStartX, y: (defaultHeight - iconTextSize.height) / 2 ), withAttributes: iconTextAttributes)
                 
                 // 绘制右侧分割线
-                deliverColor.setFill()
+                dividerColor.setFill()
                 context.fill(CGRect(
                     x: rightStartX + iconTextSize.width + rightSpacing,
                     y: (defaultHeight - rightDeliverHeight) / 2,
