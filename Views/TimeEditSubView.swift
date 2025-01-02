@@ -2,8 +2,7 @@ import SwiftUI
 
 struct TimeEditSubView: View {
     @Environment(\.colorScheme) private var colorScheme
-    @Binding var isOn: Bool
-    
+
     @Binding var displayTime: Bool
     
 //    let defaultTime: String
@@ -167,10 +166,6 @@ struct TimeEditSubView: View {
                 .foregroundStyle(colorScheme == .light ? .white : .black)
                 .opacity(0.8)
         )
-        .transition(.opacity)
-        .opacity(isOn ? 1 : 0) // 渐变透明度
-        .offset(y: isOn ? 0 : 20) // 向上的动画
-        .animation(.easeInOut(duration: 0.2), value: isOn) // 动画效果
     }
     
     // 计算每月的天数

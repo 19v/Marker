@@ -8,10 +8,6 @@ struct EditPhotoPage: View {
     
     let onDisappearAction: () -> Void
     
-    // 设置页面 Sheet 的设置
-    @State private var isSheetPresented = false
-    @State private var settingsDetent = PresentationDetent.large
-    
     var body: some View {
         ZStack {
             GeometryReader { geometry in
@@ -31,7 +27,7 @@ struct EditPhotoPage: View {
                     ProgressView()
                         .frame(width: geometry.size.width, height: geometry.size.height)
                 case .success(let image):
-                    EditPhotoDisplayView(geometry: geometry, image: image, watermark: viewModel.watermarkImage, displayWatermark: viewModel.displayWatermark)
+                    EditPhotoDisplayView(geometry: geometry, image: image, watermark: viewModel.watermarkImage, displayWatermark: viewModel.isWatermarkDisplayed)
                         .shadow(
                             color: colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.2),
                             radius: colorScheme == .dark ? 20 : 10,
@@ -46,70 +42,7 @@ struct EditPhotoPage: View {
                 : Color(hex: 0x101010)
             )
             
-            VStack(spacing: 0) {
-                Rectangle()
-                    .fill(colorScheme == .light ? .white : .black)
-                    .fill(.bar)
-                    .foregroundStyle(colorScheme == .light ? .white : .black)
-                    .opacity(0.8)
-                    .frame(height: CommonUtils.safeTopInset + 44)
-                
-                Spacer()
-                
-                ZStack(alignment: .bottom) {
-                    if viewModel.watermark is BackgroundEditable {
-                        BackgroundColorSelectSubView(isOn: $viewModel.displayBackgroundColorSubview, colors: viewModel.enabledColors, selectedIndex: $viewModel.backgroundColorIndex)
-                    }
-                    
-                    if viewModel.watermark is BackgroundEditable {
-                        TimeEditSubView(isOn: $viewModel.isEditTimePanelDisplayed, displayTime: $viewModel.isTimeDisplayed)
-                    }
-                }
-                
-                HStack{
-                    CustomTabButton(iconName: "photo.circle.fill", labelText: "水印开关") {
-                        LoggerManager.shared.debug("显示水印按钮点击")
-                        viewModel.displayWatermark.toggle()
-                    }
-                    
-                    // 背景颜色按钮
-                    CustomTabButton(iconName: "circle.tophalf.filled.inverse", labelText: "背景颜色") {
-                        LoggerManager.shared.debug("背景颜色按钮点击")
-                        viewModel.displayBackgroundColorSubview.toggle()
-                    }
-                    .disabled(!(viewModel.watermark is BackgroundEditable))
-                    
-                    // 日期时间按钮
-                    CustomTabButton(iconName: "calendar.circle.fill", labelText: "日期时间") {
-                        LoggerManager.shared.debug("日期时间按钮点击")
-                        viewModel.isEditTimePanelDisplayed.toggle()
-                    }
-                    .disabled(!(viewModel.watermark is TimeEditable))
-                    
-                    // 经纬度按钮
-                    CustomTabButton(iconName: "location.circle.fill", labelText: "地理位置") {
-                        LoggerManager.shared.debug("地理位置按钮点击")
-                        viewModel.isCoordinateDisplayed.toggle()
-                    }
-                    .disabled(!(viewModel.watermark is CoordinateEditable))
-                    
-                    CustomTabButton(iconName: "info.circle.fill", labelText: "照片信息") {
-                        LoggerManager.shared.debug("照片信息按钮点击")
-                        isSheetPresented.toggle()
-                    }
-                    .disabled(!(viewModel.watermark is InfoDisplayable))
-                }
-                .frame(height: 44)
-                .padding(.top, 10)
-                .padding(.bottom, CommonUtils.safeBottomInset)
-                .padding(.horizontal, 10)
-                .background(
-                    Rectangle()
-                        .fill(.bar)
-                        .foregroundStyle(colorScheme == .light ? .white : .black)
-                        .opacity(0.8)
-                )
-            }
+            EditPhotoToolbarView(viewModel: viewModel)
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {
@@ -119,7 +52,18 @@ struct EditPhotoPage: View {
                     viewModel.imageLoaded.toggle() // 设置为 false 以 pop 页面
                     onDisappearAction()
                 } label: {
-                    Image(systemName: "xmark.circle")
+//                    Image(systemName: "xmark.circle")
+                    Text("取消")
+                        .font(.headline)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(.gray)
+                        .foregroundColor(.white)
+                        .overlay(
+                            Capsule()
+                                .stroke(Color.gray, lineWidth: 2)
+                        )
+                        .clipShape(Capsule())
                 }
             }
             
@@ -131,14 +75,25 @@ struct EditPhotoPage: View {
                         PhotoSaver.with(uiImage: uiImage)
                     }
                 } label: {
-                    Image(systemName: "square.and.arrow.down")
+//                    Image(systemName: "square.and.arrow.down")
+                    Text("保存")
+                        .font(.headline)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(.clear)
+                        .foregroundColor(.blue)
+                        .overlay(
+                            Capsule()
+                                .stroke(Color.blue, lineWidth: 2)
+                        )
+                        .clipShape(Capsule())
                 }
             }
         }
-        .sheet(isPresented: $isSheetPresented) {
-            HalfTransparentSheetView(isSheetPresented: $isSheetPresented, viewModel: viewModel)
+        .sheet(isPresented: $viewModel.isSheetPresented) {
+            HalfTransparentSheetView(isSheetPresented: $viewModel.isSheetPresented, viewModel: viewModel)
                 .presentationBackground(.ultraThinMaterial)
-                .presentationDetents([.fraction(0.2), .medium, .large], selection: $settingsDetent)
+                .presentationDetents([.fraction(0.2), .medium, .large], selection: $viewModel.settingsDetent)
                 .presentationDragIndicator(.visible)
         }
         .onDisappear(perform: onDisappearAction)
@@ -146,105 +101,6 @@ struct EditPhotoPage: View {
     }
 }
 
-struct EditPhotoDisplayView: View {
-    let geometry: GeometryProxy
-    let image: Image
-    let watermark: UIImage?
-    let displayWatermark: Bool
-    
-    // 控制图片显示的参数
-    private static let defaultScale: CGFloat = 0.9 // 初始缩放比例，为1.0时左右填满屏幕
-    @State private var scale: CGFloat = defaultScale // 控制缩放比例
-    @State private var lastScale: CGFloat = defaultScale // 保存上一次的缩放比例
-    @State private var offset: CGSize = .zero // 偏移量
-    @State private var lastOffset: CGSize = .zero // 上一次偏移量
-    
-    var body: some View {
-        ZStack {
-            Color.white
-                .opacity(0)
-                .contentShape(Rectangle())
-                .gesture(
-                    // 双击
-                    TapGesture(count: 2)
-                        .onEnded {
-                            withAnimation {
-                                if offset != .zero {
-                                    offset = .zero
-                                    lastOffset = .zero
-                                }
-                            }
-                        }
-                )
-            
-            VStack(spacing: 0) {
-                image
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: geometry.size.width)
-                    .listRowInsets(EdgeInsets())
-                
-                if let watermark,
-                   displayWatermark {
-                    Image(uiImage: watermark)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: geometry.size.width)
-                }
-            }
-            .frame(width: geometry.size.width)
-            .scaleEffect(scale) // 缩放
-            .offset(offset) // 偏移
-            .gesture(
-                // 双击
-                TapGesture(count: 2)
-                    .onEnded {
-                        withAnimation {
-                            if offset != .zero {
-                                offset = .zero
-                                lastOffset = .zero
-                            } else {
-                                scale = scale == EditPhotoDisplayView.defaultScale ? 2.0 : EditPhotoDisplayView.defaultScale
-                            }
-                        }
-                    }
-            )
-            .gesture(
-                // 拖拽
-                DragGesture()
-                    .onChanged { value in
-                        offset = CGSize(
-                            width: lastOffset.width + value.translation.width,
-                            height: lastOffset.height + value.translation.height
-                        )
-                    }
-                    .onEnded { _ in
-                        lastOffset = offset
-                    }
-                    .simultaneously(
-                        with: MagnificationGesture()
-                            .onChanged { value in
-                                scale = lastScale * value
-                            }
-                            .onEnded { _ in
-                                lastScale = scale
-                            }
-                    )
-            )
-            .gesture(
-                // 双指放大
-                MagnificationGesture()
-                    .onChanged { value in
-                        scale = lastScale * value // 动态更新缩放比例
-                    }
-                    .onEnded { _ in
-                        lastScale = scale // 保存最终缩放比例
-                    }
-            )
-        }
-        .clipped()
-    }
-}
 
 #Preview {
     EditPhotoPage(viewModel: PhotoModel()) {}

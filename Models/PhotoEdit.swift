@@ -131,7 +131,7 @@ class PhotoModel: ObservableObject {
             refreshWatermarkImage()
         }
     }
-    var watermarkImage: UIImage?/* = Image(uiImage: PhotoUtils.generateWhiteArea(with: Watermark(exifData: ExifData(image: UIImage(named: "Example1")!)))!)*/  // 注释部分用于Preview使用
+    var watermarkImage: UIImage?
     func refreshWatermarkImage() {
         watermarkImage = watermark?.uiImage
     }
@@ -152,10 +152,11 @@ class PhotoModel: ObservableObject {
     
     // MARK: - 界面相关
     
-    @Published var deviceName: String = "" // 自定义设备名（默认样式下左侧的名称）
+    // 自定义设备名（默认样式下左侧的名称）
+    @Published var deviceName: String = ""
     
     // 显示水印的开关
-    @Published var displayWatermark = true
+    @Published var isWatermarkDisplayed = true
     
     // 切换背景颜色的按钮
     var enabledColors: [Color] {
@@ -206,4 +207,7 @@ class PhotoModel: ObservableObject {
         }
     }
     
+    // 显示图片信息的开关
+    @Published var isSheetPresented = false
+    @Published var settingsDetent = PresentationDetent.large
 }

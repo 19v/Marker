@@ -17,6 +17,8 @@
 		0532ECB02D23E16A003635B3 /* TimeEditSubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECAF2D23E169003635B3 /* TimeEditSubView.swift */; };
 		0532ECB22D23E18B003635B3 /* MeshGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECB12D23E189003635B3 /* MeshGradientView.swift */; };
 		0532ECB82D23E32F003635B3 /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECB52D23E1F3003635B3 /* Buttons.swift */; };
+		0532ECBA2D269254003635B3 /* EditPhotoDisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECB92D269252003635B3 /* EditPhotoDisplayView.swift */; };
+		0532ECBC2D269291003635B3 /* EditPhotoToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECBB2D26928C003635B3 /* EditPhotoToolbarView.swift */; };
 		05576E622CF469C800BE1DDD /* Watermark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05576E612CF469C600BE1DDD /* Watermark.swift */; };
 		05576E642CF46A8200BE1DDD /* ExifData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05576E632CF46A7F00BE1DDD /* ExifData.swift */; };
 		05576E662CF46AEE00BE1DDD /* PhotoUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05576E652CF46AED00BE1DDD /* PhotoUtils.swift */; };
@@ -44,6 +46,8 @@
 		0532ECAF2D23E169003635B3 /* TimeEditSubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeEditSubView.swift; sourceTree = "<group>"; };
 		0532ECB12D23E189003635B3 /* MeshGradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshGradientView.swift; sourceTree = "<group>"; };
 		0532ECB52D23E1F3003635B3 /* Buttons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
+		0532ECB92D269252003635B3 /* EditPhotoDisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPhotoDisplayView.swift; sourceTree = "<group>"; };
+		0532ECBB2D26928C003635B3 /* EditPhotoToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPhotoToolbarView.swift; sourceTree = "<group>"; };
 		05576E612CF469C600BE1DDD /* Watermark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Watermark.swift; sourceTree = "<group>"; };
 		05576E632CF46A7F00BE1DDD /* ExifData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExifData.swift; sourceTree = "<group>"; };
 		05576E652CF46AED00BE1DDD /* PhotoUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoUtils.swift; sourceTree = "<group>"; };
@@ -147,6 +151,8 @@
 			isa = PBXGroup;
 			children = (
 				0532ECB12D23E189003635B3 /* MeshGradientView.swift */,
+				0532ECB92D269252003635B3 /* EditPhotoDisplayView.swift */,
+				0532ECBB2D26928C003635B3 /* EditPhotoToolbarView.swift */,
 				0532ECAD2D23E138003635B3 /* BackgroundColorSelectSubView.swift */,
 				0532ECAF2D23E169003635B3 /* TimeEditSubView.swift */,
 			);
@@ -261,6 +267,8 @@
 				05BFE9F72D0C2BA000D02F12 /* ColorUtils.swift in Sources */,
 				0532ECB22D23E18B003635B3 /* MeshGradientView.swift in Sources */,
 				0501865D2CEF1AE000EAEA64 /* MarkerApp.swift in Sources */,
+				0532ECBA2D269254003635B3 /* EditPhotoDisplayView.swift in Sources */,
+				0532ECBC2D269291003635B3 /* EditPhotoToolbarView.swift in Sources */,
 				05576E642CF46A8200BE1DDD /* ExifData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
