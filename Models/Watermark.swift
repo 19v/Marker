@@ -32,6 +32,8 @@ protocol HeightEditable: AnyObject {
 
 protocol TimeEditable: AnyObject {
     var isTimeDisplayed: Bool { get set } // 是否显示时间
+    var displayTime: Date { get set } // 实际显示在水印上的时间（可以自定义）
+    func restoreDefaultTime() // 重置为默认时间
 }
 
 protocol CoordinateEditable: AnyObject {

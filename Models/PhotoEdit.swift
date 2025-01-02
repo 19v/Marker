@@ -175,29 +175,30 @@ class PhotoModel: ObservableObject {
     }
     
     // 显示时间的开关
-    @Published var displayTimeEditSubview = false
-    @Published var displayTime = false {
+    @Published var isEditTimePanelDisplayed = false
+    @Published var isTimeDisplayed = false {
         didSet {
             guard let vw = watermark as? TimeEditable else { return }
             vw.isTimeDisplayed.toggle()
             refreshWatermarkImage()
         }
     }
-//    @Published var customTime: Date {
-//        didSet {
-//            guard let vw = watermark as? TimeEditable else { return }
-//            vw.setCustomTime(customTime)
-//            refreshWatermarkImage()
-//        }
-//    }
-//    func restoreDefaultTime() {
-//        guard let vw = watermark as? TimeEditable else { return }
-//        vw.restoreDefaultTime()
-//        refreshWatermarkImage()
-//    }
+    @Published var customTime = Date() {
+        didSet {
+            guard let vw = watermark as? TimeEditable else { return }
+            vw.displayTime = customTime
+            refreshWatermarkImage()
+        }
+    }
+    func restoreDefaultTime() {
+        guard let vw = watermark as? TimeEditable else { return }
+        vw.restoreDefaultTime()
+        refreshWatermarkImage()
+    }
     
     // 显示经纬度的开关
-    @Published var displayCoordinate = false{
+    @Published var isEditCoordinatePanelDisplayed = false
+    @Published var isCoordinateDisplayed = false {
         didSet {
             guard let vw = watermark as? CoordinateEditable else { return }
             vw.isCoordinateDisplayed.toggle()

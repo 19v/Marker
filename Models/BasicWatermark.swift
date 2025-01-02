@@ -45,6 +45,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                 Date()
             }
         }()
+        customTime = originalTime
         shootingTime = DisplayItem(
             value: originalTime.timestamp,
             colors: foregroundColors2,
@@ -133,10 +134,18 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
     // 显示时间的开关
     var isTimeDisplayed = false
     private(set) var originalTime: Date
-    func setCustomTime(_ time: Date) {
-        shootingTime.customValue = time.timestamp
+    private var customTime: Date
+    var displayTime: Date {
+        get {
+            customTime
+        }
+        set {
+            customTime = newValue
+            shootingTime.customValue = newValue.timestamp
+        }
     }
     func restoreDefaultTime() {
+        customTime = originalTime
         shootingTime.clearCustomValue()
     }
     

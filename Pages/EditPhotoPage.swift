@@ -62,7 +62,7 @@ struct EditPhotoPage: View {
                     }
                     
                     if viewModel.watermark is BackgroundEditable {
-                        TimeEditSubView(isOn: $viewModel.displayTimeEditSubview, displayTime: $viewModel.displayTime)
+                        TimeEditSubView(isOn: $viewModel.isEditTimePanelDisplayed, displayTime: $viewModel.isTimeDisplayed)
                     }
                 }
                 
@@ -82,14 +82,14 @@ struct EditPhotoPage: View {
                     // 日期时间按钮
                     CustomTabButton(iconName: "calendar.circle.fill", labelText: "日期时间") {
                         LoggerManager.shared.debug("日期时间按钮点击")
-                        viewModel.displayTimeEditSubview.toggle()
+                        viewModel.isEditTimePanelDisplayed.toggle()
                     }
                     .disabled(!(viewModel.watermark is TimeEditable))
                     
                     // 经纬度按钮
                     CustomTabButton(iconName: "location.circle.fill", labelText: "地理位置") {
                         LoggerManager.shared.debug("地理位置按钮点击")
-                        viewModel.displayCoordinate.toggle()
+                        viewModel.isCoordinateDisplayed.toggle()
                     }
                     .disabled(!(viewModel.watermark is CoordinateEditable))
                     
