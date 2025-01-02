@@ -101,7 +101,6 @@ struct EditPhotoPage: View {
     }
 }
 
-
 #Preview {
     EditPhotoPage(viewModel: PhotoModel()) {}
 }
