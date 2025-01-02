@@ -131,7 +131,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
     private var dividerColor: UIColor { dividerColors.uiColor }
     
     // 显示时间的开关
-    var displayTime = false
+    var isTimeDisplayed = false
     private(set) var originalTime: Date
     func setCustomTime(_ time: Date) {
         shootingTime.customValue = time.timestamp
@@ -141,14 +141,14 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
     }
     
     // 显示经纬度的开关
-    var displayCoordinate = false
+    var isCoordinateDisplayed = false
     
     var uiImage: UIImage? {
         let defaultWidth: CGFloat = switch orientation {
         case .horizontal: 4096
         case .vertical: 3072
         }
-        let defaultHeight: CGFloat = (displayTime || displayCoordinate) ? 472 : 393
+        let defaultHeight: CGFloat = (isTimeDisplayed || isCoordinateDisplayed) ? 472 : 393
         let watermarkSize = CGSize(width: defaultWidth, height: defaultHeight)
         let renderer = UIGraphicsImageRenderer(size: watermarkSize)
         
@@ -163,7 +163,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
         let rightVerticalPadding: CGFloat = 66
         
         // 图标
-        let iconHeight: CGFloat = (displayTime || displayCoordinate) ? 182 : 165
+        let iconHeight: CGFloat = (isTimeDisplayed || isCoordinateDisplayed) ? 182 : 165
         let iconText = NSString("")
         let iconTextAttributes: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: iconHeight),
@@ -172,14 +172,14 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
         let iconTextSize = iconText.size(withAttributes: iconTextAttributes)
         
         // 分割线尺寸
-        let rightDeliverWidth: CGFloat = (displayTime || displayCoordinate) ? 5 : 6
-        let rightDeliverHeight: CGFloat = (displayTime || displayCoordinate) ? 178 : 142
+        let rightDeliverWidth: CGFloat = (isTimeDisplayed || isCoordinateDisplayed) ? 5 : 6
+        let rightDeliverHeight: CGFloat = (isTimeDisplayed || isCoordinateDisplayed) ? 178 : 142
         
         // 右边图标、分割线和拍摄参数的间距
-        let rightSpacing: CGFloat = (displayTime || displayCoordinate) ? 65 : 56
+        let rightSpacing: CGFloat = (isTimeDisplayed || isCoordinateDisplayed) ? 65 : 56
         
         // 开始绘制
-        if displayTime && displayCoordinate {
+        if isTimeDisplayed && isCoordinateDisplayed {
             // 时间和经纬度都显示
             return renderer.image { context in
                 // 绘制背景
@@ -219,7 +219,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                     height: rightDeliverHeight
                 ))
             }
-        } else if displayTime && !displayCoordinate {
+        } else if isTimeDisplayed && !isCoordinateDisplayed {
             // 只显示时间
             return renderer.image { context in
                 // 绘制背景
@@ -254,7 +254,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                     height: rightDeliverHeight
                 ))
             }
-        } else if !displayTime && displayCoordinate {
+        } else if !isTimeDisplayed && isCoordinateDisplayed {
             // 只显示经纬度
             return renderer.image { context in
                 // 绘制背景
@@ -289,7 +289,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                     height: rightDeliverHeight
                 ))
             }
-        } else if !displayTime && !displayCoordinate {
+        } else if !isTimeDisplayed && !isCoordinateDisplayed {
             // 时间和经纬度都不显示
             return renderer.image { context in
                 // 绘制背景

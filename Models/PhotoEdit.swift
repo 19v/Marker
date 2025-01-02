@@ -179,7 +179,7 @@ class PhotoModel: ObservableObject {
     @Published var displayTime = false {
         didSet {
             guard let vw = watermark as? TimeEditable else { return }
-            vw.displayTime.toggle()
+            vw.isTimeDisplayed.toggle()
             refreshWatermarkImage()
         }
     }
@@ -200,7 +200,7 @@ class PhotoModel: ObservableObject {
     @Published var displayCoordinate = false{
         didSet {
             guard let vw = watermark as? CoordinateEditable else { return }
-            vw.displayCoordinate.toggle()
+            vw.isCoordinateDisplayed.toggle()
             refreshWatermarkImage()
         }
     }

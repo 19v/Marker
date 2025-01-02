@@ -9,7 +9,7 @@ struct TimeEditSubView: View {
 //    let defaultTime: String
 //    var customTime: String
     
-    //    @Binding var time: String
+//    @Binding var time: String
     @State private var selectedDate = Date()
     
     @State private var selectedYear = Calendar.current.component(.year, from: Date())
@@ -211,4 +211,3 @@ struct TimeEditSubView: View {
         return formatter.string(from: NSNumber(value: number)) ?? "\(number)"
     }
 }
-

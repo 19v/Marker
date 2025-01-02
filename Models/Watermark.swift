@@ -31,11 +31,11 @@ protocol HeightEditable: AnyObject {
 }
 
 protocol TimeEditable: AnyObject {
-    var displayTime: Bool { get set } // 是否显示时间
+    var isTimeDisplayed: Bool { get set } // 是否显示时间
 }
 
 protocol CoordinateEditable: AnyObject {
-    var displayCoordinate: Bool { get set }
+    var isCoordinateDisplayed: Bool { get set }
 }
 
 // MARK: - Defines
