@@ -24,7 +24,7 @@ struct EditPhotoToolbarView: View {
         case .background:
             BackgroundColorSelectSubView(colors: viewModel.enabledColors, selectedIndex: $viewModel.backgroundColorIndex)
         case .time:
-            TimeEditSubView(displayTime: $viewModel.isTimeDisplayed)
+            TimeEditSubView(isTimeDisplayed: $viewModel.isTimeDisplayed)
         case .coordinate:
             EmptyView()
         }

@@ -16,7 +16,7 @@ struct EditPhotoPage: View {
                     .scaledToFit()
                     .font(.system(size: 50))
                     .foregroundStyle(.secondary)
-                Text("图片未加载")
+                Text("图片加载失败")
                     .font(.system(.footnote))
                     .foregroundStyle(.secondary)
             }

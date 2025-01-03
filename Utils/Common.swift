@@ -84,6 +84,15 @@ extension Date {
         return formatter.date(from: dateString)
     }
     
+    // 在屏幕上展示日期和时间
+    func print() -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .medium
+        formatter.locale = Locale.current
+        return formatter.string(from: self)
+    }
+    
 }
 
 extension TimeZone {

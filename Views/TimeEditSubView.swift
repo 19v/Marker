@@ -3,7 +3,9 @@ import SwiftUI
 struct TimeEditSubView: View {
     @Environment(\.colorScheme) private var colorScheme
 
-    @Binding var displayTime: Bool
+    @Binding var isTimeDisplayed: Bool
+    
+    var displayTime: Date = Date()
     
 //    let defaultTime: String
 //    var customTime: String
@@ -21,151 +23,164 @@ struct TimeEditSubView: View {
     private let currentYear = Calendar.current.component(.year, from: Date())
     private let months = Array(1...12)
     
-    @State private var isDatePickerVisible = false
-    @State private var isTimePickerVisible = false
+    @State private var isShowingSheet = false
+    @State private var isShowingPopover = false
     
     var body: some View {
-        VStack(spacing: 20) {
+        VStack {
             Button(action: {
                 withAnimation {
-                    displayTime.toggle()
-                    if !displayTime && isDatePickerVisible || isTimePickerVisible {
-                        isDatePickerVisible = false
-                        isTimePickerVisible = false
-                    }
+                    isTimeDisplayed.toggle()
                 }
             }) {
                 HStack {
-                    Text("显示时间")
+                    Text("显示日期与时间")
                         .font(.headline)
                         .foregroundStyle(.black)
                     
                     Spacer()
                     
-                    Image(systemName: displayTime ? "checkmark.circle" : "circle")
+                    Image(systemName: isTimeDisplayed ? "checkmark.circle" : "circle")
                         .padding(.trailing, 4)
                 }
             }
-            .frame(height: 40)
-            .transition(.move(edge: .bottom).combined(with: .opacity))
+            .buttonStyle(BorderlessButtonStyle())
+            .frame(height: 20)
+            .padding()
             
-            if displayTime {
+            if isTimeDisplayed {
                 HStack {
-                    Text("拍摄时间")
+                    Text("\(displayTime.print())")
                         .font(.headline)
-                    
                     Spacer()
-                    
-                    Button(action: {
-                        withAnimation {
-                            isDatePickerVisible.toggle()
-                            if isTimePickerVisible {
-                                isTimePickerVisible = false
-                            }
-                        }
-                    }) {
-                        Text(formattedDate())
-                            .font(.body)
+                    Button("调整") {
+                        isShowingSheet.toggle()
                     }
-                    .buttonStyle(BorderlessButtonStyle())
-                    
-                    Button(action: {
-                        withAnimation {
-                            isTimePickerVisible.toggle()
-                            if isDatePickerVisible {
-                                isDatePickerVisible = false
-                            }
-                        }
-                    }) {
-                        Text(formattedTime())
-                            .font(.body)
-                    }
-                    .buttonStyle(BorderlessButtonStyle())
                 }
-                .frame(height: 40)
+                .frame(height: 20)
+                .padding()
                 .transition(.move(edge: .bottom).combined(with: .opacity))
+                .animation(.easeInOut, value: isTimeDisplayed)
             }
-            
-            if isDatePickerVisible {
-                VStack {
-                    HStack {
-                        Picker("年", selection: $selectedYear) {
-                            ForEach(currentYear-100...currentYear+100, id: \.self) { year in
-                                Text("\(formattedNumber(year)) 年").tag(year)
-                            }
-                        }
-                        .frame(width: 100)
-                        .clipped()
-                        
-                        Picker("月", selection: $selectedMonth) {
-                            ForEach(months, id: \.self) { month in
-                                Text("\(month) 月").tag(month)
-                            }
-                        }
-                        .frame(width: 80)
-                        .clipped()
-                        
-                        Picker("日", selection: $selectedDay) {
-                            ForEach(daysInMonth(year: selectedYear, month: selectedMonth), id: \.self) { day in
-                                Text("\(day) 日").tag(day)
-                            }
-                        }
-                        .frame(width: 80)
-                        .clipped()
-                    }
-                    .pickerStyle(WheelPickerStyle())
-                    .padding()
-                }
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-            
-            if isTimePickerVisible {
-                VStack {
-                    HStack {
-                        Picker("时", selection: $selectedHour) {
-                            ForEach(0..<24, id: \.self) { Text("\($0) h") }
-                        }
-                        .frame(width: 80)
-                        .clipped()
-                        
-                        Picker("分", selection: $selectedMinute) {
-                            ForEach(0..<60, id: \.self) { Text("\($0) m") }
-                        }
-                        .frame(width: 80)
-                        .clipped()
-                        
-                        Picker("秒", selection: $selectedSecond) {
-                            ForEach(0..<60, id: \.self) { Text("\($0) s") }
-                        }
-                        .frame(width: 80)
-                        .clipped()
-                    }
-                    .pickerStyle(WheelPickerStyle())
-                    .padding()
-                }
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-            
-            HStack {
-                Spacer()
-                Button("恢复默认") {
-                    LoggerManager.shared.debug("恢复默认")
-                }
-                Spacer()
-                Button("应用") {
-                    LoggerManager.shared.debug("应用")
-                }
-                Spacer()
-            }
-            .frame(height: 40)
         }
-        .padding(20)
+        .padding(12)
         .background(
             Rectangle()
                 .fill(.bar)
                 .foregroundStyle(colorScheme == .light ? .white : .black)
                 .opacity(0.8)
         )
+        .sheet(isPresented: $isShowingSheet) {
+            NavigationStack {
+                List {
+                    Section {
+                        HStack {
+                            Text("调整前")
+                            Spacer()
+                            Text("\(displayTime.print())")
+                                .foregroundStyle(.gray)
+                        }
+                        
+                        HStack {
+                            Text("调整后")
+                            Spacer()
+                            Text("\(displayTime.print())")
+                        }
+                    }
+                    
+                    Section {
+                        DatePicker("调整日期", selection: $selectedDate, displayedComponents: [.date])
+                            .datePickerStyle(.graphical)
+                        
+                        HStack {
+                            Text("时间")
+                            
+                            Spacer()
+                            
+                            Button(action: {
+                                isShowingPopover.toggle()
+                            }) {
+                                Text("12:12:12")
+                                    .padding(.vertical, 6)
+                                    .padding(.horizontal, 8)
+                                    .background(isShowingPopover ? .blue : .gray)
+                                    .foregroundColor(isShowingPopover ? .white : .white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                            }
+                            .popover(isPresented: $isShowingPopover) {
+                                HStack {
+                                    Picker("时", selection: $selectedHour) {
+                                        ForEach(0..<24, id: \.self) { Text("\($0) h") }
+                                    }
+                                    .frame(width: 80)
+                                    .clipped()
+                                    
+                                    Picker("分", selection: $selectedMinute) {
+                                        ForEach(0..<60, id: \.self) { Text("\($0) m") }
+                                    }
+                                    .frame(width: 80)
+                                    .clipped()
+                                    
+                                    Picker("秒", selection: $selectedSecond) {
+                                        ForEach(0..<60, id: \.self) { Text("\($0) s") }
+                                    }
+                                    .frame(width: 80)
+                                    .clipped()
+                                }
+                                .pickerStyle(WheelPickerStyle())
+                                .padding()
+                                .frame(width: 240, height: 200)
+                                .presentationCompactAdaptation(.none)
+                            }
+                        }
+                        
+//                        if isShowingPopover {
+//                            HStack {
+//                                Picker("时", selection: $selectedHour) {
+//                                    ForEach(0..<24, id: \.self) { Text("\($0) h") }
+//                                }
+//                                .frame(width: 80)
+//                                .clipped()
+//                                
+//                                Picker("分", selection: $selectedMinute) {
+//                                    ForEach(0..<60, id: \.self) { Text("\($0) m") }
+//                                }
+//                                .frame(width: 80)
+//                                .clipped()
+//                                
+//                                Picker("秒", selection: $selectedSecond) {
+//                                    ForEach(0..<60, id: \.self) { Text("\($0) s") }
+//                                }
+//                                .frame(width: 80)
+//                                .clipped()
+//                            }
+//                            .pickerStyle(WheelPickerStyle())
+//                            .padding()
+//                            .transition(.scale)
+//                            .animation(.easeInOut, value: isShowingPopover)
+//                        }
+                        
+                        Text("时区")
+                    }
+                }
+                .navigationTitle("调整日期与时间")
+                .navigationBarTitleDisplayMode(.inline) // 标题居中
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button("取消") {
+                            isShowingSheet.toggle()
+                        }
+                    }
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("调整") {
+                            isShowingSheet.toggle()
+                        }
+                    }
+                }
+            }
+            .presentationBackground(.ultraThickMaterial)
+            .interactiveDismissDisabled(true)
+        }
     }
     
     // 计算每月的天数
