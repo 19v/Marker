@@ -2,10 +2,11 @@ import SwiftUI
 import PhotosUI
 
 struct EditPhotoDisplayView: View {
-    let geometry: GeometryProxy
+    @Environment(\.colorScheme) private var colorScheme
+    
     let image: Image
     let watermark: UIImage?
-    let displayWatermark: Bool
+    let isWatermarkDisplayed: Bool
     
     // 控制图片显示的参数
     private static let defaultScale: CGFloat = 0.9 // 初始缩放比例，为1.0时左右填满屏幕
@@ -16,6 +17,7 @@ struct EditPhotoDisplayView: View {
     
     var body: some View {
         ZStack {
+            // 背景（透明，仅用于检测手势）
             Color.white
                 .opacity(0)
                 .contentShape(Rectangle())
@@ -32,22 +34,28 @@ struct EditPhotoDisplayView: View {
                         }
                 )
             
+            // 图片和水印
             VStack(spacing: 0) {
                 image
                     .resizable()
                     .scaledToFit()
-                    .frame(width: geometry.size.width)
+                    .frame(maxWidth: .infinity)
                     .listRowInsets(EdgeInsets())
                 
                 if let watermark,
-                   displayWatermark {
+                   isWatermarkDisplayed {
                     Image(uiImage: watermark)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: geometry.size.width)
+                        .frame(maxWidth: .infinity)
                 }
             }
-            .frame(width: geometry.size.width)
+            .frame(maxWidth: .infinity, maxHeight: .infinity) // 占据剩余空间
+            .shadow(
+                color: colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.2),
+                radius: colorScheme == .dark ? 20 : 10,
+                x: 0, y: 0
+            )
             .scaleEffect(scale) // 缩放
             .offset(offset) // 偏移
             .gesture(
@@ -97,6 +105,11 @@ struct EditPhotoDisplayView: View {
                     }
             )
         }
+        .background(
+            colorScheme == .light
+            ? Color(hex: 0xF2F3F5)
+            : Color(hex: 0x101010)
+        )
         .clipped()
     }
 }

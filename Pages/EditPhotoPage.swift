@@ -9,43 +9,31 @@ struct EditPhotoPage: View {
     let onDisappearAction: () -> Void
     
     @ViewBuilder private var photoView: some View {
-        GeometryReader { geometry in
-            switch viewModel.imageState {
-            case .empty, .failure:
-                VStack(spacing: 4) {
-                    Image(systemName: "photo.badge.exclamationmark.fill")
-                        .scaledToFit()
-                        .font(.system(size: 50))
-                        .foregroundStyle(.secondary)
-                    Text("图片未加载")
-                        .font(.system(.footnote))
-                        .foregroundStyle(.secondary)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            case .loading:
-                ProgressView()
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-            case .success(let image):
-                EditPhotoDisplayView(geometry: geometry, image: image, watermark: viewModel.watermarkImage, displayWatermark: viewModel.isWatermarkDisplayed)
-                    .shadow(
-                        color: colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.2),
-                        radius: colorScheme == .dark ? 20 : 10,
-                        x: 0, y: 0
-                    )
+        switch viewModel.imageState {
+        case .empty, .failure:
+            VStack(spacing: 4) {
+                Image(systemName: "photo.badge.exclamationmark.fill")
+                    .scaledToFit()
+                    .font(.system(size: 50))
+                    .foregroundStyle(.secondary)
+                Text("图片未加载")
+                    .font(.system(.footnote))
+                    .foregroundStyle(.secondary)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        case .loading:
+            ProgressView(/*"请等待…照片加载中"*/)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .foregroundStyle(colorScheme == .dark ? .white : .init(hex: 0x282828))
+                .ignoresSafeArea()
+        case .success(let image):
+            EditPhotoDisplayView(image: image, watermark: viewModel.watermarkImage, isWatermarkDisplayed: viewModel.isWatermarkDisplayed)
         }
     }
     
     var body: some View {
         ZStack {
             photoView
-                .frame(maxHeight: .infinity) // 占据剩余空间
-                .background(
-                    colorScheme == .light
-                    ? Color(hex: 0xF2F3F5)
-                    : Color(hex: 0x101010)
-                )
-            
             EditPhotoToolbarView(viewModel: viewModel)
         }
         .navigationBarBackButtonHidden(true)
