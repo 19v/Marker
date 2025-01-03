@@ -17,7 +17,7 @@ struct EditPhotoToolbarView: View {
     }
     @State private var panel = EditPanels.empty
     
-    @ViewBuilder var activeView: some View {
+    @ViewBuilder private var activeView: some View {
         switch panel {
         case .empty:
             EmptyView()
