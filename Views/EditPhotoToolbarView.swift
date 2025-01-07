@@ -61,8 +61,13 @@ struct EditPhotoToolbarView: View {
                 // 背景颜色按钮
                 CustomTabButton(iconName: "circle.tophalf.filled.inverse", labelText: "颜色") {
                     LoggerManager.shared.debug("背景颜色按钮点击")
-                    withAnimation {
-                        panel.toggle(to: .background)
+//                    withAnimation {
+//                        panel.toggle(to: .background)
+//                    }
+                    if viewModel.backgroundColorIndex == 0 {
+                        viewModel.backgroundColorIndex = 1
+                    } else {
+                        viewModel.backgroundColorIndex = 0
                     }
                 }
                 .disabled(!(viewModel.watermark is BackgroundEditable))
@@ -79,9 +84,10 @@ struct EditPhotoToolbarView: View {
                 // 经纬度按钮
                 CustomTabButton(iconName: "location.circle.fill", labelText: "位置") {
                     LoggerManager.shared.debug("地理位置按钮点击")
-                    withAnimation {
-                        panel.toggle(to: .coordinate)
-                    }
+//                    withAnimation {
+//                        panel.toggle(to: .coordinate)
+//                    }
+                    viewModel.isCoordinateDisplayed.toggle()
                 }
                 .disabled(!(viewModel.watermark is CoordinateEditable))
                 
