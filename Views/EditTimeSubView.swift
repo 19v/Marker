@@ -47,12 +47,6 @@ struct EditTimeSubView: View {
             }
         }
         .padding(12)
-        .background(
-            Rectangle()
-                .fill(.bar)
-                .foregroundStyle(colorScheme == .light ? .white : .black)
-                .opacity(0.8)
-        )
         .sheet(isPresented: $isShowingSheet) {
             TimeEditSheet(originalDate: viewModel.watermarkTime, originalTimeZone: viewModel.watermarkTimeZone, setCustomDateAndTimeZone: { date, timeZone in
                 viewModel.watermarkTime = date

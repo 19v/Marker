@@ -18,12 +18,6 @@ struct EditColorSubView: View {
             .padding(.vertical, 10)
             .frame(height: 44)
         }
-        .background(
-            Rectangle()
-                .fill(.bar)
-                .foregroundStyle(colorScheme == .light ? .white : .black)
-                .opacity(0.8)
-        )
     }
 }
 
