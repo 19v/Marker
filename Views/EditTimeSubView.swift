@@ -2,23 +2,18 @@ import SwiftUI
 
 // MARK: - 调整是否在水印上显示时间的子菜单
 
-struct TimeEditSubView: View {
+struct EditTimeSubView: View {
     @Environment(\.colorScheme) private var colorScheme
+    
+    @ObservedObject var viewModel: PhotoModel
 
-    @Binding var isTimeDisplayed: Bool
-    
-    var displayTime: Date = Date()
-    
-    @State private var selectedDate = Date()
-    @State private var selectedTimeZone = TimeZone.current
-    
-    @State private var isShowingSheet = false
+    @State private var isShowingSheet = false // 是否显示调整时间的sheet
     
     var body: some View {
         VStack {
             Button(action: {
                 withAnimation {
-                    isTimeDisplayed.toggle()
+                    viewModel.isTimeDisplayed.toggle()
                 }
             }) {
                 HStack {
@@ -28,7 +23,7 @@ struct TimeEditSubView: View {
                     
                     Spacer()
                     
-                    Image(systemName: isTimeDisplayed ? "checkmark.circle" : "circle")
+                    Image(systemName: viewModel.isTimeDisplayed ? "checkmark.circle" : "circle")
                         .padding(.trailing, 4)
                 }
             }
@@ -36,9 +31,9 @@ struct TimeEditSubView: View {
             .frame(height: 20)
             .padding()
             
-            if isTimeDisplayed {
+            if viewModel.isTimeDisplayed {
                 HStack {
-                    Text("\(displayTime.print())")
+                    Text("\(viewModel.watermarkTime.print())")
                         .font(.headline)
                     Spacer()
                     Button("调整") {
@@ -48,7 +43,7 @@ struct TimeEditSubView: View {
                 .frame(height: 20)
                 .padding()
                 .transition(.move(edge: .bottom).combined(with: .opacity))
-                .animation(.easeInOut, value: isTimeDisplayed)
+                .animation(.easeInOut, value: viewModel.isTimeDisplayed)
             }
         }
         .padding(12)
@@ -59,9 +54,12 @@ struct TimeEditSubView: View {
                 .opacity(0.8)
         )
         .sheet(isPresented: $isShowingSheet) {
-            TimeEditSheet(selectedDate: $selectedDate, selectedTimeZone: $selectedTimeZone)
-                .presentationBackground(.ultraThickMaterial)
-                .interactiveDismissDisabled(true)
+            TimeEditSheet(originalDate: viewModel.watermarkTime, originalTimeZone: viewModel.watermarkTimeZone, setCustomDateAndTimeZone: { date, timeZone in
+                viewModel.watermarkTime = date
+                viewModel.watermarkTimeZone = timeZone
+            })
+            .presentationBackground(.ultraThickMaterial)
+            .interactiveDismissDisabled(true)
         }
     }
     
@@ -76,25 +74,6 @@ struct TimeEditSubView: View {
         return Array(range)
     }
     
-//    // 格式化日期
-//    private func formattedDate() -> String {
-//        "\(selectedYear)-\(String(format: "%02d", selectedMonth))-\(String(format: "%02d", selectedDay))"
-//    }
-//    
-//    // 格式化时间
-//    private func formattedTime() -> String {
-//        var components = Calendar.current.dateComponents([.year, .month, .day], from: selectedDate)
-//        components.hour = selectedHour
-//        components.minute = selectedMinute
-//        components.second = selectedSecond
-//        
-//        if let date = Calendar.current.date(from: components) {
-//            let formatter = DateFormatter()
-//            formatter.dateFormat = "HH:mm:ss"
-//            return formatter.string(from: date)
-//        }
-//        return "Invalid Date"
-//    }
 }
 
 // MARK: - 调整日期与时间的Sheet
@@ -102,8 +81,26 @@ struct TimeEditSubView: View {
 struct TimeEditSheet: View {
     @Environment(\.dismiss) private var dismiss
     
-    @Binding var selectedDate: Date
-    @Binding var selectedTimeZone: TimeZone
+    let originalDate: Date
+    let originalTimeZone: TimeZone
+    let setCustomDateAndTimeZone: (Date, TimeZone) -> ()
+    
+    @State private var selectedDate = Date()
+    private var formattedSelectedDate: Date {
+        let calendar = Calendar.current
+        let components = Calendar.current.dateComponents([.year, .month, .day], from: selectedDate)
+        if let newDate = calendar.date(bySettingHour: selectedHour, minute: selectedMinute, second: selectedSecond, of: calendar.date(from: components)!) {
+            return newDate
+        }
+        return selectedDate
+    }
+    private var formattedTimeString: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm:ss"
+        return formatter.string(from: formattedSelectedDate)
+    }
+    
+    @State private var selectedTimeZone: TimeZone = .current
     @State private var selectedTimeZoneID: String = "" {
         didSet {
             selectedTimeZone = TimeZone(identifier: selectedTimeZoneID) ?? .current
@@ -116,8 +113,6 @@ struct TimeEditSheet: View {
     
     @State private var isShowingPopover = false
     
-    var displayTime: Date = Date()
-    
     var body: some View {
         NavigationStack {
             List {
@@ -125,14 +120,14 @@ struct TimeEditSheet: View {
                     HStack {
                         Text("调整前")
                         Spacer()
-                        Text("\(displayTime.print())")
+                        Text("\(originalDate.print())")
                             .foregroundStyle(.gray)
                     }
                     
                     HStack {
                         Text("调整后")
                         Spacer()
-                        Text("\(displayTime.print())")
+                        Text("\(formattedSelectedDate.print())")
                     }
                 }
                 
@@ -150,7 +145,7 @@ struct TimeEditSheet: View {
                             Button(action: {
                                 isShowingPopover.toggle()
                             }) {
-                                Text("12:12:12")
+                                Text(formattedTimeString)
                                     .padding(.vertical, 10)
                                     .padding(.horizontal, 12)
                                     .background(Color(hex: 0xF0F0F0))
@@ -205,15 +200,24 @@ struct TimeEditSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("调整") {
+                        setCustomDateAndTimeZone(formattedSelectedDate, selectedTimeZone)
                         dismiss()
                     }
                 }
             }
             .onAppear {
+                selectedDate = originalDate
+                selectedTimeZone = originalTimeZone
                 selectedTimeZoneID = selectedTimeZone.identifier
+                
+                let calendar = Calendar.current
+                selectedHour = calendar.component(.hour, from: originalDate)
+                selectedMinute = calendar.component(.minute, from: originalDate)
+                selectedSecond = calendar.component(.second, from: originalDate)
             }
         }
     }
+    
 }
 
 // MARK: - 调整时区的页面

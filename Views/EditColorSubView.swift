@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct BackgroundColorSelectSubView: View {
+struct EditColorSubView: View {
     @Environment(\.colorScheme) private var colorScheme
     let colors: [Color]
     @Binding var selectedIndex: Int

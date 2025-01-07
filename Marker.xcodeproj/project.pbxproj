@@ -13,8 +13,8 @@
 		0532ECA62D192E36003635B3 /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECA52D192E34003635B3 /* Fonts.swift */; };
 		0532ECA82D193A67003635B3 /* BasicWatermark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECA72D193A67003635B3 /* BasicWatermark.swift */; };
 		0532ECAA2D193A6F003635B3 /* BlurBackgroundWatermark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECA92D193A6F003635B3 /* BlurBackgroundWatermark.swift */; };
-		0532ECAE2D23E147003635B3 /* BackgroundColorSelectSubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECAD2D23E138003635B3 /* BackgroundColorSelectSubView.swift */; };
-		0532ECB02D23E16A003635B3 /* TimeEditSubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECAF2D23E169003635B3 /* TimeEditSubView.swift */; };
+		0532ECAE2D23E147003635B3 /* EditColorSubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECAD2D23E138003635B3 /* EditColorSubView.swift */; };
+		0532ECB02D23E16A003635B3 /* EditTimeSubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECAF2D23E169003635B3 /* EditTimeSubView.swift */; };
 		0532ECB22D23E18B003635B3 /* MeshGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECB12D23E189003635B3 /* MeshGradientView.swift */; };
 		0532ECB82D23E32F003635B3 /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECB52D23E1F3003635B3 /* Buttons.swift */; };
 		0532ECBA2D269254003635B3 /* EditPhotoDisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0532ECB92D269252003635B3 /* EditPhotoDisplayView.swift */; };
@@ -42,8 +42,8 @@
 		0532ECA52D192E34003635B3 /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
 		0532ECA72D193A67003635B3 /* BasicWatermark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicWatermark.swift; sourceTree = "<group>"; };
 		0532ECA92D193A6F003635B3 /* BlurBackgroundWatermark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurBackgroundWatermark.swift; sourceTree = "<group>"; };
-		0532ECAD2D23E138003635B3 /* BackgroundColorSelectSubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundColorSelectSubView.swift; sourceTree = "<group>"; };
-		0532ECAF2D23E169003635B3 /* TimeEditSubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeEditSubView.swift; sourceTree = "<group>"; };
+		0532ECAD2D23E138003635B3 /* EditColorSubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditColorSubView.swift; sourceTree = "<group>"; };
+		0532ECAF2D23E169003635B3 /* EditTimeSubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTimeSubView.swift; sourceTree = "<group>"; };
 		0532ECB12D23E189003635B3 /* MeshGradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshGradientView.swift; sourceTree = "<group>"; };
 		0532ECB52D23E1F3003635B3 /* Buttons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
 		0532ECB92D269252003635B3 /* EditPhotoDisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPhotoDisplayView.swift; sourceTree = "<group>"; };
@@ -153,8 +153,8 @@
 				0532ECB12D23E189003635B3 /* MeshGradientView.swift */,
 				0532ECB92D269252003635B3 /* EditPhotoDisplayView.swift */,
 				0532ECBB2D26928C003635B3 /* EditPhotoToolbarView.swift */,
-				0532ECAD2D23E138003635B3 /* BackgroundColorSelectSubView.swift */,
-				0532ECAF2D23E169003635B3 /* TimeEditSubView.swift */,
+				0532ECAD2D23E138003635B3 /* EditColorSubView.swift */,
+				0532ECAF2D23E169003635B3 /* EditTimeSubView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -255,15 +255,15 @@
 				0532ECA82D193A67003635B3 /* BasicWatermark.swift in Sources */,
 				0501865F2CEF1AE000EAEA64 /* ContentView.swift in Sources */,
 				057E41092CEF1B2E0005E859 /* PhotoEdit.swift in Sources */,
-				0532ECAE2D23E147003635B3 /* BackgroundColorSelectSubView.swift in Sources */,
 				0532ECAA2D193A6F003635B3 /* BlurBackgroundWatermark.swift in Sources */,
 				05576E662CF46AEE00BE1DDD /* PhotoUtils.swift in Sources */,
 				057E410B2CEF1B2E0005E859 /* Common.swift in Sources */,
 				05576E6D2CF46BB100BE1DDD /* SettingsView.swift in Sources */,
 				05576E622CF469C800BE1DDD /* Watermark.swift in Sources */,
 				05576E6F2CF46C0900BE1DDD /* Logger.swift in Sources */,
-				0532ECB02D23E16A003635B3 /* TimeEditSubView.swift in Sources */,
+				0532ECB02D23E16A003635B3 /* EditTimeSubView.swift in Sources */,
 				05AC15042CF71D5000EE8F9A /* EditPhotoPage.swift in Sources */,
+				0532ECAE2D23E147003635B3 /* EditColorSubView.swift in Sources */,
 				05BFE9F72D0C2BA000D02F12 /* ColorUtils.swift in Sources */,
 				0532ECB22D23E18B003635B3 /* MeshGradientView.swift in Sources */,
 				0501865D2CEF1AE000EAEA64 /* MarkerApp.swift in Sources */,

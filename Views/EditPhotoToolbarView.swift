@@ -22,9 +22,9 @@ struct EditPhotoToolbarView: View {
         case .empty:
             EmptyView()
         case .background:
-            BackgroundColorSelectSubView(colors: viewModel.enabledColors, selectedIndex: $viewModel.backgroundColorIndex)
+            EditColorSubView(colors: viewModel.enabledColors, selectedIndex: $viewModel.backgroundColorIndex)
         case .time:
-            TimeEditSubView(isTimeDisplayed: $viewModel.isTimeDisplayed)
+            EditTimeSubView(viewModel: viewModel)
         case .coordinate:
             EmptyView()
         }

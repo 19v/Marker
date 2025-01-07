@@ -131,7 +131,7 @@ class PhotoModel: ObservableObject {
             refreshWatermarkImage()
         }
     }
-    var watermarkImage: UIImage?
+    @Published var watermarkImage: UIImage?
     func refreshWatermarkImage() {
         watermarkImage = watermark?.uiImage
     }
@@ -184,13 +184,18 @@ class PhotoModel: ObservableObject {
             refreshWatermarkImage()
         }
     }
-    @Published var customTime = Date() {
-        didSet {
+    var watermarkTime: Date {
+        get {
+            guard let vw = watermark as? TimeEditable else { return Date() }
+            return vw.displayTime
+        }
+        set {
             guard let vw = watermark as? TimeEditable else { return }
-            vw.displayTime = customTime
+            vw.displayTime = newValue
             refreshWatermarkImage()
         }
     }
+    @Published var watermarkTimeZone = TimeZone.current
     func restoreDefaultTime() {
         guard let vw = watermark as? TimeEditable else { return }
         vw.restoreDefaultTime()
