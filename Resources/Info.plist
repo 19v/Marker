@@ -7,7 +7,5 @@
 		<string>MiSans-Demibold.ttf</string>
 		<string>MiSans-Regular.ttf</string>
 	</array>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Export user-edited photos</string>
 </dict>
 </plist>
