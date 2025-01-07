@@ -40,7 +40,8 @@ struct EditPhotoPage: View {
             VStack {
                 Rectangle()
                     .fill(colorScheme == .light ? .white : .black)
-                    .fill(.bar)
+//                    .fill(.bar)
+                    .fill(.ultraThinMaterial)
                     .foregroundStyle(colorScheme == .light ? .white : .black)
                     .opacity(0.8)
                     .frame(height: CommonUtils.safeTopInset + 44)
@@ -106,12 +107,6 @@ struct EditPhotoPage: View {
                         .clipShape(Capsule())
                 }
             }
-        }
-        .sheet(isPresented: $viewModel.isSheetPresented) {
-            HalfTransparentSheetView(isSheetPresented: $viewModel.isSheetPresented, viewModel: viewModel)
-                .presentationBackground(.ultraThinMaterial)
-                .presentationDetents([.fraction(0.2), .medium, .large], selection: $viewModel.settingsDetent)
-                .presentationDragIndicator(.visible)
         }
         .onDisappear(perform: onDisappearAction)
         .ignoresSafeArea(.all)

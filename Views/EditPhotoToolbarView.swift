@@ -86,17 +86,18 @@ struct EditPhotoToolbarView: View {
                 
                 CustomTabButton(iconName: "info.circle.fill", labelText: "信息") {
                     LoggerManager.shared.debug("照片信息按钮点击")
-                    viewModel.isSheetPresented.toggle()
+                    viewModel.isPhotoInfoPanelDisplayed.toggle()
                 }
                 .disabled(!(viewModel.watermark is InfoDisplayable))
             }
             .frame(height: 44)
             .padding(.top, 10)
             .padding(.bottom, CommonUtils.safeBottomInset)
-            .padding(.horizontal, 10)
+            .padding(.horizontal, 30)
             .background(
                 Rectangle()
-                    .fill(.bar)
+//                    .fill(.bar)
+                    .fill(.ultraThinMaterial)
                     .foregroundStyle(colorScheme == .light ? .white : .black)
                     .opacity(0.8)
             )

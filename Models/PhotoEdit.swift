@@ -213,6 +213,5 @@ class PhotoModel: ObservableObject {
     }
     
     // 显示图片信息的开关
-    @Published var isSheetPresented = false
-    @Published var settingsDetent = PresentationDetent.large
+    @Published var isPhotoInfoPanelDisplayed = false
 }
