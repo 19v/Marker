@@ -32,13 +32,6 @@ struct EditPhotoToolbarView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            Rectangle()
-                .fill(colorScheme == .light ? .white : .black)
-                .fill(.bar)
-                .foregroundStyle(colorScheme == .light ? .white : .black)
-                .opacity(0.8)
-                .frame(height: CommonUtils.safeTopInset + 44)
-            
             Spacer()
             
             activeView
@@ -53,10 +46,10 @@ struct EditPhotoToolbarView: View {
                 )
             
             HStack{
-                CustomTabButton(iconName: "photo.circle.fill", labelText: "水印") {
-                    LoggerManager.shared.debug("显示水印按钮点击")
-                    viewModel.isWatermarkDisplayed.toggle()
-                }
+//                CustomTabButton(iconName: "photo.circle.fill", labelText: "水印") {
+//                    LoggerManager.shared.debug("显示水印按钮点击")
+//                    viewModel.isWatermarkDisplayed.toggle()
+//                }
                 
                 // 背景颜色按钮
                 CustomTabButton(iconName: "circle.tophalf.filled.inverse", labelText: "颜色") {

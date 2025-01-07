@@ -33,24 +33,54 @@ struct EditPhotoPage: View {
     
     var body: some View {
         ZStack {
+            // 照片+水印
             photoView
+            
+            // 顶部按钮的半透明背景
+            VStack {
+                Rectangle()
+                    .fill(colorScheme == .light ? .white : .black)
+                    .fill(.bar)
+                    .foregroundStyle(colorScheme == .light ? .white : .black)
+                    .opacity(0.8)
+                    .frame(height: CommonUtils.safeTopInset + 44)
+                Spacer()
+            }
+            
+            // 工具栏
             EditPhotoToolbarView(viewModel: viewModel)
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {
             // 关闭按钮
-            ToolbarItem(placement: .navigationBarLeading) {
+            ToolbarItem(placement: .topBarLeading) {
                 Button {
                     viewModel.imageLoaded.toggle() // 设置为 false 以 pop 页面
                     onDisappearAction()
                 } label: {
-//                    Image(systemName: "xmark.circle")
                     Text("取消")
-                        .font(.headline)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(.gray)
+                        .font(.system(size: 16))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.init(hex: 0xA0A0A0))
                         .foregroundColor(.white)
+                        .clipShape(Capsule())
+                }
+            }
+            
+            // 显示水印按钮
+            ToolbarItem(placement: .principal) {
+                Button {
+                    withAnimation {
+                        viewModel.isWatermarkDisplayed.toggle()
+                    }
+                } label: {
+                    Text("水印：\(viewModel.isWatermarkDisplayed ? "开" : "关")")
+                        .font(.system(size: 16))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(.clear)
+                        .foregroundColor(Color.init(hex: 0xA0A0A0))
                         .overlay(
                             Capsule()
                                 .stroke(Color.gray, lineWidth: 2)
@@ -60,24 +90,19 @@ struct EditPhotoPage: View {
             }
             
             // 保存按钮
-            ToolbarItem {
+            ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     LoggerManager.shared.debug("保存按钮点击")
                     if let uiImage = viewModel.fullImage {
                         PhotoSaver.with(uiImage: uiImage)
                     }
                 } label: {
-//                    Image(systemName: "square.and.arrow.down")
                     Text("保存")
-                        .font(.headline)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(.clear)
-                        .foregroundColor(.blue)
-                        .overlay(
-                            Capsule()
-                                .stroke(Color.blue, lineWidth: 2)
-                        )
+                        .font(.system(size: 16))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(.blue)
+                        .foregroundColor(.white)
                         .clipShape(Capsule())
                 }
             }

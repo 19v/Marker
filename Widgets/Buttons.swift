@@ -58,23 +58,20 @@ struct CapsuleButton: View {
 
 // 首页所使用的纯文字按钮
 struct TextButton: View {
+    @Environment(\.colorScheme) private var colorScheme
+    
     var icon: String
     var title: String
     var action: () -> Void
-    
-    let titleColor = Color.white
-    
-//    let backgroundColor = Color.blue
-    let backgroundColor = Color.clear
 
     var body: some View {
         Button(action: action) {
             HStack {
                 Image(systemName: icon)
-                    .foregroundColor(titleColor)
+                    .foregroundColor(colorScheme == .dark ? Color.white : Color(hex: 0x282828))
                     .padding(.leading, 16)
                 Text(title)
-                    .foregroundColor(titleColor)
+                    .foregroundColor(colorScheme == .dark ? Color.white : Color(hex: 0x282828))
                     .font(.system(size: 16, weight: .bold))
                     .padding(.trailing, 20)
             }
