@@ -6,18 +6,41 @@ struct EditColorSubView: View {
     @Binding var selectedIndex: Int
     
     var body: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: 10) {
-                ForEach(Array(colors.enumerated()), id: \.offset) { index, color in
-                    ColorSelectButton(index: index, selectedIndex: $selectedIndex, color: color) {
-                        selectedIndex = index
+        VStack(alignment: .leading) {
+            Text("背景颜色")
+                .font(.system(size: 14))
+                .foregroundStyle(.gray)
+                .padding(.bottom, 4)
+            
+            ScrollView(.horizontal) {
+                HStack(spacing: 15) {
+                    ForEach(Array(colors.enumerated()), id: \.offset) { index, color in
+                        ColorSelectButton(index: index, selectedIndex: $selectedIndex, color: color) {
+                            selectedIndex = index
+                        }
                     }
                 }
+                .padding(4)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .frame(height: 44)
+            
+            Text("文字颜色")
+                .font(.system(size: 14))
+                .foregroundStyle(.gray)
+                .padding(.top, 16)
+                .padding(.bottom, 4)
+            
+            ScrollView(.horizontal) {
+                HStack(spacing: 15) {
+                    ForEach(Array(colors.enumerated()), id: \.offset) { index, color in
+                        ColorSelectButton(index: index, selectedIndex: $selectedIndex, color: color) {
+                            selectedIndex = index
+                        }
+                    }
+                }
+                .padding(4)
+            }
         }
+        .padding(20)
     }
 }
 
@@ -34,10 +57,10 @@ struct ColorSelectButton: View {
             Circle()
                 .fill(color)
                 .frame(width: 40, height: 40)
-                .shadow(color: .gray.opacity(0.15), radius: 2.5, x: 0, y: 0) // 添加阴影
+                .shadow(color: .gray.opacity(0.15), radius: 10, x: 0, y: 0) // 添加阴影
                 .overlay(
                     Circle()
-                        .stroke(selectedIndex == index ? Color.red : Color.white, lineWidth: 2) // 添加边框
+                        .stroke(selectedIndex == index ? .blue : .gray.opacity(0.25), lineWidth: 2) // 添加边框
                 )
         }
         .buttonStyle(PlainButtonStyle()) // 去掉默认按钮样式
@@ -47,4 +70,9 @@ struct ColorSelectButton: View {
                 .onEnded { _ in isPressed = false }
         )
     }
+}
+
+#Preview {
+    @Previewable @State var index = 0
+    EditColorSubView(colors: [.white, .black], selectedIndex: $index)
 }
