@@ -13,7 +13,14 @@ class PhotoUtils {
         
         let newSize = CGSize(width: width, height: photoHeight + watermarkHeight)
         
-        let renderer = UIGraphicsImageRenderer(size: newSize)
+        // 配置图像渲染器的格式
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = 1.0
+        
+        // 创建图像渲染器
+        let renderer = UIGraphicsImageRenderer(size: newSize, format: format)
+        
+        // 绘制图像
         let mergedImage = renderer.image { context in
             photo.draw(in: CGRect(x: 0, y: 0, width: width, height: photoHeight))
             watermark.draw(in: CGRect(x: 0, y: photoHeight, width: width, height: watermarkHeight))
