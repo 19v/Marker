@@ -46,10 +46,10 @@ struct ContentView: View {
                         LoggerManager.shared.debug("view model is: \(viewModel.imageLoaded)")
                     }
                     
-                    // 多张照片
-                    PhotosPicker(selection: $viewModel.imagesSelection, maxSelectionCount: 9, matching: .images, photoLibrary: .shared()) {
-                        CapsuleButton.Style(icon: "photo.stack.fill", title: "批量处理")
-                    }
+//                    // 多张照片
+//                    PhotosPicker(selection: $viewModel.imagesSelection, maxSelectionCount: 9, matching: .images, photoLibrary: .shared()) {
+//                        CapsuleButton.Style(icon: "photo.stack.fill", title: "批量处理")
+//                    }
                     
                     // 设置 & 反馈
                     HStack {
