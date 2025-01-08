@@ -6,6 +6,9 @@ struct ContentView: View {
     
     @StateObject var viewModel = PhotoModel()
     
+    @State private var isShowPhotosPicker = false
+    @State private var isPhotoSelected = false
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -33,9 +36,10 @@ struct ContentView: View {
                 
                 VStack(spacing: 28) {
                     // 单张照片
-                    PhotosPicker(selection: $viewModel.imageSelection, matching: .images, photoLibrary: .shared()) {
-                        CapsuleButton.Style(icon: "photo.fill", title: "选择照片")
+                    CapsuleButton(icon: "camera.fill", title: "选择照片") {
+                        isShowPhotosPicker.toggle()
                     }
+                    .photosPicker(isPresented: $isShowPhotosPicker, selection: $viewModel.imageSelection, matching: .images, photoLibrary: .shared())
                     
                     CapsuleButton(icon: "camera.fill", title: "拍摄照片") {
                         print("Button tapped!")
