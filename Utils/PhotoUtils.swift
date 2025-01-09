@@ -1,5 +1,5 @@
 import CoreLocation
-import PhotosUI
+import Photos
 import UIKit
 
 class PhotoUtils {
@@ -49,17 +49,31 @@ class PhotoUtils {
 }
 
 class PhotoSaver: NSObject {
-
-    static func with(uiImage: UIImage) {
-        UIImageWriteToSavedPhotosAlbum(uiImage, self, #selector(callback(_: didFinishSavingWithError:contextInfo:)), nil)
+    
+    enum SaveError: Error {
+        case invalidImage
     }
     
-    @objc static internal func callback(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer?) {
-        if let error = error {
+    private var continuation: CheckedContinuation<Void, Error>?
+    
+    static func with(_ uiImage: UIImage?) async throws {
+        guard let uiImage else { throw SaveError.invalidImage }
+        let saver = PhotoSaver()
+        try await withCheckedThrowingContinuation { continuation in
+            saver.continuation = continuation
+            UIImageWriteToSavedPhotosAlbum(uiImage, saver, #selector(PhotoSaver.callback(_: didFinishSavingWithError:contextInfo:)), nil)
+        }
+    }
+    
+    @objc private func callback(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer?) {
+        if let error {
             LoggerManager.shared.error("保存失败: \(error.localizedDescription)")
+            continuation?.resume(throwing: error) // 保存失败，抛出错误
         } else {
             LoggerManager.shared.info("图片已成功保存到相册")
+            continuation?.resume() // 保存成功，正常结束
         }
+        continuation = nil // 避免重复调用
     }
     
 }

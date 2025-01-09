@@ -4,10 +4,14 @@ import PhotosUI
 struct ContentView: View {
     @Environment(\.colorScheme) private var colorScheme // 读取当前颜色模式
     
-    @StateObject var viewModel = PhotoModel()
+    @State private var selectedItem: PhotosPickerItem? = nil
+    @State private var selectedImage: UIImage? = nil
     
-    @State private var isShowPhotosPicker = false
-    @State private var isPhotoSelected = false
+    @State private var isCameraPresented = false
+    @State private var capturedImage: UIImage? = nil
+    
+    @State private var selectedItems: [PhotosPickerItem] = []
+    @State private var selectedImages: [UIImage] = []
     
     var body: some View {
         NavigationStack {
@@ -36,20 +40,61 @@ struct ContentView: View {
                 
                 VStack(spacing: 28) {
                     // 单张照片
-                    CapsuleButton(icon: "camera.fill", title: "选择照片") {
-                        isShowPhotosPicker.toggle()
+                    PhotosPicker(selection: $selectedItem, matching: .images, photoLibrary: .shared()) {
+                        CapsuleButton.Style(icon: "photo.fill", title: "选择照片")
                     }
-                    .photosPicker(isPresented: $isShowPhotosPicker, selection: $viewModel.imageSelection, matching: .images, photoLibrary: .shared())
+                    .onChange(of: selectedItem) {
+                        Task {
+                            if let data = try? await selectedItem?.loadTransferable(type: Data.self),
+                               let image = UIImage(data: data) {
+                                selectedImage = image
+                            }
+                        }
+                    }
+                    .navigationDestination(isPresented: .constant(selectedImage != nil)) {
+                        EditorView(photo: selectedImage)
+                            .onDisappear {
+                                selectedItem = nil
+                                selectedImage = nil
+                            }
+                    }
                     
+                    // 拍摄照片
                     CapsuleButton(icon: "camera.fill", title: "拍摄照片") {
-                        print("Button tapped!")
-                        LoggerManager.shared.debug("view model is: \(viewModel.imageLoaded)")
+                        isCameraPresented.toggle()
+                    }
+                    .navigationDestination(isPresented: $isCameraPresented) {
+                        CameraView(image: $capturedImage)
+                    }
+                    .navigationDestination(isPresented: .constant(capturedImage != nil)) {
+                        EditorView(photo: capturedImage)
+                            .onDisappear {
+                                capturedImage = nil
+                            }
                     }
                     
-//                    // 多张照片
-//                    PhotosPicker(selection: $viewModel.imagesSelection, maxSelectionCount: 9, matching: .images, photoLibrary: .shared()) {
-//                        CapsuleButton.Style(icon: "photo.stack.fill", title: "批量处理")
-//                    }
+                    // 多张照片
+                    PhotosPicker(selection: $selectedItems, matching: .images, photoLibrary: .shared()) {
+                        CapsuleButton.Style(icon: "photo.stack.fill", title: "批量处理")
+                    }
+                    .onChange(of: selectedItems) {
+                        Task {
+                            selectedImages.removeAll()
+                            for item in selectedItems {
+                                if let data = try? await item.loadTransferable(type: Data.self),
+                                   let image = UIImage(data: data) {
+                                    selectedImages.append(image)
+                                }
+                            }
+                        }
+                    }
+                    .navigationDestination(isPresented: .constant(!selectedImages.isEmpty)) {
+                        EditorView(photo: selectedImages.first)
+                            .onDisappear {
+                                selectedItems.removeAll()
+                                selectedImages.removeAll()
+                            }
+                    }
                     
                     // 设置 & 反馈
                     HStack {
@@ -70,11 +115,6 @@ struct ContentView: View {
                 MeshGradientView()
                     .edgesIgnoringSafeArea(.all)
             )
-            .navigationDestination(isPresented: $viewModel.imageLoaded) {
-                EditPhotoPage(viewModel: viewModel) {
-                    viewModel.reset()
-                }
-            }
         }
     }
 }

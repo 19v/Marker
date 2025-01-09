@@ -1,12 +1,13 @@
 import SwiftUI
 import PhotosUI
 
-struct EditPhotoPage: View {
+struct EditorView: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.dismiss) private var dismiss
     
-    @ObservedObject var viewModel: PhotoModel
+    let photo: UIImage?
     
-    let onDisappearAction: () -> Void
+    @StateObject private var viewModel = PhotoModel()
     
     @ViewBuilder private var photoView: some View {
         switch viewModel.imageState {
@@ -56,8 +57,8 @@ struct EditPhotoPage: View {
             // 关闭按钮
             ToolbarItem(placement: .topBarLeading) {
                 Button {
-                    viewModel.imageLoaded.toggle() // 设置为 false 以 pop 页面
-                    onDisappearAction()
+//                    viewModel.imageLoaded.toggle() // 设置为 false 以 pop 页面
+                    dismiss()
                 } label: {
                     Text("取消")
                         .font(.system(size: 16))
@@ -92,27 +93,16 @@ struct EditPhotoPage: View {
             
             // 保存按钮
             ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    LoggerManager.shared.debug("保存按钮点击")
-                    if let uiImage = viewModel.fullImage {
-                        PhotoSaver.with(uiImage: uiImage)
-                    }
-                } label: {
-                    Text("保存")
-                        .font(.system(size: 16))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(.blue)
-                        .foregroundColor(.white)
-                        .clipShape(Capsule())
-                }
+                SavePhotoButton(image: viewModel.fullImage)
             }
         }
-        .onDisappear(perform: onDisappearAction)
         .ignoresSafeArea(.all)
+        .onAppear {
+            viewModel.uiImage = photo
+        }
     }
 }
 
 #Preview {
-    EditPhotoPage(viewModel: PhotoModel()) {}
+    EditorView(photo: UIImage(named: "Example1"))
 }

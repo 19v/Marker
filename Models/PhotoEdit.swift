@@ -105,7 +105,14 @@ class PhotoModel: ObservableObject {
     // TODO: 这部分我认为应当用一个单独的类去做，单张和多张不宜放在一块
     @Published var imagesSelection: [PhotosPickerItem] = []
     
-    var uiImage: UIImage?
+    var uiImage: UIImage? {
+        didSet {
+            if let uiImage {
+                imageState = .success(Image(uiImage: uiImage))
+                exifData = ExifData(image: uiImage)
+            }
+        }
+    }
     
     var photoURL: URL? {
         didSet {
@@ -143,11 +150,6 @@ class PhotoModel: ObservableObject {
             return PhotoUtils.combine(photo: uiImage, watermark: watermarkImage)
         }
         return nil
-    }
-    
-    // 重置状态
-    func reset() {
-        imageSelection = nil
     }
     
     // MARK: - 界面相关
