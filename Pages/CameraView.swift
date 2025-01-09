@@ -1,54 +1,75 @@
 import SwiftUI
+import AVFoundation
 import UIKit
 
-struct CameraView: View {
-    @Environment(\.dismiss) var dismiss
-    @Binding var image: UIImage?
+struct CameraView: UIViewControllerRepresentable {
+    @Binding var capturedImageData: Data?
     
-    var body: some View {
-        CameraPicker(image: $image)
-            .toolbar(.hidden)
-            .ignoresSafeArea()
-            .onDisappear {
-                if image != nil {
-                    dismiss()
-                }
-            }
+    func makeUIViewController(context: Context) -> UIViewController {
+        let cameraController = CameraViewController()
+        cameraController.capturedImageData = $capturedImageData
+        return cameraController
     }
+    
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
 }
 
-struct CameraPicker: UIViewControllerRepresentable {
-    @Binding var image: UIImage?
+class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
+    var capturedImageData: Binding<Data?>?
     
-    func makeCoordinator() -> Coordinator {
-        return Coordinator(image: $image)
-    }
+    private var captureSession: AVCaptureSession!
+    private var previewLayer: AVCaptureVideoPreviewLayer!
+    private var photoOutput: AVCapturePhotoOutput!
     
-    func makeUIViewController(context: Context) -> UIImagePickerController {
-        let picker = UIImagePickerController()
-        picker.sourceType = .camera
-        picker.delegate = context.coordinator
-        return picker
-    }
-    
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-    
-    class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        @Binding var image: UIImage?
+    override func viewDidLoad() {
+        super.viewDidLoad()
         
-        init(image: Binding<UIImage?>) {
-            _image = image
+        captureSession = AVCaptureSession()
+        captureSession.sessionPreset = .high
+        
+        guard let videoDevice = AVCaptureDevice.default(for: .video) else {
+            print("No camera available.")
+            return
         }
         
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            if let pickedImage = info[.originalImage] as? UIImage {
-                image = pickedImage
+        do {
+            let videoInput = try AVCaptureDeviceInput(device: videoDevice)
+            if captureSession.canAddInput(videoInput) {
+                captureSession.addInput(videoInput)
             }
-            picker.dismiss(animated: true)
+            
+            photoOutput = AVCapturePhotoOutput()
+            if captureSession.canAddOutput(photoOutput) {
+                captureSession.addOutput(photoOutput)
+            }
+            
+            previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
+            previewLayer.frame = self.view.bounds
+            previewLayer.videoGravity = .resizeAspectFill
+            self.view.layer.addSublayer(previewLayer)
+            
+            captureSession.startRunning()
+        } catch {
+            print("Error setting up camera: \(error)")
         }
         
-        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            picker.dismiss(animated: true)
+        let captureButton = UIButton(frame: CGRect(x: self.view.frame.size.width / 2 - 35, y: self.view.frame.size.height - 100, width: 70, height: 70))
+        captureButton.layer.cornerRadius = 35
+        captureButton.backgroundColor = .red
+        captureButton.addTarget(self, action: #selector(capturePhoto), for: .touchUpInside)
+        self.view.addSubview(captureButton)
+    }
+    
+    @objc func capturePhoto() {
+        let photoSettings = AVCapturePhotoSettings()
+        if let connection = photoOutput.connection(with: .video), connection.isEnabled {
+            photoOutput.capturePhoto(with: photoSettings, delegate: self)
+        }
+    }
+    
+    func captureOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhotoToSandboxedData photoData: Data?, error: Error?) {
+        if let photoData = photoData {
+            self.capturedImageData?.wrappedValue = photoData
         }
     }
 }

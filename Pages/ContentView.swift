@@ -7,9 +7,6 @@ struct ContentView: View {
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var selectedData: Data? = nil
     
-    @State private var isCameraPresented = false
-    @State private var capturedImage: UIImage? = nil
-    
     @State private var selectedItems: [PhotosPickerItem] = []
     @State private var selectedDatas: [Data] = []
     
@@ -48,32 +45,15 @@ struct ContentView: View {
                             selectedData = try? await selectedItem?.loadTransferable(type: Data.self)
                         }
                     }
-                    .navigationDestination(isPresented: .constant(selectedData != nil)) {
-                        if let data = selectedData,
-                           let image = UIImage(data: data) {
-                            EditorView(image: image, exif: ExifData(data: data))
-                                .onDisappear {
-                                    selectedItem = nil
-                                    selectedData = nil
-                                }
-                        }
-                    }
                     
                     // 拍摄照片
-                    CapsuleButton(icon: "camera.fill", title: "拍摄照片") {
-                        isCameraPresented.toggle()
+                    NavigationLink {
+                        CameraView(capturedImageData: $selectedData)
+                            .toolbar(.hidden)
+                            .edgesIgnoringSafeArea(.all)
+                    } label: {
+                        CapsuleButton.Style(icon: "camera.fill", title: "拍摄照片")
                     }
-                    .navigationDestination(isPresented: $isCameraPresented) {
-                        CameraView(image: $capturedImage)
-                    }
-//                    .navigationDestination(isPresented: .constant(capturedImage != nil)) {
-//                        if let image = capturedImage {
-//                            EditorView(image: image)
-//                                .onDisappear {
-//                                    capturedImage = nil
-//                                }
-//                        }
-//                    }
                     
                     // 多张照片
                     PhotosPicker(selection: $selectedItems, matching: .images, photoLibrary: .shared()) {
@@ -87,17 +67,6 @@ struct ContentView: View {
                                     selectedDatas.append(data)
                                 }
                             }
-                        }
-                    }
-                    .navigationDestination(isPresented: .constant(!selectedDatas.isEmpty)) {
-                        // TODO: 批量编辑功能待完善
-                        if let data = selectedDatas.first,
-                           let image = UIImage(data: data) {
-                            EditorView(image: image, exif: ExifData(data: data))
-                                .onDisappear {
-                                    selectedItems.removeAll()
-                                    selectedDatas.removeAll()
-                                }
                         }
                     }
                     
@@ -120,6 +89,27 @@ struct ContentView: View {
                 MeshGradientView()
                     .edgesIgnoringSafeArea(.all)
             )
+            .navigationDestination(isPresented: .constant(selectedData != nil)) {
+                if let data = selectedData,
+                   let image = UIImage(data: data) {
+                    EditorView(image: image, exif: ExifData(data: data))
+                        .onDisappear {
+                            selectedItem = nil
+                            selectedData = nil
+                        }
+                }
+            }
+            .navigationDestination(isPresented: .constant(!selectedDatas.isEmpty)) {
+                // TODO: 批量编辑功能待完善
+                if let data = selectedDatas.first,
+                   let image = UIImage(data: data) {
+                    EditorView(image: image, exif: ExifData(data: data))
+                        .onDisappear {
+                            selectedItems.removeAll()
+                            selectedDatas.removeAll()
+                        }
+                }
+            }
         }
     }
 }
