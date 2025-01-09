@@ -5,13 +5,13 @@ struct ContentView: View {
     @Environment(\.colorScheme) private var colorScheme // 读取当前颜色模式
     
     @State private var selectedItem: PhotosPickerItem? = nil
-    @State private var selectedImage: UIImage? = nil
+    @State private var selectedData: Data? = nil
     
     @State private var isCameraPresented = false
     @State private var capturedImage: UIImage? = nil
     
     @State private var selectedItems: [PhotosPickerItem] = []
-    @State private var selectedImages: [UIImage] = []
+    @State private var selectedDatas: [Data] = []
     
     var body: some View {
         NavigationStack {
@@ -45,18 +45,16 @@ struct ContentView: View {
                     }
                     .onChange(of: selectedItem) {
                         Task {
-                            if let data = try? await selectedItem?.loadTransferable(type: Data.self),
-                               let image = UIImage(data: data) {
-                                selectedImage = image
-                            }
+                            selectedData = try? await selectedItem?.loadTransferable(type: Data.self)
                         }
                     }
-                    .navigationDestination(isPresented: .constant(selectedImage != nil)) {
-                        if let image = selectedImage {
-                            EditorView(image: image)
+                    .navigationDestination(isPresented: .constant(selectedData != nil)) {
+                        if let data = selectedData,
+                           let image = UIImage(data: data) {
+                            EditorView(image: image, exif: ExifData(data: data))
                                 .onDisappear {
                                     selectedItem = nil
-                                    selectedImage = nil
+                                    selectedData = nil
                                 }
                         }
                     }
@@ -68,14 +66,14 @@ struct ContentView: View {
                     .navigationDestination(isPresented: $isCameraPresented) {
                         CameraView(image: $capturedImage)
                     }
-                    .navigationDestination(isPresented: .constant(capturedImage != nil)) {
-                        if let image = capturedImage {
-                            EditorView(image: image)
-                                .onDisappear {
-                                    capturedImage = nil
-                                }
-                        }
-                    }
+//                    .navigationDestination(isPresented: .constant(capturedImage != nil)) {
+//                        if let image = capturedImage {
+//                            EditorView(image: image)
+//                                .onDisappear {
+//                                    capturedImage = nil
+//                                }
+//                        }
+//                    }
                     
                     // 多张照片
                     PhotosPicker(selection: $selectedItems, matching: .images, photoLibrary: .shared()) {
@@ -83,21 +81,22 @@ struct ContentView: View {
                     }
                     .onChange(of: selectedItems) {
                         Task {
-                            selectedImages.removeAll()
+                            selectedDatas.removeAll()
                             for item in selectedItems {
-                                if let data = try? await item.loadTransferable(type: Data.self),
-                                   let image = UIImage(data: data) {
-                                    selectedImages.append(image)
+                                if let data = try? await item.loadTransferable(type: Data.self) {
+                                    selectedDatas.append(data)
                                 }
                             }
                         }
                     }
-                    .navigationDestination(isPresented: .constant(!selectedImages.isEmpty)) {
-                        if let image = selectedImages.first {
-                            EditorView(image: image)
+                    .navigationDestination(isPresented: .constant(!selectedDatas.isEmpty)) {
+                        // TODO: 批量编辑功能待完善
+                        if let data = selectedDatas.first,
+                           let image = UIImage(data: data) {
+                            EditorView(image: image, exif: ExifData(data: data))
                                 .onDisappear {
                                     selectedItems.removeAll()
-                                    selectedImages.removeAll()
+                                    selectedDatas.removeAll()
                                 }
                         }
                     }

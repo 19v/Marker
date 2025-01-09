@@ -8,9 +8,9 @@ import CoreLocation
 @MainActor
 class PhotoModel: ObservableObject {
     
-    init(image: UIImage) {
+    init(image: UIImage, exif: ExifData) {
         uiImage = image
-        exifData = ExifData(image: image)
+        exifData = exif
         watermark = BasicWatermark(exifData: exifData)
         watermarkImage = watermark.uiImage
     }

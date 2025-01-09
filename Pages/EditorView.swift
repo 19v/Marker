@@ -5,8 +5,8 @@ struct EditorView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dismiss) private var dismiss
     
-    init(image: UIImage) {
-        _viewModel = StateObject(wrappedValue: PhotoModel(image: image))
+    init(image: UIImage, exif: ExifData) {
+        _viewModel = StateObject(wrappedValue: PhotoModel(image: image, exif: exif))
     }
     
     @StateObject private var viewModel: PhotoModel
@@ -81,5 +81,7 @@ struct EditorView: View {
 }
 
 #Preview {
-    EditorView(image: UIImage(named: "Example1")!)
+    let image = UIImage(named: "Example1")!
+    let exif = ExifData(image: image)
+    EditorView(image: image, exif: exif)
 }
