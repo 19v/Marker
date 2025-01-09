@@ -26,10 +26,10 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
     var orientation: Orientation = .horizontal
     
     // 初始化
-    required init(exifData: ExifData?) {
+    required init(exifData: ExifData) {
         // 设备名
         deviceName = DisplayItem(
-            value: exifData?.model ?? UIDevice.current.name, // 默认使用当前设备名称
+            value: exifData.model ?? UIDevice.current.name, // 默认使用当前设备名称
             colors: foregroundColors1,
             fontName: .miSansDemibold,
             fontSize: 87
@@ -37,8 +37,8 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
         
         // 拍摄时间
         originalTime = { () -> Date in
-            if let dateTimeOriginal = exifData?.dateTimeOriginal,
-               let offsetTimeOriginal = exifData?.offsetTimeOriginal,
+            if let dateTimeOriginal = exifData.dateTimeOriginal,
+               let offsetTimeOriginal = exifData.offsetTimeOriginal,
                let date = Date.from(dateString: dateTimeOriginal, timeZoneString: offsetTimeOriginal) {
                 date
             } else {
@@ -58,25 +58,25 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
         shootingParameters = DisplayItem(
             value: { () -> String in
                 // 光圈值
-                let fNumber = if let fNum = exifData?.fNumber {
+                let fNumber = if let fNum = exifData.fNumber {
                     String(format: "%.1f", fNum)
                 } else {
                     "0"
                 }
                 // 35mm胶片的等效焦距
-                let focalLenIn35mmFilm = if let focalLenIn35mmFilm = exifData?.focalLenIn35mmFilm {
+                let focalLenIn35mmFilm = if let focalLenIn35mmFilm = exifData.focalLenIn35mmFilm {
                     String(focalLenIn35mmFilm)
                 } else {
                     "0"
                 }
                 // 曝光时间
-                let exposureTime = if let exposureTime = exifData?.exposureTime {
+                let exposureTime = if let exposureTime = exifData.exposureTime {
                     "1/\(CommonUtils.decimalToFractionDenominator(decimal: exposureTime))"
                 } else {
                     "1/1"
                 }
                 // 感光度
-                let isoSpeedRatings = if let v = exifData?.isoSpeedRatings?.first,
+                let isoSpeedRatings = if let v = exifData.isoSpeedRatings?.first,
                                          let v {
                     String(v)
                 } else {
@@ -94,8 +94,8 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
         // Example: `31°58'19.92"N  118°45'24.93"E` (latitude & longitude)
         coordinate = DisplayItem(
             value: { () -> String in
-                if let latitude = exifData?.latitude,
-                   let longitude = exifData?.longitude {
+                if let latitude = exifData.latitude,
+                   let longitude = exifData.longitude {
                     let result = PhotoUtils.convertDecimalCoordinateToDMS(latitude: latitude, longitude: longitude)
                     return "\(result.latitudeDMS)  \(result.longitudeDMS)"
                 } else {
@@ -110,7 +110,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
         // 照片方向
         // 参考 Founcation 中的 UIImage.imageOrientation 枚举的定义
         // 默认视作横向
-        orientation = Orientation(rawValue: exifData?.orientation ?? UIImage.Orientation.up.rawValue)
+        orientation = Orientation(rawValue: exifData.orientation ?? UIImage.Orientation.up.rawValue)
     }
     
     // 背景色
@@ -152,7 +152,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
     // 显示经纬度的开关
     var isCoordinateDisplayed = false
     
-    var uiImage: UIImage? {
+    var uiImage: UIImage {
         let defaultWidth: CGFloat = switch orientation {
         case .horizontal: 4096
         case .vertical: 3072
@@ -332,7 +332,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
             }
         } else {
             LoggerManager.shared.error("参数有误！")
-            return nil
+            return UIImage() // TODO: 暂时先返回个空的？后面再来补
         }
     }
     

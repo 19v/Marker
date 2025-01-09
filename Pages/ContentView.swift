@@ -52,11 +52,13 @@ struct ContentView: View {
                         }
                     }
                     .navigationDestination(isPresented: .constant(selectedImage != nil)) {
-                        EditorView(photo: selectedImage)
-                            .onDisappear {
-                                selectedItem = nil
-                                selectedImage = nil
-                            }
+                        if let image = selectedImage {
+                            EditorView(image: image)
+                                .onDisappear {
+                                    selectedItem = nil
+                                    selectedImage = nil
+                                }
+                        }
                     }
                     
                     // 拍摄照片
@@ -67,10 +69,12 @@ struct ContentView: View {
                         CameraView(image: $capturedImage)
                     }
                     .navigationDestination(isPresented: .constant(capturedImage != nil)) {
-                        EditorView(photo: capturedImage)
-                            .onDisappear {
-                                capturedImage = nil
-                            }
+                        if let image = capturedImage {
+                            EditorView(image: image)
+                                .onDisappear {
+                                    capturedImage = nil
+                                }
+                        }
                     }
                     
                     // 多张照片
@@ -89,11 +93,13 @@ struct ContentView: View {
                         }
                     }
                     .navigationDestination(isPresented: .constant(!selectedImages.isEmpty)) {
-                        EditorView(photo: selectedImages.first)
-                            .onDisappear {
-                                selectedItems.removeAll()
-                                selectedImages.removeAll()
-                            }
+                        if let image = selectedImages.first {
+                            EditorView(image: image)
+                                .onDisappear {
+                                    selectedItems.removeAll()
+                                    selectedImages.removeAll()
+                                }
+                        }
                     }
                     
                     // 设置 & 反馈

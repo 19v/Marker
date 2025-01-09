@@ -83,8 +83,8 @@ struct EditPhotoToolbarView: View {
                     viewModel.isCoordinateDisplayed.toggle()
                     
                     // TODO: 将经纬度信息转换为实际地址
-                    if let latitude = viewModel.exifData?.latitude,
-                       let longitude = viewModel.exifData?.longitude {
+                    if let latitude = viewModel.exifData.latitude,
+                       let longitude = viewModel.exifData.longitude {
                         Task {
                             do {
                                 let address = try await CommonUtils.getAddressFromCoordinates(latitude: latitude, longitude: longitude)

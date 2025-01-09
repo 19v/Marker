@@ -13,11 +13,11 @@ import SwiftUICore
  */
 
 protocol WatermarkProtocol {
-    var uiImage: UIImage? { get } // 获得水印实例
+    var uiImage: UIImage { get } // 获得水印实例
 }
 
 protocol InfoDisplayable {
-    init(exifData: ExifData?)
+    init(exifData: ExifData)
 }
 
 protocol BackgroundEditable: AnyObject {

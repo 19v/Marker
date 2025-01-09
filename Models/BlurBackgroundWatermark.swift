@@ -11,6 +11,6 @@ import UIKit
  */
 
 struct BlurBackgroundWatermark: WatermarkProtocol {
-    init(exifData: ExifData?) {}
-    var uiImage: UIImage? { nil }
+    init(exifData: ExifData) {}
+    private(set) var uiImage = UIImage(named: "Example1")! // TODO: 待定
 }

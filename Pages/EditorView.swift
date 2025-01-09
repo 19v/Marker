@@ -5,37 +5,17 @@ struct EditorView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dismiss) private var dismiss
     
-    let photo: UIImage?
-    
-    @StateObject private var viewModel = PhotoModel()
-    
-    @ViewBuilder private var photoView: some View {
-        switch viewModel.imageState {
-        case .empty, .failure:
-            VStack(spacing: 4) {
-                Image(systemName: "photo.badge.exclamationmark.fill")
-                    .scaledToFit()
-                    .font(.system(size: 50))
-                    .foregroundStyle(.secondary)
-                Text("图片加载失败")
-                    .font(.system(.footnote))
-                    .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        case .loading:
-            ProgressView(/*"请等待…照片加载中"*/)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .foregroundStyle(colorScheme == .dark ? .white : .init(hex: 0x282828))
-                .ignoresSafeArea()
-        case .success(let image):
-            EditPhotoDisplayView(image: image, watermark: viewModel.watermarkImage, isWatermarkDisplayed: viewModel.isWatermarkDisplayed)
-        }
+    init(image: UIImage) {
+        _viewModel = StateObject(wrappedValue: PhotoModel(image: image))
     }
+    
+    @StateObject private var viewModel: PhotoModel
     
     var body: some View {
         ZStack {
             // 照片+水印
-            photoView
+            // TODO: 待修改
+            EditPhotoDisplayView(image: Image(uiImage: viewModel.uiImage), watermark: viewModel.watermarkImage, isWatermarkDisplayed: viewModel.isWatermarkDisplayed)
             
             // 顶部按钮的半透明背景
             VStack {
@@ -93,16 +73,13 @@ struct EditorView: View {
             
             // 保存按钮
             ToolbarItem(placement: .topBarTrailing) {
-                SavePhotoButton(image: viewModel.fullImage)
+                SavePhotoButton(image: PhotoUtils.combine(photo: viewModel.uiImage, watermark: viewModel.watermarkImage))
             }
         }
         .ignoresSafeArea(.all)
-        .onAppear {
-            viewModel.uiImage = photo
-        }
     }
 }
 
 #Preview {
-    EditorView(photo: UIImage(named: "Example1"))
+    EditorView(image: UIImage(named: "Example1")!)
 }

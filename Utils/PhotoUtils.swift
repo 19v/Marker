@@ -4,7 +4,7 @@ import UIKit
 
 class PhotoUtils {
     
-    static func combine(photo: UIImage, watermark: UIImage) -> UIImage? {
+    static func combine(photo: UIImage, watermark: UIImage) -> UIImage {
         let width = photo.size.width
         let photoHeight = photo.size.height
         

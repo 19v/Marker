@@ -4,7 +4,7 @@ struct SavePhotoButton: View {
     @State private var buttonState: ButtonState = .normal
     @State private var saveResult: String?
     
-    let image: UIImage?
+    let image: UIImage
 
     enum ButtonState {
         case normal
@@ -82,5 +82,5 @@ struct SavePhotoButton: View {
 }
 
 #Preview {
-    SavePhotoButton(image: UIImage(named: "Example1"))
+    SavePhotoButton(image: UIImage())
 }
