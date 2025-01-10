@@ -55,22 +55,25 @@ class ExifData {
     }
     
     init(data: Data) {
-        self.setExifData(data: data as CFData)
+        setMetadata(data: data as CFData)
     }
     
     init(url: URL) {
-        if let data = NSData(contentsOf: url) {
-            self.setExifData(data: data)
-        }
+        guard let data = NSData(contentsOf: url) else { return }
+        setMetadata(data: data)
     }
     
     init(image: UIImage) {
-        if let data = image.cgImage?.dataProvider?.data {
-            self.setExifData(data: data)
-        }
+        guard let data = image.cgImage?.dataProvider?.data else { return }
+        setMetadata(data: data)
     }
     
-    private func setExifData(data: CFData) {
+    init(metadata: [CFString: Any]) {
+        rawDict = metadata
+        setExifData()
+    }
+    
+    private func setMetadata(data: CFData) {
         let propertiesOptions = [kCGImageSourceShouldCache: false] as CFDictionary
         
         guard let provider = CGDataProvider(data: data) else {
@@ -82,12 +85,18 @@ class ExifData {
             LoggerManager.shared.error("get image source error")
             return
         }
-
+        
         guard let properties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, propertiesOptions) as? [CFString: Any] else {
             LoggerManager.shared.warning("properties is empty")
             return
         }
+        
         rawDict = properties
+        setExifData()
+    }
+    
+    private func setExifData() {
+        guard let properties = rawDict else { return }
         
         self.colorModel = properties[kCGImagePropertyColorModel] as? String
         self.pixelWidth = properties[kCGImagePropertyPixelWidth] as? Int

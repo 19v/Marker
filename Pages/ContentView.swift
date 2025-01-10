@@ -10,6 +10,11 @@ struct ContentView: View {
     @State private var selectedItems: [PhotosPickerItem] = []
     @State private var selectedDatas: [Data] = []
     
+    @State private var showCameraPicker = false
+    @State private var capturedImage: UIImage? = nil
+    @State private var capturedImageExif: ExifData? = nil
+    @State private var navigateToEditPage = false
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -45,14 +50,38 @@ struct ContentView: View {
                             selectedData = try? await selectedItem?.loadTransferable(type: Data.self)
                         }
                     }
+                    .navigationDestination(isPresented: .constant(selectedData != nil)) {
+                        if let data = selectedData,
+                           let image = UIImage(data: data) {
+                            EditorView(image: image, exif: ExifData(data: data))
+                                .onDisappear {
+                                    selectedItem = nil
+                                    selectedData = nil
+                                }
+                        }
+                    }
                     
                     // 拍摄照片
-                    NavigationLink {
-                        CameraView(capturedImageData: $selectedData)
-                            .toolbar(.hidden)
-                            .edgesIgnoringSafeArea(.all)
-                    } label: {
-                        CapsuleButton.Style(icon: "camera.fill", title: "拍摄照片")
+                    CapsuleButton(icon: "camera.fill", title: "拍摄照片") {
+                        showCameraPicker.toggle()
+                    }
+                    .fullScreenCover(isPresented: $showCameraPicker) {
+                        CameraPickerView() { image, data in
+                            capturedImage = image
+                            capturedImageExif = ExifData(metadata: data)
+                            navigateToEditPage.toggle()
+                        }
+                        .ignoresSafeArea()
+                    }
+                    .navigationDestination(isPresented: $navigateToEditPage) {
+                        if let image = capturedImage,
+                           let data = capturedImageExif {
+                            EditorView(image: image, exif: data)
+                                .onDisappear {
+                                    capturedImage = nil
+                                    capturedImageExif = nil
+                                }
+                        }
                     }
                     
                     // 多张照片
@@ -67,6 +96,17 @@ struct ContentView: View {
                                     selectedDatas.append(data)
                                 }
                             }
+                        }
+                    }
+                    .navigationDestination(isPresented: .constant(!selectedDatas.isEmpty)) {
+                        // TODO: 批量编辑功能待完善
+                        if let data = selectedDatas.first,
+                           let image = UIImage(data: data) {
+                            EditorView(image: image, exif: ExifData(data: data))
+                                .onDisappear {
+                                    selectedItems.removeAll()
+                                    selectedDatas.removeAll()
+                                }
                         }
                     }
                     
@@ -89,27 +129,6 @@ struct ContentView: View {
                 MeshGradientView()
                     .edgesIgnoringSafeArea(.all)
             )
-            .navigationDestination(isPresented: .constant(selectedData != nil)) {
-                if let data = selectedData,
-                   let image = UIImage(data: data) {
-                    EditorView(image: image, exif: ExifData(data: data))
-                        .onDisappear {
-                            selectedItem = nil
-                            selectedData = nil
-                        }
-                }
-            }
-            .navigationDestination(isPresented: .constant(!selectedDatas.isEmpty)) {
-                // TODO: 批量编辑功能待完善
-                if let data = selectedDatas.first,
-                   let image = UIImage(data: data) {
-                    EditorView(image: image, exif: ExifData(data: data))
-                        .onDisappear {
-                            selectedItems.removeAll()
-                            selectedDatas.removeAll()
-                        }
-                }
-            }
         }
     }
 }

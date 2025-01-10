@@ -53,7 +53,7 @@ struct SavePhotoButton: View {
         case .normal:
             Color(hex: 0x04B3DB)
         case .saving:
-            Color(hex: 0x0447DB)
+            Color(hex: 0x17D0FB)
         case .success:
             Color(hex: 0x04DB98)
         case .failed:
