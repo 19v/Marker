@@ -6,6 +6,12 @@ struct EditPhotoDisplayView: View {
     
     @ObservedObject var viewModel: PhotoModel
     
+    @State private var scale: CGFloat = 1.0 // 缩放比例
+    @State private var lastScale: CGFloat = 1.0 // 上一次的缩放比例
+    
+    @State private var offset: CGSize = .zero // 偏移量
+    @State private var lastOffset: CGSize = .zero // 上一次偏移量
+    
     var body: some View {
         ZStack {
             backgroundView
@@ -37,9 +43,9 @@ struct EditPhotoDisplayView: View {
                 TapGesture(count: 2)
                     .onEnded {
                         withAnimation {
-                            if viewModel.offset != .zero {
-                                viewModel.offset = .zero
-                                viewModel.lastOffset = .zero
+                            if offset != .zero {
+                                offset = .zero
+                                lastOffset = .zero
                             }
                         }
                     }
@@ -78,8 +84,8 @@ struct EditPhotoDisplayView: View {
             radius: colorScheme == .dark ? 20 : 10,
             x: 0, y: 0
         )
-        .scaleEffect(viewModel.scale) // 缩放
-        .offset(viewModel.offset) // 偏移
+        .scaleEffect(scale) // 缩放
+        .offset(offset) // 偏移
         .onTapGesture {
             // 单击
             withAnimation {
@@ -89,11 +95,11 @@ struct EditPhotoDisplayView: View {
         .onTapGesture(count: 2, perform: {
             // 双击
             withAnimation {
-                if viewModel.offset != .zero {
-                    viewModel.offset = .zero
-                    viewModel.lastOffset = .zero
+                if offset != .zero {
+                    offset = .zero
+                    lastOffset = .zero
                 } else {
-                    viewModel.scale = viewModel.scale == PhotoModel.defaultScale ? 2.0 : PhotoModel.defaultScale
+                    scale = scale == 1.0 ? 2.0 : 1.0
                 }
             }
         })
@@ -101,21 +107,21 @@ struct EditPhotoDisplayView: View {
             // 拖拽
             DragGesture()
                 .onChanged { value in
-                    viewModel.offset = CGSize(
-                        width: viewModel.lastOffset.width + value.translation.width,
-                        height: viewModel.lastOffset.height + value.translation.height
+                    offset = CGSize(
+                        width: lastOffset.width + value.translation.width,
+                        height: lastOffset.height + value.translation.height
                     )
                 }
                 .onEnded { _ in
-                    viewModel.lastOffset = viewModel.offset
+                    lastOffset = offset // 拖动结束时保持最终位置
                 }
                 .simultaneously(
                     with: MagnificationGesture()
                         .onChanged { value in
-                            viewModel.scale = viewModel.lastScale * value
+                            scale = lastScale * value
                         }
                         .onEnded { _ in
-                            viewModel.lastScale = viewModel.scale
+                            lastScale = scale
                         }
                 )
         )
@@ -123,10 +129,10 @@ struct EditPhotoDisplayView: View {
             // 双指放大
             MagnificationGesture()
                 .onChanged { value in
-                    viewModel.scale = viewModel.lastScale * value // 动态更新缩放比例
+                    scale = lastScale * value // 动态更新缩放比例
                 }
                 .onEnded { _ in
-                    viewModel.lastScale = viewModel.scale // 保存最终缩放比例
+                    lastScale = scale // 保存最终缩放比例
                 }
         )
     }

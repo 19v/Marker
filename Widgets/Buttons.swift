@@ -108,7 +108,7 @@ struct CustomTabButton: View {
                 }
                 .frame(/*width: 20, */height: 30)
                 Text(labelText)
-                    .font(.caption)
+                    .font(.system(size: 10))
 //                    .foregroundColor(Color(hex: 0x282828))
             }
             .padding(.vertical, 8)
