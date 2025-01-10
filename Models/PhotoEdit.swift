@@ -23,10 +23,39 @@ class PhotoModel: ObservableObject {
         watermarkImage = watermark.uiImage
     }
     
-    // MARK: - 界面相关
+    // 控制图片的拖拽、缩放
+    static let defaultScale: CGFloat = 1.0 // 初始缩放比例
+    @Published var scale: CGFloat = defaultScale // 控制缩放比例
+    @Published var lastScale: CGFloat = defaultScale // 保存上一次的缩放比例
+    @Published var offset: CGSize = .zero // 偏移量
+    @Published var lastOffset: CGSize = .zero // 上一次偏移量
     
-    // 自定义设备名（默认样式下左侧的名称）
-    @Published var deviceName: String = ""
+    // 工具栏
+    enum EditPanels {
+        case empty
+        case background
+        case time
+        case coordinate
+        
+        mutating func toggle(to panel: EditPanels) {
+            self = self != panel ? panel : .empty
+        }
+    }
+    @Published private(set) var panel = EditPanels.empty
+    func setPanel(to newPanel: EditPanels) {
+        panel = panel != newPanel ? newPanel : .empty
+        // 打开编辑界面时，图片恢复初始位置与大小
+        if newPanel != .empty {
+            if scale != PhotoModel.defaultScale {
+                scale = PhotoModel.defaultScale
+                lastScale = PhotoModel.defaultScale
+            }
+            if offset != .zero {
+                offset = .zero
+                lastOffset = .zero
+            }
+        }
+    }
     
     // 显示水印的开关
     @Published var isWatermarkDisplayed = true

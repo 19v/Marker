@@ -15,7 +15,7 @@ struct EditorView: View {
     var body: some View {
         ZStack {
             // 照片+水印
-            EditPhotoDisplayView(image: Image(uiImage: viewModel.uiImage), watermark: viewModel.watermarkImage, isWatermarkDisplayed: $viewModel.isWatermarkDisplayed)
+            EditPhotoDisplayView(viewModel: viewModel)
             
             // 顶部按钮的半透明背景
             VStack {

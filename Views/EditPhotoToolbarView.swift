@@ -5,20 +5,8 @@ struct EditPhotoToolbarView: View {
     
     @ObservedObject var viewModel: PhotoModel
     
-    enum EditPanels {
-        case empty
-        case background
-        case time
-        case coordinate
-        
-        mutating func toggle(to panel: EditPanels) {
-            self = self != panel ? panel : .empty
-        }
-    }
-    @State private var panel = EditPanels.empty
-    
     @ViewBuilder private var activeView: some View {
-        switch panel {
+        switch viewModel.panel {
         case .empty:
             EmptyView()
         case .background:
@@ -36,7 +24,7 @@ struct EditPhotoToolbarView: View {
             
             activeView
                 .transition(.opacity) // 使用缩放过渡动画
-                .animation(.easeInOut, value: panel)
+                .animation(.easeInOut, value: viewModel.panel)
                 .background(
                     Rectangle()
                         .fill(
@@ -48,11 +36,6 @@ struct EditPhotoToolbarView: View {
                 )
             
             HStack{
-//                CustomTabButton(iconName: "photo.circle.fill", labelText: "水印") {
-//                    LoggerManager.shared.debug("显示水印按钮点击")
-//                    viewModel.isWatermarkDisplayed.toggle()
-//                }
-                
                 // 背景颜色按钮
                 CustomTabButton(iconName: "circle.tophalf.filled.inverse", labelText: "颜色") {
                     LoggerManager.shared.debug("背景颜色按钮点击")
@@ -71,7 +54,7 @@ struct EditPhotoToolbarView: View {
                 CustomTabButton(iconName: "calendar.circle.fill", labelText: "时间") {
                     LoggerManager.shared.debug("日期时间按钮点击")
                     withAnimation {
-                        panel.toggle(to: .time)
+                        viewModel.setPanel(to: .time)
                     }
                 }
                 .disabled(!(viewModel.watermark is TimeEditable))
@@ -80,7 +63,7 @@ struct EditPhotoToolbarView: View {
                 CustomTabButton(iconName: "location.circle.fill", labelText: "位置") {
                     LoggerManager.shared.debug("地理位置按钮点击")
                     withAnimation {
-                        panel.toggle(to: .coordinate)
+                        viewModel.setPanel(to: .coordinate)
                     }
                     viewModel.isCoordinateDisplayed.toggle()
                     

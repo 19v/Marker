@@ -4,22 +4,14 @@ import PhotosUI
 struct EditPhotoDisplayView: View {
     @Environment(\.colorScheme) private var colorScheme
     
-    let image: Image
-    let watermark: UIImage?
-    @Binding var isWatermarkDisplayed: Bool
-    
-    // 控制图片显示的参数
-    private static let defaultScale: CGFloat = 1.0 // 初始缩放比例
-    @State private var scale: CGFloat = defaultScale // 控制缩放比例
-    @State private var lastScale: CGFloat = defaultScale // 保存上一次的缩放比例
-    @State private var offset: CGSize = .zero // 偏移量
-    @State private var lastOffset: CGSize = .zero // 上一次偏移量
+    @ObservedObject var viewModel: PhotoModel
     
     var body: some View {
         ZStack {
             backgroundView
             imageWithWatermark
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
             colorScheme == .light
             ? Color(hex: 0xF2F3F5)
@@ -34,14 +26,20 @@ struct EditPhotoDisplayView: View {
             .opacity(0)
             .contentShape(Rectangle())
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .onTapGesture {
+                // 单击
+                withAnimation {
+                    viewModel.setPanel(to: .empty)
+                }
+            }
             .gesture(
                 // 双击
                 TapGesture(count: 2)
                     .onEnded {
                         withAnimation {
-                            if offset != .zero {
-                                offset = .zero
-                                lastOffset = .zero
+                            if viewModel.offset != .zero {
+                                viewModel.offset = .zero
+                                viewModel.lastOffset = .zero
                             }
                         }
                     }
@@ -49,10 +47,10 @@ struct EditPhotoDisplayView: View {
             .gesture(
                 LongPressGesture(minimumDuration: 1)
                     .onChanged { _ in
-                        isWatermarkDisplayed = false
+                        viewModel.isWatermarkDisplayed = false
                     }
                     .onEnded { _ in
-                        isWatermarkDisplayed = true
+                        viewModel.isWatermarkDisplayed = true
                     }
             )
     }
@@ -60,15 +58,14 @@ struct EditPhotoDisplayView: View {
     // 图片和水印
     @ViewBuilder var imageWithWatermark: some View {
         VStack(spacing: 0) {
-            image
+            Image(uiImage: viewModel.uiImage)
                 .resizable()
                 .scaledToFit()
                 .frame(maxWidth: .infinity)
                 .listRowInsets(EdgeInsets())
             
-            if let watermark,
-               isWatermarkDisplayed {
-                Image(uiImage: watermark)
+            if viewModel.isWatermarkDisplayed {
+                Image(uiImage: viewModel.watermarkImage)
                     .resizable()
                     .scaledToFit()
                     .frame(maxWidth: .infinity)
@@ -81,41 +78,44 @@ struct EditPhotoDisplayView: View {
             radius: colorScheme == .dark ? 20 : 10,
             x: 0, y: 0
         )
-        .scaleEffect(scale) // 缩放
-        .offset(offset) // 偏移
-        .gesture(
+        .scaleEffect(viewModel.scale) // 缩放
+        .offset(viewModel.offset) // 偏移
+        .onTapGesture {
+            // 单击
+            withAnimation {
+                viewModel.setPanel(to: .empty)
+            }
+        }
+        .onTapGesture(count: 2, perform: {
             // 双击
-            TapGesture(count: 2)
-                .onEnded {
-                    withAnimation {
-                        if offset != .zero {
-                            offset = .zero
-                            lastOffset = .zero
-                        } else {
-                            scale = scale == EditPhotoDisplayView.defaultScale ? 2.0 : EditPhotoDisplayView.defaultScale
-                        }
-                    }
+            withAnimation {
+                if viewModel.offset != .zero {
+                    viewModel.offset = .zero
+                    viewModel.lastOffset = .zero
+                } else {
+                    viewModel.scale = viewModel.scale == PhotoModel.defaultScale ? 2.0 : PhotoModel.defaultScale
                 }
-        )
+            }
+        })
         .gesture(
             // 拖拽
             DragGesture()
                 .onChanged { value in
-                    offset = CGSize(
-                        width: lastOffset.width + value.translation.width,
-                        height: lastOffset.height + value.translation.height
+                    viewModel.offset = CGSize(
+                        width: viewModel.lastOffset.width + value.translation.width,
+                        height: viewModel.lastOffset.height + value.translation.height
                     )
                 }
                 .onEnded { _ in
-                    lastOffset = offset
+                    viewModel.lastOffset = viewModel.offset
                 }
                 .simultaneously(
                     with: MagnificationGesture()
                         .onChanged { value in
-                            scale = lastScale * value
+                            viewModel.scale = viewModel.lastScale * value
                         }
                         .onEnded { _ in
-                            lastScale = scale
+                            viewModel.lastScale = viewModel.scale
                         }
                 )
         )
@@ -123,10 +123,10 @@ struct EditPhotoDisplayView: View {
             // 双指放大
             MagnificationGesture()
                 .onChanged { value in
-                    scale = lastScale * value // 动态更新缩放比例
+                    viewModel.scale = viewModel.lastScale * value // 动态更新缩放比例
                 }
                 .onEnded { _ in
-                    lastScale = scale // 保存最终缩放比例
+                    viewModel.lastScale = viewModel.scale // 保存最终缩放比例
                 }
         )
     }
