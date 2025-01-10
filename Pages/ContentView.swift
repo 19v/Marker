@@ -15,6 +15,8 @@ struct ContentView: View {
     @State private var capturedImageExif: ExifData? = nil
     @State private var navigateToEditPage = false
     
+    @State private var navigateToSettingPage = false
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -113,13 +115,24 @@ struct ContentView: View {
                     // 设置 & 反馈
                     HStack {
                         Spacer()
+                        
                         TextButton(icon: "gearshape.fill", title: "设置") {
-                            print("Button tapped!")
+                            navigateToSettingPage.toggle()
                         }
+                        .navigationDestination(isPresented: $navigateToSettingPage) {
+                            SettingsTabView()
+                        }
+                        
                         Spacer()
+                        
                         TextButton(icon: "quote.bubble.fill", title: "反馈") {
-                            print("Button tapped!")
+                            // TODO: 测试
+                            let appID = "6450999012"
+                            if let url = URL(string: "itms-apps://itunes.apple.com/app/id\(appID)?action=write-review") {
+                                UIApplication.shared.open(url)
+                            }
                         }
+                        
                         Spacer()
                     }
                 }

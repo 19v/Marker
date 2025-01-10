@@ -222,11 +222,12 @@
 				};
 			};
 			buildConfigurationList = 050186542CEF1AE000EAEA64 /* Build configuration list for PBXProject "Marker" */;
-			developmentRegion = en;
+			developmentRegion = "zh-Hans";
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
 			);
 			mainGroup = 050186502CEF1AE000EAEA64;
 			minimizedProjectReferenceProxies = 1;
@@ -422,6 +423,7 @@
 				INFOPLIST_FILE = Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "简单水印";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need access to the camera for taking photos.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Export user-edited photos";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -468,6 +470,7 @@
 				INFOPLIST_FILE = Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "简单水印";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need access to the camera for taking photos.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Export user-edited photos";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
