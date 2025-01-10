@@ -52,7 +52,7 @@ struct EditTimeSubView: View {
                 viewModel.watermarkTime = date
                 viewModel.watermarkTimeZone = timeZone
             })
-            .presentationBackground(.ultraThickMaterial)
+            .presentationBackground(.thickMaterial)
             .interactiveDismissDisabled(true)
         }
     }

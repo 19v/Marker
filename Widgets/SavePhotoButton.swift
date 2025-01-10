@@ -20,11 +20,6 @@ struct SavePhotoButton: View {
             } label: {
                 contentForButtonState
                     .font(.system(size: 16))
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(backgroundColor)
-                    .foregroundColor(.white)
-                    .clipShape(Capsule())
                     .scaleEffect(buttonState == .normal ? 1 : 0.95) // 按钮点击时略微缩小
                     .opacity(buttonState == .normal || buttonState == .saving ? 1 : 0.7) // 按钮动画平滑
                     .animation(.easeInOut(duration: 0.3), value: buttonState) // 使按钮状态变化时有平滑动画
@@ -37,27 +32,20 @@ struct SavePhotoButton: View {
     @ViewBuilder private var contentForButtonState: some View {
         switch buttonState {
         case .normal:
-            Text("保存")
+            HStack {
+                Image(systemName: "square.and.arrow.down")
+                Text("保存")
+            }
+            .foregroundColor(.init(hex: 0x04B3DB))
         case .saving:
             ProgressView()
-                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                .progressViewStyle(CircularProgressViewStyle(tint: .init(hex: 0x17D0FB)))
         case .success:
             Image(systemName: "checkmark")
+                .foregroundColor(.init(hex: 0x04DB98))
         case .failed:
             Image(systemName: "exclamationmark.triangle.fill")
-        }
-    }
-    
-    @ViewBuilder private var backgroundColor: some View {
-        switch buttonState {
-        case .normal:
-            Color(hex: 0x04B3DB)
-        case .saving:
-            Color(hex: 0x17D0FB)
-        case .success:
-            Color(hex: 0x04DB98)
-        case .failed:
-            Color(hex: 0xDB2C04)
+                .foregroundColor(.init(hex: 0xDB2C04))
         }
     }
 

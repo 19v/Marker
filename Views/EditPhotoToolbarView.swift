@@ -35,14 +35,16 @@ struct EditPhotoToolbarView: View {
             Spacer()
             
             activeView
-//                .frame(height: 300)
                 .transition(.opacity) // 使用缩放过渡动画
                 .animation(.easeInOut, value: panel)
                 .background(
                     Rectangle()
-                        .fill(.bar)
-                        .foregroundStyle(colorScheme == .light ? .white : .black)
-                        .opacity(0.8)
+                        .fill(
+                            colorScheme == .dark
+                            ? .black.opacity(0.8)
+                            : .white.opacity(0.5)
+                        )
+                        .background(.thinMaterial)
                 )
             
             HStack{
@@ -77,9 +79,9 @@ struct EditPhotoToolbarView: View {
                 // 经纬度按钮
                 CustomTabButton(iconName: "location.circle.fill", labelText: "位置") {
                     LoggerManager.shared.debug("地理位置按钮点击")
-//                    withAnimation {
-//                        panel.toggle(to: .coordinate)
-//                    }
+                    withAnimation {
+                        panel.toggle(to: .coordinate)
+                    }
                     viewModel.isCoordinateDisplayed.toggle()
                     
                     // TODO: 将经纬度信息转换为实际地址
@@ -109,10 +111,12 @@ struct EditPhotoToolbarView: View {
             .padding(.horizontal, 30)
             .background(
                 Rectangle()
-//                    .fill(.bar)
-                    .fill(.ultraThinMaterial)
-                    .foregroundStyle(colorScheme == .light ? .white : .black)
-                    .opacity(0.8)
+                    .fill(
+                        colorScheme == .dark
+                        ? .black.opacity(0.8)
+                        : .white.opacity(0.5)
+                    )
+                    .background(.regularMaterial)
             )
         }
     }

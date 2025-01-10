@@ -6,10 +6,10 @@ struct EditPhotoDisplayView: View {
     
     let image: Image
     let watermark: UIImage?
-    let isWatermarkDisplayed: Bool
+    @Binding var isWatermarkDisplayed: Bool
     
     // 控制图片显示的参数
-    private static let defaultScale: CGFloat = 0.9 // 初始缩放比例，为1.0时左右填满屏幕
+    private static let defaultScale: CGFloat = 1.0 // 初始缩放比例
     @State private var scale: CGFloat = defaultScale // 控制缩放比例
     @State private var lastScale: CGFloat = defaultScale // 保存上一次的缩放比例
     @State private var offset: CGSize = .zero // 偏移量
@@ -21,6 +21,7 @@ struct EditPhotoDisplayView: View {
             Color.white
                 .opacity(0)
                 .contentShape(Rectangle())
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .gesture(
                     // 双击
                     TapGesture(count: 2)
@@ -31,6 +32,15 @@ struct EditPhotoDisplayView: View {
                                     lastOffset = .zero
                                 }
                             }
+                        }
+                )
+                .gesture(
+                    LongPressGesture(minimumDuration: 1)
+                        .onChanged { _ in
+                            isWatermarkDisplayed = false
+                        }
+                        .onEnded { _ in
+                            isWatermarkDisplayed = true
                         }
                 )
             
@@ -51,6 +61,7 @@ struct EditPhotoDisplayView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity) // 占据剩余空间
+            .padding(.horizontal, 20)
             .shadow(
                 color: colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.2),
                 radius: colorScheme == .dark ? 20 : 10,
