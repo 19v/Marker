@@ -100,7 +100,7 @@ struct CustomTabButton: View {
                         .fill(Color.white.opacity(0))
                     Image(systemName: iconName)
                         .symbolVariant(.circle.fill)
-                        .foregroundStyle(Color(hex: 0x282828))
+//                        .foregroundStyle(Color(hex: 0x282828))
 //                        .resizable()
 //                        .scaledToFit()
                         .font(.system(size: 24))
@@ -109,7 +109,7 @@ struct CustomTabButton: View {
                 .frame(/*width: 20, */height: 30)
                 Text(labelText)
                     .font(.caption)
-                    .foregroundColor(Color(hex: 0x282828))
+//                    .foregroundColor(Color(hex: 0x282828))
             }
             .padding(.vertical, 8)
             .frame(maxWidth: .infinity)

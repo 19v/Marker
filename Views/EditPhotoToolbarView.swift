@@ -15,6 +15,24 @@ struct EditPhotoToolbarView: View {
             EditTimeSubView(viewModel: viewModel)
         case .coordinate:
             EmptyView()
+        case .info:
+            EmptyView()
+        }
+    }
+    
+    private func toolbarButtonForegroundStyle(panel: PhotoModel.EditPanels) -> Color {
+        if colorScheme == .dark {
+            if panel == viewModel.panel {
+                return Color(hex: 0xA0A0A0)
+            } else {
+                return Color.white
+            }
+        } else {
+            if panel == viewModel.panel {
+                return Color(hex: 0x909090)
+            } else {
+                return Color(hex: 0x282828)
+            }
         }
     }
     
@@ -49,6 +67,7 @@ struct EditPhotoToolbarView: View {
                     }
                 }
                 .disabled(!(viewModel.watermark is BackgroundEditable))
+                .foregroundStyle(toolbarButtonForegroundStyle(panel: .background))
                 
                 // 日期时间按钮
                 CustomTabButton(iconName: "calendar.circle.fill", labelText: "时间") {
@@ -58,6 +77,7 @@ struct EditPhotoToolbarView: View {
                     }
                 }
                 .disabled(!(viewModel.watermark is TimeEditable))
+                .foregroundStyle(toolbarButtonForegroundStyle(panel: .time))
                 
                 // 经纬度按钮
                 CustomTabButton(iconName: "location.circle.fill", labelText: "位置") {
@@ -81,12 +101,14 @@ struct EditPhotoToolbarView: View {
                     }
                 }
                 .disabled(!(viewModel.watermark is CoordinateEditable))
+                .foregroundStyle(toolbarButtonForegroundStyle(panel: .coordinate))
                 
                 CustomTabButton(iconName: "info.circle.fill", labelText: "信息") {
                     LoggerManager.shared.debug("照片信息按钮点击")
                     viewModel.isPhotoInfoPanelDisplayed.toggle()
                 }
                 .disabled(!(viewModel.watermark is InfoDisplayable))
+                .foregroundStyle(toolbarButtonForegroundStyle(panel: .info))
             }
             .frame(height: 44)
             .padding(.top, 10)

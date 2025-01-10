@@ -36,6 +36,7 @@ class PhotoModel: ObservableObject {
         case background
         case time
         case coordinate
+        case info
         
         mutating func toggle(to panel: EditPanels) {
             self = self != panel ? panel : .empty

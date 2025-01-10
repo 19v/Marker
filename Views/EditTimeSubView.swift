@@ -19,7 +19,7 @@ struct EditTimeSubView: View {
                 HStack {
                     Text("显示日期与时间")
                         .font(.headline)
-                        .foregroundStyle(.black)
+                        .foregroundStyle(colorScheme == .dark ? .white : .black)
                     
                     Spacer()
                     
@@ -56,18 +56,6 @@ struct EditTimeSubView: View {
             .interactiveDismissDisabled(true)
         }
     }
-    
-    // 计算每月的天数
-    private func daysInMonth(year: Int, month: Int) -> [Int] {
-        let dateComponents = DateComponents(year: year, month: month)
-        let calendar = Calendar.current
-        guard let date = calendar.date(from: dateComponents),
-              let range = calendar.range(of: .day, in: .month, for: date) else {
-            return []
-        }
-        return Array(range)
-    }
-    
 }
 
 // MARK: - 调整日期与时间的Sheet
