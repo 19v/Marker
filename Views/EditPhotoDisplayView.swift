@@ -35,6 +35,7 @@ struct EditPhotoDisplayView: View {
             .onTapGesture {
                 // 单击
                 withAnimation {
+                    viewModel.isWatermarkDisplayed.toggle()
                     viewModel.setPanel(to: .empty)
                 }
             }
@@ -48,15 +49,6 @@ struct EditPhotoDisplayView: View {
                                 lastOffset = .zero
                             }
                         }
-                    }
-            )
-            .gesture(
-                LongPressGesture(minimumDuration: 1)
-                    .onChanged { _ in
-                        viewModel.isWatermarkDisplayed = false
-                    }
-                    .onEnded { _ in
-                        viewModel.isWatermarkDisplayed = true
                     }
             )
     }
@@ -89,6 +81,7 @@ struct EditPhotoDisplayView: View {
         .onTapGesture {
             // 单击
             withAnimation {
+                viewModel.isWatermarkDisplayed.toggle()
                 viewModel.setPanel(to: .empty)
             }
         }
@@ -124,16 +117,6 @@ struct EditPhotoDisplayView: View {
                             lastScale = scale
                         }
                 )
-        )
-        .gesture(
-            // 双指放大
-            MagnificationGesture()
-                .onChanged { value in
-                    scale = lastScale * value // 动态更新缩放比例
-                }
-                .onEnded { _ in
-                    lastScale = scale // 保存最终缩放比例
-                }
         )
     }
 }

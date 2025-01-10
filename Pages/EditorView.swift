@@ -44,7 +44,24 @@ struct EditorView: View {
                         Image(systemName: "arrow.uturn.backward")
                         Text("返回")
                     }
-                    .foregroundStyle(.gray.opacity(0.8))
+                    .foregroundStyle(.gray)
+                }
+            }
+            
+            // 水印开关
+            if !viewModel.isWatermarkDisplayed {
+                ToolbarItem(placement: .principal) {
+                    Button {
+                        withAnimation {
+                            viewModel.isWatermarkDisplayed = true
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "circle")
+                            Text("打开水印")
+                        }
+                        .foregroundStyle(Color(hex: 0x04DBCD))
+                    }
                 }
             }
             
