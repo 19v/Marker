@@ -38,6 +38,7 @@ protocol TimeEditable: AnyObject {
 
 protocol CoordinateEditable: AnyObject {
     var isCoordinateDisplayed: Bool { get set }
+    var displayCoordinate: String { get set } // 实际显示在水印上的位置信息
 }
 
 // MARK: - Defines

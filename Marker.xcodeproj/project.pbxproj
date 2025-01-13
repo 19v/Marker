@@ -31,6 +31,7 @@
 		05977A302D2E60CB003E269F /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05977A2F2D2E60C8003E269F /* Location.swift */; };
 		05977A332D2F756E003E269F /* SavePhotoButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05977A322D2F7567003E269F /* SavePhotoButton.swift */; };
 		05977A352D2F9FB8003E269F /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05977A342D2F9FB4003E269F /* CameraView.swift */; };
+		05977A3D2D34F8D6003E269F /* EditCoordinateSubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05977A3C2D34F8D6003E269F /* EditCoordinateSubView.swift */; };
 		05AC15042CF71D5000EE8F9A /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AC15032CF71D4700EE8F9A /* EditorView.swift */; };
 		05BFE9F72D0C2BA000D02F12 /* ColorUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BFE9F62D0C2B9D00D02F12 /* ColorUtils.swift */; };
 /* End PBXBuildFile section */
@@ -63,6 +64,7 @@
 		05977A2F2D2E60C8003E269F /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		05977A322D2F7567003E269F /* SavePhotoButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavePhotoButton.swift; sourceTree = "<group>"; };
 		05977A342D2F9FB4003E269F /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		05977A3C2D34F8D6003E269F /* EditCoordinateSubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCoordinateSubView.swift; sourceTree = "<group>"; };
 		05AC15032CF71D4700EE8F9A /* EditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorView.swift; sourceTree = "<group>"; };
 		05BFE9F62D0C2B9D00D02F12 /* ColorUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorUtils.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -161,6 +163,7 @@
 				0532ECBB2D26928C003635B3 /* EditPhotoToolbarView.swift */,
 				0532ECAD2D23E138003635B3 /* EditColorSubView.swift */,
 				0532ECAF2D23E169003635B3 /* EditTimeSubView.swift */,
+				05977A3C2D34F8D6003E269F /* EditCoordinateSubView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -278,6 +281,7 @@
 				0532ECBA2D269254003635B3 /* EditPhotoDisplayView.swift in Sources */,
 				0532ECBC2D269291003635B3 /* EditPhotoToolbarView.swift in Sources */,
 				05576E642CF46A8200BE1DDD /* ExifData.swift in Sources */,
+				05977A3D2D34F8D6003E269F /* EditCoordinateSubView.swift in Sources */,
 				05977A332D2F756E003E269F /* SavePhotoButton.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -88,7 +88,6 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
             fontName: .miSansDemibold,
             fontSize: 87
         )
-         
         
         // 位置信息
         // Example: `31°58'19.92"N  118°45'24.93"E` (latitude & longitude)
@@ -151,7 +150,16 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
     
     // 显示经纬度的开关
     var isCoordinateDisplayed = false
+    var displayCoordinate: String {
+        get {
+            coordinate.value
+        }
+        set {
+            coordinate.customValue = newValue
+        }
+    }
     
+    // 返回水印
     var uiImage: UIImage {
         let defaultWidth: CGFloat = switch orientation {
         case .horizontal: 4096

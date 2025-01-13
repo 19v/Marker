@@ -74,6 +74,17 @@ class PhotoModel: ObservableObject {
             refreshWatermarkImage()
         }
     }
+    var displayCoordinate: String {
+        get {
+            guard let vw = watermark as? CoordinateEditable else { return "" }
+            return vw.displayCoordinate
+        }
+        set {
+            guard let vw = watermark as? CoordinateEditable else { return }
+            vw.displayCoordinate = newValue
+            refreshWatermarkImage()
+        }
+    }
     
     // 显示图片信息的开关
     @Published var isPhotoInfoPanelDisplayed = false

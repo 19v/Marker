@@ -28,7 +28,7 @@ struct EditPhotoToolbarView: View {
         case .time:
             EditTimeSubView(viewModel: viewModel)
         case .coordinate:
-            EmptyView()
+            EditCoordinateSubView(viewModel: viewModel)
         case .info:
             EmptyView()
         }
@@ -71,13 +71,8 @@ struct EditPhotoToolbarView: View {
                 // 背景颜色按钮
                 CustomTabButton(iconName: "circle.tophalf.filled.inverse", labelText: "颜色") {
                     LoggerManager.shared.debug("背景颜色按钮点击")
-//                    withAnimation {
-//                        panel.toggle(to: .background)
-//                    }
-                    if viewModel.backgroundColorIndex == 0 {
-                        viewModel.backgroundColorIndex = 1
-                    } else {
-                        viewModel.backgroundColorIndex = 0
+                    withAnimation {
+                        panel.toggle(to: .background)
                     }
                 }
                 .disabled(!(viewModel.watermark is BackgroundEditable))
@@ -98,20 +93,6 @@ struct EditPhotoToolbarView: View {
                     LoggerManager.shared.debug("地理位置按钮点击")
                     withAnimation {
                         panel.toggle(to: .coordinate)
-                    }
-                    viewModel.isCoordinateDisplayed.toggle()
-                    
-                    // TODO: 将经纬度信息转换为实际地址
-                    if let latitude = viewModel.exifData.latitude,
-                       let longitude = viewModel.exifData.longitude {
-                        Task {
-                            do {
-                                let address = try await CommonUtils.getAddressFromCoordinates(latitude: latitude, longitude: longitude)
-                                LoggerManager.shared.debug("Address: \(address)")
-                            } catch {
-                                LoggerManager.shared.error("Error: \(error.localizedDescription)")
-                            }
-                        }
                     }
                 }
                 .disabled(!(viewModel.watermark is CoordinateEditable))
