@@ -12,10 +12,12 @@ struct EditorView: View {
     @StateObject private var viewModel: PhotoModel
     @State private var isShowCancelAlert = false
     
+    @State private var isDisplayWatermark = true
+    
     var body: some View {
         ZStack {
             // 照片+水印
-            EditPhotoDisplayView(viewModel: viewModel)
+            EditPhotoDisplayView(viewModel: viewModel, isDisplayWatermark: $isDisplayWatermark)
             
             // 顶部按钮的半透明背景
             VStack {
@@ -48,22 +50,12 @@ struct EditorView: View {
                 }
             }
             
-//            // 水印开关
-//            if !viewModel.isWatermarkDisplayed {
-//                ToolbarItem(placement: .principal) {
-//                    Button {
-//                        withAnimation {
-//                            viewModel.isWatermarkDisplayed = true
-//                        }
-//                    } label: {
-//                        HStack {
-//                            Image(systemName: "circle")
-//                            Text("打开水印")
-//                        }
-//                        .foregroundStyle(Color(hex: 0x04DBCD))
-//                    }
-//                }
-//            }
+            if !isDisplayWatermark {
+                ToolbarItem(placement: .principal) {
+                    Text("原图")
+                        .foregroundStyle(Color(hex: 0xC0C0C0))
+                }
+            }
             
             // 保存按钮
             ToolbarItem(placement: .topBarTrailing) {

@@ -13,7 +13,7 @@ struct EditPhotoDisplayView: View {
     @State private var offset: CGSize = .zero // 偏移量
     @State private var lastOffset: CGSize = .zero // 上一次偏移量
     
-    @State private var isWatermarkDisplayed = true
+    @Binding var isDisplayWatermark: Bool
     
     var body: some View {
         ZStack {
@@ -37,7 +37,7 @@ struct EditPhotoDisplayView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .onTapGesture {
                 // 单击
-                isWatermarkDisplayed = true
+                isDisplayWatermark = true
             }
             .gesture(
                 // 双击
@@ -47,6 +47,9 @@ struct EditPhotoDisplayView: View {
                             if offset != .zero {
                                 offset = .zero
                                 lastOffset = .zero
+                                if scale != 1.0 {
+                                    scale = 1.0
+                                }
                             }
                         }
                     }
@@ -63,7 +66,7 @@ struct EditPhotoDisplayView: View {
                     .frame(maxWidth: .infinity)
                     .listRowInsets(EdgeInsets())
                 
-                if isWatermarkDisplayed {
+                if isDisplayWatermark {
                     Image(uiImage: viewModel.watermarkImage)
                         .resizable()
                         .scaledToFit()
@@ -83,32 +86,39 @@ struct EditPhotoDisplayView: View {
                 y: doubleTapLocation.y / geometry.size.height))
             .onTapGesture {
                 // 单击
-                isWatermarkDisplayed = true
+                isDisplayWatermark = true
             }
             .onTapGesture(count: 2) { location in
                 // 双击
-                let convertedLocation = CGPoint(
-                    x: location.x - geometry.frame(in: .local).origin.x,
-                    y: location.y - geometry.frame(in: .local).origin.y
-                )
-                
                 withAnimation(.easeInOut) {
-                    if scale == 1.0 {
-                        scale = 2.0
-                        doubleTapLocation = convertedLocation
+                    // 如果不在原位，优先恢复原位，并恢复原本大小
+                    if offset != .zero {
                         lastOffset = .zero
                         offset = .zero
+                        if scale != 1.0 {
+                            scale = 1.0
+                        }
                     } else {
-                        scale = 1.0
-                        lastOffset = .zero
-                        offset = .zero
+                        if scale == 1.0 {
+                            scale = 2.0
+                            doubleTapLocation = CGPoint(
+                                x: location.x - geometry.frame(in: .local).origin.x,
+                                y: location.y - geometry.frame(in: .local).origin.y
+                            )
+                            lastOffset = .zero
+                            offset = .zero
+                        } else {
+                            scale = 1.0
+                            lastOffset = .zero
+                            offset = .zero
+                        }
                     }
                 }
             }
             .onLongPressGesture(minimumDuration: 1.0, perform: {
-                isWatermarkDisplayed = false
+                isDisplayWatermark = false
             }, onPressingChanged: { _ in
-                isWatermarkDisplayed = true
+                isDisplayWatermark = true
             })
             .gesture(
                 // 拖拽
