@@ -143,8 +143,25 @@ struct ContentView: View {
                 .padding(EdgeInsets(top: 10, leading: 32, bottom: 20, trailing: 32))
             }
             .background(
-                MeshGradientView()
-                    .edgesIgnoringSafeArea(.all)
+                MeshGradient(
+                    width: 3,
+                    height: 3,
+                    points: [
+                        .init(x: 0, y: 0),   .init(x: 0.2, y: 0),   .init(x: 1, y: 0),
+                        .init(x: 0, y: 0.5), .init(x: 0.3, y: 0.7), .init(x: 1, y: 0.2),
+                        .init(x: 0, y: 1),   .init(x: 0.7, y: 1),   .init(x: 1, y: 1)
+                    ],
+                    colors: colorScheme == .dark ? [
+                        .init(hex: 0x41b2d9), .init(hex: 0x3ba4cb), .init(hex: 0x3595be),
+                        .init(hex: 0x2f87b0), .init(hex: 0x2a79a2), .init(hex: 0x246a94),
+                        .init(hex: 0x1e5c87), .init(hex: 0x184d79), .init(hex: 0x123f6b),
+                    ] : [
+                        .init(hex: 0xffffff), .init(hex: 0xf2f9fd), .init(hex: 0xe5f3fb),
+                        .init(hex: 0xd8edf9), .init(hex: 0xcbe7f8), .init(hex: 0xbee1f6),
+                        .init(hex: 0xb1dbf4), .init(hex: 0xa4d5f2), .init(hex: 0x97cff0),
+                    ]
+                )
+                .edgesIgnoringSafeArea(.all)
             )
         }
     }
