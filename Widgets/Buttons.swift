@@ -4,48 +4,34 @@ import SwiftUI
 
 // 首页所使用的胶囊型按钮
 struct CapsuleButton: View {
+    @Environment(\.colorScheme) private var colorScheme
+    
     var icon: String
     var title: String
     var action: () -> Void
     
-//    let titleColor = Color.white
-    let titleColor = Color(hexString: "333333")
-    
-//    let backgroundColor = Color.blue
-    let backgroundColor = Color.clear
-    
     var body: some View {
         Button(action: action) {
-            Style(icon: icon, title: title, titleColor: Color.black)
-        }
-    }
-    
-    struct Style: View {
-        var icon: String
-        var title: String
-        var titleColor = Color(hexString: "333333")
-        var backgroundColor = Color.clear
-
-        var body: some View {
             HStack {
                 Image(systemName: icon)
-                    .foregroundColor(titleColor)
                     .padding(.leading, 16)
                     .frame(width: 46)
                 Text(title)
-                    .foregroundColor(titleColor)
                     .font(.system(size: 16, weight: .bold))
                     .padding(.horizontal, 8)
                 Spacer()
                 Image(systemName: "chevron.right")
-                    .foregroundColor(titleColor)
                     .padding(.trailing, 16)
             }
+            .foregroundStyle(Color(hex: colorScheme == .dark
+                                   ? 0xF2F3F5
+                                   : 0x333333))
             .padding(.vertical, 12)
             .frame(height: 58)
-//            .background(Capsule().fill(backgroundColor))
             .background(
-                Color(hexString: "#FFFFFF")
+                Color(Color(hex: colorScheme == .dark
+                            ? 0x333333
+                            : 0xFFFFFF))
                     .opacity(0.55)
                     .background(.ultraThinMaterial) // 添加模糊效果
                     .cornerRadius(0)

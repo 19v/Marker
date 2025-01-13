@@ -4,13 +4,15 @@ import PhotosUI
 struct ContentView: View {
     @Environment(\.colorScheme) private var colorScheme // 读取当前颜色模式
     
+    @State private var isShowPhotoPicker = false
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var selectedData: Data? = nil
     
+    @State private var isShowPhotosPicker = false
     @State private var selectedItems: [PhotosPickerItem] = []
     @State private var selectedDatas: [Data] = []
     
-    @State private var showCameraPicker = false
+    @State private var isShowCameraPicker = false
     @State private var capturedImage: UIImage? = nil
     @State private var capturedImageExif: ExifData? = nil
     @State private var navigateToEditPage = false
@@ -44,9 +46,10 @@ struct ContentView: View {
                 
                 VStack(spacing: 28) {
                     // 单张照片
-                    PhotosPicker(selection: $selectedItem, matching: .images, photoLibrary: .shared()) {
-                        CapsuleButton.Style(icon: "photo.fill", title: "选择照片")
+                    CapsuleButton(icon: "photo.fill", title: "选择照片") {
+                        isShowPhotoPicker.toggle()
                     }
+                    .photosPicker(isPresented: $isShowPhotoPicker, selection: $selectedItem, matching: .images, photoLibrary: .shared())
                     .onChange(of: selectedItem) {
                         Task {
                             selectedData = try? await selectedItem?.loadTransferable(type: Data.self)
@@ -65,9 +68,9 @@ struct ContentView: View {
                     
                     // 拍摄照片
                     CapsuleButton(icon: "camera.fill", title: "拍摄照片") {
-                        showCameraPicker.toggle()
+                        isShowCameraPicker.toggle()
                     }
-                    .fullScreenCover(isPresented: $showCameraPicker) {
+                    .fullScreenCover(isPresented: $isShowCameraPicker) {
                         CameraPickerView() { image, data in
                             capturedImage = image
                             capturedImageExif = ExifData(metadata: data)
@@ -87,9 +90,10 @@ struct ContentView: View {
                     }
                     
                     // 多张照片
-                    PhotosPicker(selection: $selectedItems, matching: .images, photoLibrary: .shared()) {
-                        CapsuleButton.Style(icon: "photo.stack.fill", title: "批量处理")
+                    CapsuleButton(icon: "photo.stack.fill", title: "批量处理") {
+                        isShowPhotosPicker.toggle()
                     }
+                    .photosPicker(isPresented: $isShowPhotosPicker, selection: $selectedItems, matching: .images, photoLibrary: .shared())
                     .onChange(of: selectedItems) {
                         Task {
                             selectedDatas.removeAll()

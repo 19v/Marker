@@ -25,7 +25,7 @@ struct EditPhotoToolbarView: View {
             if panel == viewModel.panel {
                 return Color(hex: 0xA0A0A0)
             } else {
-                return Color.white
+                return Color(hex: 0xE0E0E0)
             }
         } else {
             if panel == viewModel.panel {
@@ -113,7 +113,7 @@ struct EditPhotoToolbarView: View {
             .frame(height: 44)
             .padding(.top, 10)
             .padding(.bottom, CommonUtils.safeBottomInset)
-            .padding(.horizontal, 30)
+            .padding(.horizontal, 20)
             .background(
                 Rectangle()
                     .fill(

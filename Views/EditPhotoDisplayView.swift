@@ -34,10 +34,8 @@ struct EditPhotoDisplayView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .onTapGesture {
                 // 单击
-                withAnimation {
-                    viewModel.isWatermarkDisplayed.toggle()
-                    viewModel.setPanel(to: .empty)
-                }
+                viewModel.isWatermarkDisplayed.toggle()
+                viewModel.setPanel(to: .empty)
             }
             .gesture(
                 // 双击
@@ -72,18 +70,16 @@ struct EditPhotoDisplayView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity) // 占据剩余空间
         .padding(.horizontal, 20)
         .shadow(
-            color: colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.2),
-            radius: colorScheme == .dark ? 20 : 10,
+            color: colorScheme == .dark ? Color.gray.opacity(0.1) : Color.black.opacity(0.2),
+            radius: colorScheme == .dark ? 12 : 10,
             x: 0, y: 0
         )
         .scaleEffect(scale) // 缩放
         .offset(offset) // 偏移
         .onTapGesture {
             // 单击
-            withAnimation {
-                viewModel.isWatermarkDisplayed.toggle()
-                viewModel.setPanel(to: .empty)
-            }
+            viewModel.isWatermarkDisplayed.toggle()
+            viewModel.setPanel(to: .empty)
         }
         .onTapGesture(count: 2, perform: {
             // 双击
