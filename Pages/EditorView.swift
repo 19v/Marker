@@ -33,7 +33,7 @@ struct EditorView: View {
             // 工具栏
             EditPhotoToolbarView(viewModel: viewModel)
         }
-        .navigationBarBackButtonHidden(true)
+        .navigationBarBackButtonHidden()
         .toolbar {
             // 关闭按钮
             ToolbarItem(placement: .topBarLeading) {
@@ -48,22 +48,22 @@ struct EditorView: View {
                 }
             }
             
-            // 水印开关
-            if !viewModel.isWatermarkDisplayed {
-                ToolbarItem(placement: .principal) {
-                    Button {
-                        withAnimation {
-                            viewModel.isWatermarkDisplayed = true
-                        }
-                    } label: {
-                        HStack {
-                            Image(systemName: "circle")
-                            Text("打开水印")
-                        }
-                        .foregroundStyle(Color(hex: 0x04DBCD))
-                    }
-                }
-            }
+//            // 水印开关
+//            if !viewModel.isWatermarkDisplayed {
+//                ToolbarItem(placement: .principal) {
+//                    Button {
+//                        withAnimation {
+//                            viewModel.isWatermarkDisplayed = true
+//                        }
+//                    } label: {
+//                        HStack {
+//                            Image(systemName: "circle")
+//                            Text("打开水印")
+//                        }
+//                        .foregroundStyle(Color(hex: 0x04DBCD))
+//                    }
+//                }
+//            }
             
             // 保存按钮
             ToolbarItem(placement: .topBarTrailing) {

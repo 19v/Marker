@@ -40,9 +40,6 @@ class PhotoModel: ObservableObject {
         panel = panel != newPanel ? newPanel : .empty
     }
     
-    // 显示水印的开关
-    @Published var isWatermarkDisplayed = true
-    
     // 切换背景颜色的按钮
     var enabledColors: [Color] {
         if let vm = watermark as? BackgroundEditable {

@@ -8,9 +8,12 @@ struct EditPhotoDisplayView: View {
     
     @State private var scale: CGFloat = 1.0 // 缩放比例
     @State private var lastScale: CGFloat = 1.0 // 上一次的缩放比例
+    @State private var doubleTapLocation: CGPoint = .zero // 记录双击时手指所在的位置
     
     @State private var offset: CGSize = .zero // 偏移量
     @State private var lastOffset: CGSize = .zero // 上一次偏移量
+    
+    @State private var isWatermarkDisplayed = true
     
     var body: some View {
         ZStack {
@@ -34,7 +37,7 @@ struct EditPhotoDisplayView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .onTapGesture {
                 // 单击
-                viewModel.isWatermarkDisplayed.toggle()
+                isWatermarkDisplayed.toggle()
                 viewModel.setPanel(to: .empty)
             }
             .gesture(
@@ -53,66 +56,84 @@ struct EditPhotoDisplayView: View {
     
     // 图片和水印
     @ViewBuilder var imageWithWatermark: some View {
-        VStack(spacing: 0) {
-            Image(uiImage: viewModel.uiImage)
-                .resizable()
-                .scaledToFit()
-                .frame(maxWidth: .infinity)
-                .listRowInsets(EdgeInsets())
-            
-            if viewModel.isWatermarkDisplayed {
-                Image(uiImage: viewModel.watermarkImage)
+        GeometryReader { geometry in
+            VStack(spacing: 0) {
+                Image(uiImage: viewModel.uiImage)
                     .resizable()
                     .scaledToFit()
                     .frame(maxWidth: .infinity)
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity) // 占据剩余空间
-        .padding(.horizontal, 20)
-        .shadow(
-            color: colorScheme == .dark ? Color.gray.opacity(0.1) : Color.black.opacity(0.2),
-            radius: colorScheme == .dark ? 12 : 10,
-            x: 0, y: 0
-        )
-        .scaleEffect(scale) // 缩放
-        .offset(offset) // 偏移
-        .onTapGesture {
-            // 单击
-            viewModel.isWatermarkDisplayed.toggle()
-            viewModel.setPanel(to: .empty)
-        }
-        .onTapGesture(count: 2, perform: {
-            // 双击
-            withAnimation {
-                if offset != .zero {
-                    offset = .zero
-                    lastOffset = .zero
-                } else {
-                    scale = scale == 1.0 ? 2.0 : 1.0
+                    .listRowInsets(EdgeInsets())
+                
+                if isWatermarkDisplayed {
+                    Image(uiImage: viewModel.watermarkImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity)
                 }
             }
-        })
-        .gesture(
-            // 拖拽
-            DragGesture()
-                .onChanged { value in
-                    offset = CGSize(
-                        width: lastOffset.width + value.translation.width,
-                        height: lastOffset.height + value.translation.height
-                    )
-                }
-                .onEnded { _ in
-                    lastOffset = offset // 拖动结束时保持最终位置
-                }
-                .simultaneously(
-                    with: MagnificationGesture()
-                        .onChanged { value in
-                            scale = lastScale * value
-                        }
-                        .onEnded { _ in
-                            lastScale = scale
-                        }
+            .frame(maxWidth: .infinity, maxHeight: .infinity) // 占据剩余空间
+            .padding(.horizontal, 20)
+            .shadow(
+                color: colorScheme == .dark ? Color.gray.opacity(0.1) : Color.black.opacity(0.2),
+                radius: colorScheme == .dark ? 12 : 10,
+                x: 0, y: 0
+            )
+            .offset(offset)
+            .scaleEffect(scale, anchor: scale == 1.0 ? .center : UnitPoint(
+                x: doubleTapLocation.x / geometry.size.width,
+                y: doubleTapLocation.y / geometry.size.height))
+            .onTapGesture {
+                // 单击
+                isWatermarkDisplayed.toggle()
+                viewModel.setPanel(to: .empty)
+            }
+            .onTapGesture(count: 2) { location in
+                // 双击
+                let convertedLocation = CGPoint(
+                    x: location.x - geometry.frame(in: .local).origin.x,
+                    y: location.y - geometry.frame(in: .local).origin.y
                 )
-        )
+                
+                withAnimation(.easeInOut) {
+                    if scale == 1.0 {
+                        scale = 2.0
+                        doubleTapLocation = convertedLocation
+                        lastOffset = .zero
+                        offset = .zero
+                    } else {
+                        scale = 1.0
+                        lastOffset = .zero
+                        offset = .zero
+                    }
+                }
+            }
+            .onLongPressGesture(minimumDuration: 1.0, perform: {
+                isWatermarkDisplayed = false
+            }, onPressingChanged: { _ in
+                isWatermarkDisplayed = true
+            })
+            .gesture(
+                // 拖拽
+                DragGesture()
+                    .onChanged { value in
+                        offset = CGSize(
+                            width: lastOffset.width + value.translation.width,
+                            height: lastOffset.height + value.translation.height
+                        )
+                    }
+                    .onEnded { _ in
+                        lastOffset = offset // 拖动结束时保持最终位置
+                    }
+                    .simultaneously(
+                        with: MagnificationGesture()
+                            .onChanged { value in
+                                scale = lastScale * value
+                            }
+                            .onEnded { _ in
+                                lastScale = scale
+                            }
+                    )
+            )
+        }
     }
 }
