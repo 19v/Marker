@@ -26,7 +26,7 @@
 		05576E6F2CF46C0900BE1DDD /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05576E6E2CF46C0700BE1DDD /* Logger.swift */; };
 		05576E792CF47A3600BE1DDD /* MiSans-Demibold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 05576E772CF47A3600BE1DDD /* MiSans-Demibold.ttf */; };
 		05576E7A2CF47A3600BE1DDD /* MiSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 05576E782CF47A3600BE1DDD /* MiSans-Regular.ttf */; };
-		057E41092CEF1B2E0005E859 /* PhotoEdit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057E41072CEF1B2E0005E859 /* PhotoEdit.swift */; };
+		057E41092CEF1B2E0005E859 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057E41072CEF1B2E0005E859 /* Photo.swift */; };
 		057E410B2CEF1B2E0005E859 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057E41062CEF1B2E0005E859 /* Common.swift */; };
 		05977A302D2E60CB003E269F /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05977A2F2D2E60C8003E269F /* Location.swift */; };
 		05977A332D2F756E003E269F /* SavePhotoButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05977A322D2F7567003E269F /* SavePhotoButton.swift */; };
@@ -58,7 +58,7 @@
 		05576E772CF47A3600BE1DDD /* MiSans-Demibold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "MiSans-Demibold.ttf"; sourceTree = "<group>"; };
 		05576E782CF47A3600BE1DDD /* MiSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "MiSans-Regular.ttf"; sourceTree = "<group>"; };
 		057E41062CEF1B2E0005E859 /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
-		057E41072CEF1B2E0005E859 /* PhotoEdit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoEdit.swift; sourceTree = "<group>"; };
+		057E41072CEF1B2E0005E859 /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
 		057E410D2CF079B80005E859 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		05977A2F2D2E60C8003E269F /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		05977A322D2F7567003E269F /* SavePhotoButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavePhotoButton.swift; sourceTree = "<group>"; };
@@ -131,7 +131,7 @@
 		05576E5F2CF468FC00BE1DDD /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				057E41072CEF1B2E0005E859 /* PhotoEdit.swift */,
+				057E41072CEF1B2E0005E859 /* Photo.swift */,
 				05576E632CF46A7F00BE1DDD /* ExifData.swift */,
 				0532ECA52D192E34003635B3 /* Fonts.swift */,
 				05576E612CF469C600BE1DDD /* Watermark.swift */,
@@ -261,7 +261,7 @@
 				05977A352D2F9FB8003E269F /* CameraView.swift in Sources */,
 				0532ECA82D193A67003635B3 /* BasicWatermark.swift in Sources */,
 				0501865F2CEF1AE000EAEA64 /* ContentView.swift in Sources */,
-				057E41092CEF1B2E0005E859 /* PhotoEdit.swift in Sources */,
+				057E41092CEF1B2E0005E859 /* Photo.swift in Sources */,
 				0532ECAA2D193A6F003635B3 /* BlurBackgroundWatermark.swift in Sources */,
 				05576E662CF46AEE00BE1DDD /* PhotoUtils.swift in Sources */,
 				057E410B2CEF1B2E0005E859 /* Common.swift in Sources */,

@@ -5,8 +5,22 @@ struct EditPhotoToolbarView: View {
     
     @ObservedObject var viewModel: PhotoModel
     
+    enum EditPanels {
+        case empty
+        case background
+        case time
+        case coordinate
+        case info
+        
+        mutating func toggle(to panel: EditPanels) {
+            self = self != panel ? panel : .empty
+        }
+    }
+    
+    @State private var panel = EditPanels.empty
+    
     @ViewBuilder private var activeView: some View {
-        switch viewModel.panel {
+        switch panel {
         case .empty:
             EmptyView()
         case .background:
@@ -20,15 +34,15 @@ struct EditPhotoToolbarView: View {
         }
     }
     
-    private func toolbarButtonForegroundStyle(panel: PhotoModel.EditPanels) -> Color {
+    private func toolbarButtonForegroundStyle(panel: EditPanels) -> Color {
         if colorScheme == .dark {
-            if panel == viewModel.panel {
+            if panel == panel {
                 return Color(hex: 0xA0A0A0)
             } else {
                 return Color(hex: 0xE0E0E0)
             }
         } else {
-            if panel == viewModel.panel {
+            if panel == panel {
                 return Color(hex: 0x909090)
             } else {
                 return Color(hex: 0x282828)
@@ -42,7 +56,7 @@ struct EditPhotoToolbarView: View {
             
             activeView
                 .transition(.opacity) // 使用缩放过渡动画
-                .animation(.easeInOut, value: viewModel.panel)
+                .animation(.easeInOut, value: panel)
                 .background(
                     Rectangle()
                         .fill(
@@ -73,7 +87,7 @@ struct EditPhotoToolbarView: View {
                 CustomTabButton(iconName: "calendar.circle.fill", labelText: "时间") {
                     LoggerManager.shared.debug("日期时间按钮点击")
                     withAnimation {
-                        viewModel.setPanel(to: .time)
+                        panel.toggle(to: .time)
                     }
                 }
                 .disabled(!(viewModel.watermark is TimeEditable))
@@ -83,7 +97,7 @@ struct EditPhotoToolbarView: View {
                 CustomTabButton(iconName: "location.circle.fill", labelText: "位置") {
                     LoggerManager.shared.debug("地理位置按钮点击")
                     withAnimation {
-                        viewModel.setPanel(to: .coordinate)
+                        panel.toggle(to: .coordinate)
                     }
                     viewModel.isCoordinateDisplayed.toggle()
                     

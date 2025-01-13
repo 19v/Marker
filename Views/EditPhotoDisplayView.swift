@@ -37,8 +37,7 @@ struct EditPhotoDisplayView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .onTapGesture {
                 // 单击
-                isWatermarkDisplayed.toggle()
-                viewModel.setPanel(to: .empty)
+                isWatermarkDisplayed = true
             }
             .gesture(
                 // 双击
@@ -84,8 +83,7 @@ struct EditPhotoDisplayView: View {
                 y: doubleTapLocation.y / geometry.size.height))
             .onTapGesture {
                 // 单击
-                isWatermarkDisplayed.toggle()
-                viewModel.setPanel(to: .empty)
+                isWatermarkDisplayed = true
             }
             .onTapGesture(count: 2) { location in
                 // 双击

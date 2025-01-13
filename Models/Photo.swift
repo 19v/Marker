@@ -23,23 +23,6 @@ class PhotoModel: ObservableObject {
         watermarkImage = watermark.uiImage
     }
     
-    // 工具栏
-    enum EditPanels {
-        case empty
-        case background
-        case time
-        case coordinate
-        case info
-        
-        mutating func toggle(to panel: EditPanels) {
-            self = self != panel ? panel : .empty
-        }
-    }
-    @Published private(set) var panel = EditPanels.empty
-    func setPanel(to newPanel: EditPanels) {
-        panel = panel != newPanel ? newPanel : .empty
-    }
-    
     // 切换背景颜色的按钮
     var enabledColors: [Color] {
         if let vm = watermark as? BackgroundEditable {
@@ -48,8 +31,7 @@ class PhotoModel: ObservableObject {
             []
         }
     }
-    @Published var displayBackgroundColorSubview = false
-    @Published var backgroundColorIndex = 0 {
+    var backgroundColorIndex = 0 {
         didSet {
             guard let vw = watermark as? BackgroundEditable else { return }
             vw.changeColor(withIndex: backgroundColorIndex)
@@ -58,8 +40,7 @@ class PhotoModel: ObservableObject {
     }
     
     // 显示时间的开关
-    @Published var isEditTimePanelDisplayed = false
-    @Published var isTimeDisplayed = false {
+    var isTimeDisplayed = false {
         didSet {
             guard let vw = watermark as? TimeEditable else { return }
             vw.isTimeDisplayed.toggle()
@@ -77,7 +58,7 @@ class PhotoModel: ObservableObject {
             refreshWatermarkImage()
         }
     }
-    @Published var watermarkTimeZone = TimeZone.current
+    var watermarkTimeZone = TimeZone.current
     func restoreDefaultTime() {
         guard let vw = watermark as? TimeEditable else { return }
         vw.restoreDefaultTime()
@@ -85,8 +66,8 @@ class PhotoModel: ObservableObject {
     }
     
     // 显示经纬度的开关
-    @Published var isEditCoordinatePanelDisplayed = false
-    @Published var isCoordinateDisplayed = false {
+    var isEditCoordinatePanelDisplayed = false
+    var isCoordinateDisplayed = false {
         didSet {
             guard let vw = watermark as? CoordinateEditable else { return }
             vw.isCoordinateDisplayed.toggle()
