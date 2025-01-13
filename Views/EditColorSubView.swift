@@ -31,7 +31,7 @@ struct EditColorSubView: View {
             
             ScrollView(.horizontal) {
                 HStack(spacing: 15) {
-                    ForEach(Array(colors.enumerated()), id: \.offset) { index, color in
+                    ForEach(Array(colors.reversed().enumerated()), id: \.offset) { index, color in
                         ColorSelectButton(index: index, selectedIndex: $selectedIndex, color: color) {
                             selectedIndex = index
                         }

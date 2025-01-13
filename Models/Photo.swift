@@ -85,6 +85,11 @@ class PhotoModel: ObservableObject {
             refreshWatermarkImage()
         }
     }
+    func restoreDefaultCoordinate() {
+        guard let vw = watermark as? CoordinateEditable else { return }
+        vw.restoreDefaultCoordinate()
+        refreshWatermarkImage()
+    }
     
     // 显示图片信息的开关
     @Published var isPhotoInfoPanelDisplayed = false

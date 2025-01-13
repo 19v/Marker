@@ -8,6 +8,8 @@ struct EditCoordinateSubView: View {
     
     @State private var selectedCoordinate: CLLocationCoordinate2D?
     
+    @State private var isDisplayAddress = false
+    
     var body: some View {
         VStack {
             Button(action: {
@@ -36,19 +38,24 @@ struct EditCoordinateSubView: View {
                         .font(.headline)
                     Spacer()
                     Button("转换显示") {
-                        // 将经纬度信息转换为实际地址
-                        if let latitude = viewModel.exifData.latitude,
-                           let longitude = viewModel.exifData.longitude {
-                            Task {
-                                do {
-                                    let address = try await CommonUtils.getAddressFromCoordinates(latitude: latitude, longitude: longitude)
-                                    viewModel.displayCoordinate = address
-                                    LoggerManager.shared.debug("Address: \(address)")
-                                } catch {
-                                    LoggerManager.shared.error("Error: \(error.localizedDescription)")
+                        if isDisplayAddress {
+                            viewModel.restoreDefaultCoordinate()
+                        } else {
+                            // 将经纬度信息转换为实际地址
+                            if let latitude = viewModel.exifData.latitude,
+                               let longitude = viewModel.exifData.longitude {
+                                Task {
+                                    do {
+                                        let address = try await CommonUtils.getAddressFromCoordinates(latitude: latitude, longitude: longitude)
+                                        viewModel.displayCoordinate = address
+                                        LoggerManager.shared.debug("Address: \(address)")
+                                    } catch {
+                                        LoggerManager.shared.error("Error: \(error.localizedDescription)")
+                                    }
                                 }
                             }
                         }
+                        isDisplayAddress.toggle()
                     }
                 }
                 .frame(height: 20)

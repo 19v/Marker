@@ -149,6 +149,11 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
     }
     
     // 显示经纬度的开关
+    enum LocationDisplyMode {
+        case coordinates // Example: 31.972547, 118.757392
+        case address // Example: 安德门大街, 江苏, 中国
+    }
+    
     var isCoordinateDisplayed = false
     var displayCoordinate: String {
         get {
@@ -157,6 +162,9 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
         set {
             coordinate.customValue = newValue
         }
+    }
+    func restoreDefaultCoordinate() {
+        coordinate.clearCustomValue()
     }
     
     // 返回水印
