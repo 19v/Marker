@@ -6,44 +6,50 @@ struct EditColorSubView: View {
     let viewModel: PhotoModel
     
     var body: some View {
-        VStack(alignment: .leading) {
-            @Bindable var viewModel = viewModel
-            let colors = viewModel.enabledColors
-            
-            Text("背景颜色")
-                .font(.system(size: 14))
-                .foregroundStyle(.gray)
-                .padding(.bottom, 4)
-            
-            ScrollView(.horizontal) {
-                HStack(spacing: 15) {
-                    ForEach(Array(colors.enumerated()), id: \.offset) { index, color in
-                        ColorSelectButton(index: index, selectedIndex: $viewModel.backgroundColorIndex, color: color) {
-                            viewModel.backgroundColorIndex = index
+        @Bindable var viewModel = viewModel
+        let colors = viewModel.enabledColors
+        
+        VStack {
+            HStack {
+                Text("背景")
+                    .font(.headline)
+                    .foregroundStyle(.gray)
+                    .padding(.trailing, 10)
+                
+                ScrollView(.horizontal) {
+                    HStack(spacing: 15) {
+                        ForEach(Array(colors.enumerated()), id: \.offset) { index, color in
+                            ColorSelectButton(index: index, selectedIndex: $viewModel.backgroundColorIndex, color: color) {
+                                viewModel.backgroundColorIndex = index
+                            }
                         }
                     }
+                    .padding(4)
                 }
-                .padding(4)
             }
+            .frame(height: 20)
+            .padding()
             
-            Text("文字颜色")
-                .font(.system(size: 14))
-                .foregroundStyle(.gray)
-                .padding(.top, 16)
-                .padding(.bottom, 4)
-            
-            ScrollView(.horizontal) {
-                HStack(spacing: 15) {
-                    ForEach(Array(colors.reversed().enumerated()), id: \.offset) { index, color in
-                        ColorSelectButton(index: index, selectedIndex: $viewModel.backgroundColorIndex, color: color) {
-                            viewModel.backgroundColorIndex = index
+            HStack {
+                Text("文字")
+                    .font(.headline)
+                    .foregroundStyle(.gray)
+                    .padding(.trailing, 10)
+                
+                ScrollView(.horizontal) {
+                    HStack(spacing: 15) {
+                        ForEach(Array(colors.reversed().enumerated()), id: \.offset) { index, color in
+                            ColorSelectButton(index: index, selectedIndex: $viewModel.backgroundColorIndex, color: color) {
+                                viewModel.backgroundColorIndex = index
+                            }
                         }
                     }
+                    .padding(4)
                 }
-                .padding(4)
             }
+            .frame(height: 20)
+            .padding()
         }
-        .padding(20)
     }
 }
 

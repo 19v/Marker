@@ -5,22 +5,72 @@ struct EditPhotoToolbarView: View {
     
     let viewModel: PhotoModel
     
-    enum EditPanels {
+    enum EditPanel: CaseIterable, Identifiable {
         case empty
         case background
         case time
         case coordinate
         case info
         
-        mutating func toggle(to panel: EditPanels) {
+        var id: Self { self } // 使用自身作为唯一标识符
+        
+        mutating func toggle(to panel: EditPanel) {
             self = self != panel ? panel : .empty
+        }
+        
+        var iconName: String {
+            switch self {
+            case .empty:
+                ""
+            case .background:
+                "circle.tophalf.filled.inverse"
+            case .time:
+                "calendar.circle.fill"
+            case .coordinate:
+                "location.circle.fill"
+            case .info:
+                "info.circle.fill"
+            }
+        }
+        
+        var labelText: String {
+            switch self {
+            case .empty:
+                ""
+            case .background:
+                "颜色"
+            case .time:
+                "背景"
+            case .coordinate:
+                "位置"
+            case .info:
+                "信息"
+            }
+        }
+        
+        func isAvailable(with watermark: WatermarkProtocol) -> Bool {
+            switch self {
+            case .empty:
+                false
+            case .background:
+                watermark is BackgroundEditable
+            case .time:
+                watermark is TimeEditable
+            case .coordinate:
+                watermark is CoordinateEditable
+            case .info:
+                watermark is InfoDisplayable
+            }
         }
     }
     
-    @State private var panel = EditPanels.empty
+    let panels: [EditPanel] = [
+        .background, .time, .coordinate, .info
+    ]
+    @State private var currentPanel = EditPanel.empty
     
     @ViewBuilder private var activeView: some View {
-        switch panel {
+        switch currentPanel {
         case .empty:
             EmptyView()
         case .background:
@@ -30,22 +80,26 @@ struct EditPhotoToolbarView: View {
         case .coordinate:
             EditLocationSubView(viewModel: viewModel)
         case .info:
-            EmptyView()
+            if let vm = viewModel.watermark as? BasicWatermark {
+                InfoDisplaySubView(watermark: vm)
+            } else {
+                EmptyView()
+            }
         }
     }
     
-    private func toolbarButtonForegroundStyle(panel: EditPanels) -> Color {
+    private func toolbarButtonForegroundStyle(panel: EditPanel) -> Color {
         if colorScheme == .dark {
-            if panel == panel {
-                return Color(hex: 0xA0A0A0)
+            if currentPanel == panel {
+                Color(hex: 0xA0A0A0)
             } else {
-                return Color(hex: 0xE0E0E0)
+                Color(hex: 0xE0E0E0)
             }
         } else {
-            if panel == panel {
-                return Color(hex: 0x909090)
+            if currentPanel == panel {
+                Color(hex: 0x909090)
             } else {
-                return Color(hex: 0x282828)
+                Color(hex: 0x282828)
             }
         }
     }
@@ -55,8 +109,9 @@ struct EditPhotoToolbarView: View {
             Spacer()
             
             activeView
+                .padding(12)
                 .transition(.opacity) // 使用缩放过渡动画
-                .animation(.easeInOut, value: panel)
+                .animation(.easeInOut, value: currentPanel)
                 .background(
                     Rectangle()
                         .fill(
@@ -68,42 +123,30 @@ struct EditPhotoToolbarView: View {
                 )
             
             HStack{
-                // 背景颜色按钮
-                CustomTabButton(iconName: "circle.tophalf.filled.inverse", labelText: "颜色") {
-                    LoggerManager.shared.debug("背景颜色按钮点击")
-                    withAnimation {
-                        panel.toggle(to: .background)
+                ForEach(panels) { panel in
+                    Button(action: {
+                        withAnimation {
+                            currentPanel.toggle(to: panel)
+                        }
+                    }) {
+                        VStack(spacing: 4) {
+                            ZStack {
+                                Rectangle()
+                                    .fill(Color.white.opacity(0))
+                                Image(systemName: panel.iconName)
+                                    .symbolVariant(.circle.fill)
+                                    .font(.system(size: 24))
+                            }
+                            .frame(height: 30)
+                            Text(panel.labelText)
+                                .font(.system(size: 10))
+                        }
+                        .padding(.vertical, 8)
+                        .frame(maxWidth: .infinity)
                     }
+                    .disabled(!panel.isAvailable(with: viewModel.watermark))
+                    .foregroundStyle(toolbarButtonForegroundStyle(panel: panel))
                 }
-                .disabled(!(viewModel.watermark is BackgroundEditable))
-                .foregroundStyle(toolbarButtonForegroundStyle(panel: .background))
-                
-                // 日期时间按钮
-                CustomTabButton(iconName: "calendar.circle.fill", labelText: "时间") {
-                    LoggerManager.shared.debug("日期时间按钮点击")
-                    withAnimation {
-                        panel.toggle(to: .time)
-                    }
-                }
-                .disabled(!(viewModel.watermark is TimeEditable))
-                .foregroundStyle(toolbarButtonForegroundStyle(panel: .time))
-                
-                // 经纬度按钮
-                CustomTabButton(iconName: "location.circle.fill", labelText: "位置") {
-                    LoggerManager.shared.debug("地理位置按钮点击")
-                    withAnimation {
-                        panel.toggle(to: .coordinate)
-                    }
-                }
-                .disabled(!(viewModel.watermark is CoordinateEditable))
-                .foregroundStyle(toolbarButtonForegroundStyle(panel: .coordinate))
-                
-                CustomTabButton(iconName: "info.circle.fill", labelText: "信息") {
-                    LoggerManager.shared.debug("照片信息按钮点击")
-                    viewModel.isPhotoInfoPanelDisplayed.toggle()
-                }
-                .disabled(!(viewModel.watermark is InfoDisplayable))
-                .foregroundStyle(toolbarButtonForegroundStyle(panel: .info))
             }
             .frame(height: 44)
             .padding(.top, 10)

@@ -12,7 +12,6 @@ import CoreLocation
         exifData = exif
         watermark = BasicWatermark(exifData: exif)
         refreshWatermarkImage()
-        
     }
     
     var uiImage: UIImage

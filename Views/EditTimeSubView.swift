@@ -5,7 +5,7 @@ import SwiftUI
 struct EditTimeSubView: View {
     @Environment(\.colorScheme) private var colorScheme
     
-    @ObservedObject var viewModel: PhotoModel
+    let viewModel: PhotoModel
 
     @State private var isShowingSheet = false // 是否显示调整时间的sheet
     
@@ -46,7 +46,6 @@ struct EditTimeSubView: View {
                 .animation(.easeInOut, value: viewModel.isTimeDisplayed)
             }
         }
-        .padding(12)
         .sheet(isPresented: $isShowingSheet) {
             TimeEditSheet(originalDate: viewModel.watermarkTime, originalTimeZone: viewModel.watermarkTimeZone, setCustomDateAndTimeZone: { date, timeZone in
                 viewModel.watermarkTime = date

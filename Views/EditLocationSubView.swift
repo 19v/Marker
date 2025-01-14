@@ -64,6 +64,5 @@ struct EditLocationSubView: View {
                 .animation(.easeInOut, value: viewModel.isTimeDisplayed)
             }
         }
-        .padding(12)
     }
 }

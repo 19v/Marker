@@ -67,38 +67,3 @@ struct TextButton: View {
         }
     }
 }
-
-// MARK: - 照片编辑界面
-
-// 照片编辑界面所使用的工具栏按钮
-struct CustomTabButton: View {
-    let iconName: String
-    let labelText: String
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: {
-            action()
-        }) {
-            VStack(spacing: 4) {
-                ZStack {
-                    Rectangle()
-                        .fill(Color.white.opacity(0))
-                    Image(systemName: iconName)
-                        .symbolVariant(.circle.fill)
-//                        .foregroundStyle(Color(hex: 0x282828))
-//                        .resizable()
-//                        .scaledToFit()
-                        .font(.system(size: 24))
-//                        .frame(height: 20)
-                }
-                .frame(/*width: 20, */height: 30)
-                Text(labelText)
-                    .font(.system(size: 10))
-//                    .foregroundColor(Color(hex: 0x282828))
-            }
-            .padding(.vertical, 8)
-            .frame(maxWidth: .infinity)
-        }
-    }
-}
