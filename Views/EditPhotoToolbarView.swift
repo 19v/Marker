@@ -3,7 +3,7 @@ import SwiftUI
 struct EditPhotoToolbarView: View {
     @Environment(\.colorScheme) private var colorScheme
     
-    @ObservedObject var viewModel: PhotoModel
+    let viewModel: PhotoModel
     
     enum EditPanels {
         case empty
@@ -24,11 +24,11 @@ struct EditPhotoToolbarView: View {
         case .empty:
             EmptyView()
         case .background:
-            EditColorSubView(colors: viewModel.enabledColors, selectedIndex: $viewModel.backgroundColorIndex)
+            EditColorSubView(viewModel: viewModel)
         case .time:
             EditTimeSubView(viewModel: viewModel)
         case .coordinate:
-            EditCoordinateSubView(viewModel: viewModel)
+            EditLocationSubView(viewModel: viewModel)
         case .info:
             EmptyView()
         }

@@ -6,12 +6,12 @@ struct EditorView: View {
     @Environment(\.dismiss) private var dismiss
     
     init(image: UIImage, exif: ExifData) {
-        _viewModel = StateObject(wrappedValue: PhotoModel(image: image, exif: exif))
+        viewModel = PhotoModel(image: image, exif: exif)
     }
     
-    @StateObject private var viewModel: PhotoModel
-    @State private var isShowCancelAlert = false
+    private var viewModel: PhotoModel
     
+    @State private var isShowCancelAlert = false
     @State private var isDisplayWatermark = true
     
     var body: some View {

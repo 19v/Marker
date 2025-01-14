@@ -2,11 +2,14 @@ import SwiftUI
 
 struct EditColorSubView: View {
     @Environment(\.colorScheme) private var colorScheme
-    let colors: [Color]
-    @Binding var selectedIndex: Int
+    
+    let viewModel: PhotoModel
     
     var body: some View {
         VStack(alignment: .leading) {
+            @Bindable var viewModel = viewModel
+            let colors = viewModel.enabledColors
+            
             Text("背景颜色")
                 .font(.system(size: 14))
                 .foregroundStyle(.gray)
@@ -15,8 +18,8 @@ struct EditColorSubView: View {
             ScrollView(.horizontal) {
                 HStack(spacing: 15) {
                     ForEach(Array(colors.enumerated()), id: \.offset) { index, color in
-                        ColorSelectButton(index: index, selectedIndex: $selectedIndex, color: color) {
-                            selectedIndex = index
+                        ColorSelectButton(index: index, selectedIndex: $viewModel.backgroundColorIndex, color: color) {
+                            viewModel.backgroundColorIndex = index
                         }
                     }
                 }
@@ -32,8 +35,8 @@ struct EditColorSubView: View {
             ScrollView(.horizontal) {
                 HStack(spacing: 15) {
                     ForEach(Array(colors.reversed().enumerated()), id: \.offset) { index, color in
-                        ColorSelectButton(index: index, selectedIndex: $selectedIndex, color: color) {
-                            selectedIndex = index
+                        ColorSelectButton(index: index, selectedIndex: $viewModel.backgroundColorIndex, color: color) {
+                            viewModel.backgroundColorIndex = index
                         }
                     }
                 }
@@ -73,6 +76,8 @@ struct ColorSelectButton: View {
 }
 
 #Preview {
-    @Previewable @State var index = 0
-    EditColorSubView(colors: [.white, .black], selectedIndex: $index)
+    let img = UIImage()
+    let exif = ExifData(image: img)
+    let viewModel = PhotoModel(image: img, exif: exif)
+    EditColorSubView(viewModel: viewModel)
 }

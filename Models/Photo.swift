@@ -5,20 +5,21 @@ import UIKit
 import ImageIO
 import CoreLocation
 
-@MainActor
-class PhotoModel: ObservableObject {
+@Observable final class PhotoModel {
     
     init(image: UIImage, exif: ExifData) {
         uiImage = image
         exifData = exif
-        watermark = BasicWatermark(exifData: exifData)
-        watermarkImage = watermark.uiImage
+        watermark = BasicWatermark(exifData: exif)
+        refreshWatermarkImage()
+        
     }
     
     var uiImage: UIImage
     var exifData: ExifData
+    
     var watermark: WatermarkProtocol // 水印信息，包含样式信息和数据
-    @Published var watermarkImage: UIImage
+    var watermarkImage = UIImage()
     func refreshWatermarkImage() {
         watermarkImage = watermark.uiImage
     }
@@ -92,5 +93,5 @@ class PhotoModel: ObservableObject {
     }
     
     // 显示图片信息的开关
-    @Published var isPhotoInfoPanelDisplayed = false
+    var isPhotoInfoPanelDisplayed = false
 }

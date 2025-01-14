@@ -1,10 +1,10 @@
 import SwiftUI
 import MapKit
 
-struct EditCoordinateSubView: View {
+struct EditLocationSubView: View {
     @Environment(\.colorScheme) private var colorScheme
     
-    @ObservedObject var viewModel: PhotoModel
+    let viewModel: PhotoModel
     
     @State private var selectedCoordinate: CLLocationCoordinate2D?
     

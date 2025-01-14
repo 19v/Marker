@@ -4,7 +4,7 @@ import PhotosUI
 struct EditPhotoDisplayView: View {
     @Environment(\.colorScheme) private var colorScheme
     
-    @ObservedObject var viewModel: PhotoModel
+    let viewModel: PhotoModel
     
     @State private var scale: CGFloat = 1.0 // 缩放比例
     @State private var lastScale: CGFloat = 1.0 // 上一次的缩放比例
