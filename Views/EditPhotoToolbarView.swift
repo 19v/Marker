@@ -106,7 +106,19 @@ struct EditPhotoToolbarView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            Spacer()
+            if currentPanel != .empty {
+                Color.white
+                    .opacity(0)
+                    .contentShape(Rectangle())
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .onTapGesture {
+                        withAnimation {
+                            currentPanel = .empty
+                        }
+                    }
+            } else {
+                Spacer()
+            }
             
             activeView
                 .padding(12)

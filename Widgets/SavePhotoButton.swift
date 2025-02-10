@@ -38,14 +38,24 @@ struct SavePhotoButton: View {
             }
             .foregroundColor(.init(hex: 0x04B3DB))
         case .saving:
-            ProgressView()
-                .progressViewStyle(CircularProgressViewStyle(tint: .init(hex: 0x17D0FB)))
+            HStack {
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .init(hex: 0x17D0FB)))
+                Text("稍等")
+                    .foregroundColor(.init(hex: 0x17D0FB))
+            }
         case .success:
-            Image(systemName: "checkmark")
-                .foregroundColor(.init(hex: 0x04DB98))
+            HStack {
+                Image(systemName: "checkmark")
+                Text("完成")
+            }
+            .foregroundColor(.init(hex: 0x04DB98))
         case .failed:
-            Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundColor(.init(hex: 0xDB2C04))
+            HStack {
+                Image(systemName: "exclamationmark.triangle.fill")
+                Text("失败")
+            }
+            .foregroundColor(.init(hex: 0xDB2C04))
         }
     }
 
