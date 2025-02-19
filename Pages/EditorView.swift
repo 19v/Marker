@@ -62,15 +62,13 @@ struct EditorView: View {
                 SavePhotoButton(image: PhotoUtils.combine(photo: viewModel.uiImage, watermark: viewModel.watermarkImage))
             }
         }
-        .alert(isPresented: $isShowCancelAlert) {
-            Alert(
-                title: Text("返回到主界面"),
-                message: Text("放弃更改？"),
-                primaryButton: .destructive(Text("确定")) {
-                    dismiss()
-                },
-                secondaryButton: .cancel()
-            )
+        .alert("返回到主界面", isPresented: $isShowCancelAlert) {
+            Button("确定", role: .destructive) {
+                dismiss()
+            }
+            Button("取消", role: .cancel) {}
+        } message: {
+            Text("放弃更改？")
         }
         .ignoresSafeArea(.all)
     }
