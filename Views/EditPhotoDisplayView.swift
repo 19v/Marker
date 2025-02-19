@@ -8,10 +8,11 @@ struct EditPhotoDisplayView: View {
     
     @State private var scale: CGFloat = 1.0 // 缩放比例
     @State private var lastScale: CGFloat = 1.0 // 上一次的缩放比例
-    @State private var doubleTapLocation: CGPoint = .zero // 记录双击时手指所在的位置
     
     @State private var offset: CGSize = .zero // 偏移量
     @State private var lastOffset: CGSize = .zero // 上一次偏移量
+    
+    @State private var anchorPoint: CGPoint = .zero // 记录双击的坐标（相对于视图）
     
     @Binding var isDisplayWatermark: Bool
     
@@ -34,101 +35,93 @@ struct EditPhotoDisplayView: View {
                                 if offset != .zero {
                                     offset = .zero
                                     lastOffset = .zero
-                                    if scale != 1.0 {
-                                        scale = 1.0
-                                    }
+                                }
+                                if scale != 1.0 {
+                                    scale = 1.0
+                                    lastScale = scale
                                 }
                             }
                         }
                 )
             
             // 图片和水印
-            GeometryReader { geometry in
-                VStack(spacing: 0) {
-                    Image(uiImage: viewModel.uiImage)
+            VStack(spacing: 0) {
+                Image(uiImage: viewModel.uiImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity)
+                    .listRowInsets(EdgeInsets())
+                
+                if isDisplayWatermark {
+                    Image(uiImage: viewModel.watermarkImage)
                         .resizable()
                         .scaledToFit()
                         .frame(maxWidth: .infinity)
-                        .listRowInsets(EdgeInsets())
-                    
-                    if isDisplayWatermark {
-                        Image(uiImage: viewModel.watermarkImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(maxWidth: .infinity)
-                    }
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity) // 占据剩余空间
-                .padding(.horizontal, 20)
-                .shadow(
-                    color: colorScheme == .dark ? Color.gray.opacity(0.1) : Color.black.opacity(0.2),
-                    radius: colorScheme == .dark ? 12 : 10,
-                    x: 0, y: 0
-                )
-                .offset(offset)
-                .scaleEffect(scale, anchor: scale == 1.0 ? .center : UnitPoint(
-                    x: doubleTapLocation.x / geometry.size.width,
-                    y: doubleTapLocation.y / geometry.size.height))
-                // 单击手势
-                .onTapGesture {
-                    isDisplayWatermark = true
-                }
-                // 双击放大、缩小和恢复原位
-                .onTapGesture(count: 2) { location in
-                    withAnimation(.easeInOut) {
-                        // 如果不在原位，优先恢复原位，并恢复原本大小
-                        if offset != .zero {
-                            lastOffset = .zero
-                            offset = .zero
-                            if scale != 1.0 {
-                                scale = 1.0
-                            }
-                        } else {
-                            if scale == 1.0 {
-                                scale = 2.0
-                                doubleTapLocation = CGPoint(
-                                    x: location.x - geometry.frame(in: .local).origin.x,
-                                    y: location.y - geometry.frame(in: .local).origin.y
-                                )
-                                lastOffset = .zero
-                                offset = .zero
-                            } else {
-                                scale = 1.0
-                                lastOffset = .zero
-                                offset = .zero
-                            }
-                        }
-                    }
-                }
-                // 长按显示原图，松手恢复
-                .onLongPressGesture(minimumDuration: 0.1, perform: {
-                    isDisplayWatermark = false
-                }, onPressingChanged: { _ in
-                    isDisplayWatermark = true
-                })
-                // 拖拽和双指放大
-                .gesture(
-                    DragGesture()
-                        .onChanged { value in
-                            offset = CGSize(
-                                width: lastOffset.width + value.translation.width,
-                                height: lastOffset.height + value.translation.height
-                            )
-                        }
-                        .onEnded { _ in
-                            lastOffset = offset // 拖动结束时保持最终位置
-                        }
-                        .simultaneously(
-                            with: MagnificationGesture()
-                                .onChanged { value in
-                                    scale = lastScale * value
-                                }
-                                .onEnded { _ in
-                                    lastScale = scale
-                                }
-                        )
-                )
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity) // 占据剩余空间
+            .padding(.horizontal, 20)
+            .shadow(
+                color: colorScheme == .dark ? Color.gray.opacity(0.1) : Color.black.opacity(0.2),
+                radius: colorScheme == .dark ? 12 : 10,
+                x: 0, y: 0
+            )
+            .offset(offset)
+            .scaleEffect(scale, anchor: UnitPoint(x: anchorPoint.x, y: anchorPoint.y))
+            // 单击手势
+            .onTapGesture {
+                isDisplayWatermark = true
+            }
+            // 双击放大、缩小和恢复原位
+            .onTapGesture(count: 2) { location in
+                if scale == 1.0 {
+                    // 计算缩放中心点
+                    let screenWidth = UIScreen.main.bounds.width
+                    let screenHeight = UIScreen.main.bounds.height
+                    anchorPoint = CGPoint(x: location.x / screenWidth, y: location.y / screenHeight)
+                }
+                withAnimation {
+                    // 如果不在原位，优先恢复原位，并恢复原本大小
+                    if offset != .zero {
+                        offset = .zero
+                        lastOffset = .zero
+                        if scale != 1.0 {
+                            scale = 1.0
+                            lastScale = scale
+                            anchorPoint = .zero
+                        }
+                    } else {
+                        if scale == 1.0 {
+                            scale = 2.0
+                        } else {
+                            scale = 1.0
+                        }
+                        lastScale = scale
+                    }
+                }
+            }
+            // 拖拽和双指放大
+            .gesture(
+                DragGesture()
+                    .onChanged { value in
+                        offset = CGSize(
+                            width: lastOffset.width + value.translation.width / scale,
+                            height: lastOffset.height + value.translation.height / scale
+                        )
+                    }
+                    .onEnded { value in
+                        lastOffset = offset
+                    }
+            )
+            .gesture(
+                MagnificationGesture()
+                    .onChanged { value in
+                        scale = lastScale * value
+                    }
+                    .onEnded { _ in
+                        lastScale = scale
+                    }
+            )
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
