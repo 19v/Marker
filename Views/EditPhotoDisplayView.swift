@@ -12,7 +12,7 @@ struct EditPhotoDisplayView: View {
     @State private var offset: CGSize = .zero // 偏移量
     @State private var lastOffset: CGSize = .zero // 上一次偏移量
     
-    @State private var anchorPoint: CGPoint = .zero // 记录双击的坐标（相对于视图）
+    @State private var anchorPoint: UnitPoint = .center // 记录双击的坐标（相对于视图）
     
     @Binding var isDisplayWatermark: Bool
     
@@ -39,6 +39,9 @@ struct EditPhotoDisplayView: View {
                                 if scale != 1.0 {
                                     scale = 1.0
                                     lastScale = scale
+                                }
+                                if anchorPoint != .center {
+                                    anchorPoint = .center
                                 }
                             }
                         }
@@ -67,7 +70,7 @@ struct EditPhotoDisplayView: View {
                 x: 0, y: 0
             )
             .offset(offset)
-            .scaleEffect(scale, anchor: UnitPoint(x: anchorPoint.x, y: anchorPoint.y))
+            .scaleEffect(scale, anchor: anchorPoint)
             // 单击手势
             .onTapGesture {
                 isDisplayWatermark = true
@@ -78,7 +81,7 @@ struct EditPhotoDisplayView: View {
                     // 计算缩放中心点
                     let screenWidth = UIScreen.main.bounds.width
                     let screenHeight = UIScreen.main.bounds.height
-                    anchorPoint = CGPoint(x: location.x / screenWidth, y: location.y / screenHeight)
+                    anchorPoint = UnitPoint(x: location.x / screenWidth, y: location.y / screenHeight)
                 }
                 withAnimation {
                     // 如果不在原位，优先恢复原位，并恢复原本大小
@@ -88,19 +91,20 @@ struct EditPhotoDisplayView: View {
                         if scale != 1.0 {
                             scale = 1.0
                             lastScale = scale
-                            anchorPoint = .zero
+                            anchorPoint = .center
                         }
                     } else {
                         if scale == 1.0 {
                             scale = 2.0
                         } else {
+                            anchorPoint = .center
                             scale = 1.0
                         }
                         lastScale = scale
                     }
                 }
             }
-            // 拖拽和双指放大
+            // 拖拽
             .gesture(
                 DragGesture()
                     .onChanged { value in
@@ -113,10 +117,13 @@ struct EditPhotoDisplayView: View {
                         lastOffset = offset
                     }
             )
+            // 双指放大
             .gesture(
                 MagnificationGesture()
                     .onChanged { value in
-                        scale = lastScale * value
+                        withAnimation {
+                            scale = lastScale * value
+                        }
                     }
                     .onEnded { _ in
                         lastScale = scale
