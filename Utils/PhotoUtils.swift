@@ -77,3 +77,24 @@ class PhotoSaver: NSObject {
     }
     
 }
+
+extension UIImage {
+    
+    // 获取缩略图
+    var thumbnail: UIImage {
+        self.resized() ?? UIImage()
+    }
+    
+    // 将UIImage缩小到指定宽度，保持原始宽高比
+    // 默认宽度为屏幕宽度，高度自适应
+    func resized(to width: CGFloat = UIScreen.main.bounds.width) -> UIImage? {
+        let aspectRatio = self.size.height / self.size.width
+        let targetSize = CGSize(width: width, height: width * aspectRatio)
+
+        let renderer = UIGraphicsImageRenderer(size: targetSize)
+        return renderer.image { _ in
+            self.draw(in: CGRect(origin: .zero, size: targetSize))
+        }
+    }
+    
+}

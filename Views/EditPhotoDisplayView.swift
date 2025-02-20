@@ -71,10 +71,6 @@ struct EditPhotoDisplayView: View {
             )
             .offset(offset)
             .scaleEffect(scale, anchor: anchorPoint)
-            // 单击手势
-            .onTapGesture {
-                isDisplayWatermark = true
-            }
             // 双击放大、缩小和恢复原位
             .onTapGesture(count: 2) { location in
                 if scale == 1.0 {

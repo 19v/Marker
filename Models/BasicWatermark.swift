@@ -175,8 +175,13 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
         }
         let defaultHeight: CGFloat = (isTimeDisplayed || isCoordinateDisplayed) ? 472 : 393
         let watermarkSize = CGSize(width: defaultWidth, height: defaultHeight)
-        let renderer = UIGraphicsImageRenderer(size: watermarkSize)
         
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = UIScreen.main.scale  // 设置正确的 scale
+        format.opaque = true  // 透明度可能导致抗锯齿问题，不透明以提高渲染性能
+        
+        let renderer = UIGraphicsImageRenderer(size: watermarkSize, format: format)
+
         // NOTE: 以下尺寸全部按照默认尺寸设定
         
         // 在默认尺寸下，左右的边距

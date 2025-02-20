@@ -23,11 +23,11 @@ struct EditPhotoToolbarView: View {
             case .empty:
                 ""
             case .background:
-                "circle.tophalf.filled.inverse"
+                "paintpalette"
             case .time:
-                "calendar.circle.fill"
+                "calendar"
             case .coordinate:
-                "location.circle.fill"
+                "mappin.and.ellipse"
             case .info:
                 "info.circle.fill"
             }
@@ -40,7 +40,7 @@ struct EditPhotoToolbarView: View {
             case .background:
                 "颜色"
             case .time:
-                "背景"
+                "时间"
             case .coordinate:
                 "位置"
             case .info:
@@ -145,11 +145,10 @@ struct EditPhotoToolbarView: View {
                             ZStack {
                                 Rectangle()
                                     .fill(Color.white.opacity(0))
+                                    .frame(height: 28)
                                 Image(systemName: panel.iconName)
-                                    .symbolVariant(.circle.fill)
-                                    .font(.system(size: 24))
+                                    .font(.system(size: 20))
                             }
-                            .frame(height: 30)
                             Text(panel.labelText)
                                 .font(.system(size: 10))
                         }
