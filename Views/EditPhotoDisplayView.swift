@@ -15,33 +15,74 @@ struct EditPhotoDisplayView: View {
     @State private var anchorPoint: UnitPoint = .center // 记录双击的坐标（相对于视图）
 
     @State private var contentSize: CGSize = .zero
+    @State private var imageSize: CGSize = .zero
     
     @Binding var isDisplayWatermark: Bool
     
+    let blankImage: Image
+    
     var body: some View {
-        VStack(spacing: 0) {
-            Image(uiImage: viewModel.uiImage)
+        ZStack {
+            // 空白画布，用于约束尺寸
+            blankImage
                 .resizable()
                 .scaledToFit()
-                .frame(maxWidth: .infinity)
-                .listRowInsets(EdgeInsets())
+                .background(
+                    GeometryReader { proxy in
+                        Color.clear
+                            .onAppear {
+                                imageSize = proxy.size
+                            }
+                    }
+                )
+                .padding(.vertical, 20)
+                .padding(.horizontal, 20)
             
-            if isDisplayWatermark {
-                Image(uiImage: viewModel.watermarkImage)
+            // 图片和水印
+            VStack(spacing: 0) {
+                Image(uiImage: viewModel.uiImage)
                     .resizable()
                     .scaledToFit()
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: imageSize.width)
+                
+                if isDisplayWatermark {
+                    Image(uiImage: viewModel.watermarkImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: imageSize.width)
+                }
             }
+            .shadow(
+                color: colorScheme == .dark ? Color.gray.opacity(0.1) : Color.black.opacity(0.2),
+                radius: colorScheme == .dark ? 12 : 10,
+                x: 0, y: 0
+            )
+            .offset(offset)
+            .scaleEffect(scale, anchor: anchorPoint)
+            
+            // 手势层
+            gestureView
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity) // 占据剩余空间
-        .padding(.horizontal, 20)
-        .shadow(
-            color: colorScheme == .dark ? Color.gray.opacity(0.1) : Color.black.opacity(0.2),
-            radius: colorScheme == .dark ? 12 : 10,
-            x: 0, y: 0
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(
+            GeometryReader { proxy in
+                Color(hex: colorScheme == .light ? 0xF2F3F5 : 0x101010)
+                    .opacity(0)
+                    .contentShape(Rectangle())
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .onAppear {
+                        // 设计上这张图的背景覆盖全屏，应该和 UIScreen.main.bounds 一致
+                        contentSize = proxy.size
+                    }
+            }
         )
-        .offset(offset)
-        .scaleEffect(scale, anchor: anchorPoint)
+    }
+    
+    @ViewBuilder private var gestureView: some View {
+        Color.white
+            .opacity(0)
+            .contentShape(Rectangle())
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         // 双击
         .onTapGesture(count: 2) { location in
             if scale == 1.0 {
@@ -69,21 +110,23 @@ struct EditPhotoDisplayView: View {
                 }
             }
         }
-        .gesture(dragGesture) // 拖拽
-        .gesture(magnificationGesture) // 双指
-        .background(backgroundView)
+        .gesture(
+            SimultaneousGesture(dragGesture, magnificationGesture)
+        )
     }
     
     // 拖拽手势
     private var dragGesture: some Gesture {
         DragGesture()
             .onChanged { value in
-                offset = CGSize(
-                    width: lastOffset.width + value.translation.width / scale,
-                    height: lastOffset.height + value.translation.height / scale
-                )
+                withAnimation(.interactiveSpring) {
+                    offset = CGSize(
+                        width: lastOffset.width + value.translation.width / scale,
+                        height: lastOffset.height + value.translation.height / scale
+                    )
+                }
             }
-            .onEnded { value in
+            .onEnded { _ in
                 lastOffset = offset
             }
     }
@@ -122,36 +165,6 @@ struct EditPhotoDisplayView: View {
                     lastScale = scale
                 }
             }
-    }
-    
-    // 背景（可用于检测手势）
-    @ViewBuilder private var backgroundView: some View {
-        GeometryReader { proxy in
-            Color(hex: colorScheme == .light ? 0xF2F3F5 : 0x101010)
-                .opacity(0)
-                .contentShape(Rectangle())
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .onTapGesture(count: 2) {
-                    // 双击
-                    withAnimation {
-                        if offset != .zero {
-                            offset = .zero
-                            lastOffset = .zero
-                        }
-                        if scale != 1.0 {
-                            scale = 1.0
-                            lastScale = scale
-                        }
-                        if anchorPoint != .center {
-                            anchorPoint = .center
-                        }
-                    }
-                }
-                .onAppear {
-                    // 设计上这张图的背景覆盖全屏，应该和 UIScreen.main.bounds 一致
-                    contentSize = proxy.size
-                }
-        }
     }
     
 }

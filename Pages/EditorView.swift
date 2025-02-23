@@ -17,7 +17,9 @@ struct EditorView: View {
     var body: some View {
         ZStack {
             // 照片+水印
-            EditPhotoDisplayView(viewModel: viewModel, isDisplayWatermark: $isDisplayWatermark)
+            EditPhotoDisplayView(viewModel: viewModel, isDisplayWatermark: $isDisplayWatermark, blankImage: Image(uiImage: viewModel.blankImage))
+                .padding(.top, CommonUtils.safeTopInset + 44) // 顶部操作栏的高度
+                .padding(.bottom, CommonUtils.safeBottomInset + 44 + 10) // 底部工具栏的高度
             
             // 顶部按钮的半透明背景
             VStack {

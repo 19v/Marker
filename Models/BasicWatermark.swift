@@ -107,9 +107,22 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
         )
         
         // 照片方向
-        // 参考 Founcation 中的 UIImage.imageOrientation 枚举的定义
+        // 参考 Foundation 中的 UIImage.imageOrientation 枚举的定义
         // 默认视作横向
-        orientation = Orientation(rawValue: exifData.orientation ?? UIImage.Orientation.up.rawValue)
+        if let orientation = exifData.orientation {
+            self.orientation = Orientation(rawValue: orientation)
+        } else {
+            if let pixelWidth = exifData.pixelWidth,
+               let pixelHeight = exifData.pixelHeight {
+                if pixelWidth < pixelHeight {
+                    orientation = .vertical
+                } else {
+                    orientation = .horizontal
+                }
+            } else {
+                orientation = .horizontal
+            }
+        }
     }
     
     // 背景色

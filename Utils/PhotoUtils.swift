@@ -97,4 +97,12 @@ extension UIImage {
         }
     }
     
+    static func createBlankImage(size: CGSize, color: UIColor = .white) -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { context in
+            color.setFill()
+            context.fill(CGRect(origin: .zero, size: size))
+        }
+    }
+    
 }

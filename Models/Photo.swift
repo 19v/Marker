@@ -23,6 +23,14 @@ import CoreLocation
         watermarkImage = watermark.uiImage
     }
     
+    @ObservationIgnored
+    var blankImage: UIImage {
+        UIImage.createBlankImage(size: CGSize(
+            width: uiImage.size.width,
+            height: uiImage.size.height + watermarkImage.size.height * (uiImage.size.width / watermarkImage.size.width)
+        ), color: .clear)
+    }
+    
     // 切换背景颜色的按钮
     var enabledColors: [Color] {
         if let vm = watermark as? BackgroundEditable {
