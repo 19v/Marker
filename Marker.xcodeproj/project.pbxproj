@@ -34,6 +34,8 @@
 		05977A3F2D3641C1003E269F /* InfoDisplaySubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05977A3E2D3641C1003E269F /* InfoDisplaySubView.swift */; };
 		05AC15042CF71D5000EE8F9A /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AC15032CF71D4700EE8F9A /* EditorView.swift */; };
 		05BFE9F72D0C2BA000D02F12 /* ColorUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BFE9F62D0C2B9D00D02F12 /* ColorUtils.swift */; };
+		05FF61AB2E28FCD600DF0155 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 05FF61AA2E28FCD600DF0155 /* InfoPlist.xcstrings */; };
+		05FF61AD2E28FDAA00DF0155 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 05FF61AC2E28FDAA00DF0155 /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -67,6 +69,8 @@
 		05977A3E2D3641C1003E269F /* InfoDisplaySubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoDisplaySubView.swift; sourceTree = "<group>"; };
 		05AC15032CF71D4700EE8F9A /* EditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorView.swift; sourceTree = "<group>"; };
 		05BFE9F62D0C2B9D00D02F12 /* ColorUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorUtils.swift; sourceTree = "<group>"; };
+		05FF61AA2E28FCD600DF0155 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
+		05FF61AC2E28FDAA00DF0155 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -177,6 +181,8 @@
 				057E410D2CF079B80005E859 /* Info.plist */,
 				05576E772CF47A3600BE1DDD /* MiSans-Demibold.ttf */,
 				05576E782CF47A3600BE1DDD /* MiSans-Regular.ttf */,
+				05FF61AC2E28FDAA00DF0155 /* Localizable.xcstrings */,
+				05FF61AA2E28FCD600DF0155 /* InfoPlist.xcstrings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -222,11 +228,10 @@
 				};
 			};
 			buildConfigurationList = 050186542CEF1AE000EAEA64 /* Build configuration list for PBXProject "Marker" */;
-			developmentRegion = "zh-Hans";
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
-				Base,
 				"zh-Hans",
 			);
 			mainGroup = 050186502CEF1AE000EAEA64;
@@ -246,6 +251,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				05FF61AB2E28FCD600DF0155 /* InfoPlist.xcstrings in Resources */,
+				05FF61AD2E28FDAA00DF0155 /* Localizable.xcstrings in Resources */,
 				050186612CEF1AE200EAEA64 /* Assets.xcassets in Resources */,
 				05576E792CF47A3600BE1DDD /* MiSans-Demibold.ttf in Resources */,
 				05576E7A2CF47A3600BE1DDD /* MiSans-Regular.ttf in Resources */,
@@ -347,6 +354,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -402,6 +410,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 			};
 			name = Release;
 		};
@@ -421,7 +430,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Resources/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "简单水印";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
 				INFOPLIST_KEY_NSCameraUsageDescription = "We need access to the camera for taking photos.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Export user-edited photos";
@@ -468,7 +476,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Resources/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "简单水印";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
 				INFOPLIST_KEY_NSCameraUsageDescription = "We need access to the camera for taking photos.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Export user-edited photos";
