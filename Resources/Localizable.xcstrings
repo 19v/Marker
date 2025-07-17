@@ -13,6 +13,16 @@
     "%lld s" : {
 
     },
+    "Create watermarked photos" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "创建带有水印的照片"
+          }
+        }
+      }
+    },
     "Marker" : {
 
     },
@@ -24,16 +34,6 @@
     },
     "分" : {
 
-    },
-    "创建带有水印的照片" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Create watermarked photos"
-          }
-        }
-      }
     },
     "原图" : {
 

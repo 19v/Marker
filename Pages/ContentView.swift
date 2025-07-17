@@ -30,7 +30,7 @@ struct ContentView: View {
                             .foregroundStyle(
                                 colorScheme == .light ? .black : .white
                             )
-                        Text("创建带有水印的照片")
+                        Text("Create watermarked photos")
                             .font(.subheadline)
                             .foregroundStyle(
                                 colorScheme == .light ? Color(hex: 0x101010) : Color(hex: 0xE2E3E5)
