@@ -1,13 +1,25 @@
 import SwiftUI
+import UIKit
 
 struct SettingsTabView: View {
-    @State private var toggleSetting = false
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         List {
-            Toggle("示例开关", isOn: $toggleSetting)
-                .padding()
+            Button {
+                openAppSettings()
+            } label: {
+                Label("App 设置", systemImage: "gearshape")
+            }
         }
         .navigationTitle("设置")
+    }
+
+    private func openAppSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else {
+            return
+        }
+
+        openURL(url)
     }
 }

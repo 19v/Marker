@@ -89,6 +89,7 @@ struct ContentView: View {
                         }
                     }
                     
+/*
                     // 多张照片
                     CapsuleButton(icon: "photo.stack.fill", title: "批量处理") {
                         isShowPhotosPicker.toggle()
@@ -115,6 +116,7 @@ struct ContentView: View {
                                 }
                         }
                     }
+*/
                     
                     // 设置 & 反馈
                     HStack {

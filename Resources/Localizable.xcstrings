@@ -13,6 +13,9 @@
     "%lld s" : {
 
     },
+    "App 设置" : {
+
+    },
     "Create watermarked photos" : {
       "localizations" : {
         "zh-Hans" : {
@@ -75,9 +78,6 @@
 
     },
     "确定" : {
-
-    },
-    "示例开关" : {
 
     },
     "秒" : {

@@ -12,8 +12,6 @@ struct EditPhotoDisplayView: View {
     @State private var offset: CGSize = .zero // 偏移量
     @State private var lastOffset: CGSize = .zero // 上一次偏移量
     
-    @State private var anchorPoint: UnitPoint = .center // 记录双击的坐标（相对于视图）
-
     @State private var contentSize: CGSize = .zero
     @State private var imageSize: CGSize = .zero
     
@@ -57,8 +55,8 @@ struct EditPhotoDisplayView: View {
                 radius: colorScheme == .dark ? 12 : 10,
                 x: 0, y: 0
             )
+            .scaleEffect(scale)
             .offset(offset)
-            .scaleEffect(scale, anchor: anchorPoint)
             
             // 手势层
             gestureView
@@ -74,6 +72,9 @@ struct EditPhotoDisplayView: View {
                         // 设计上这张图的背景覆盖全屏，应该和 UIScreen.main.bounds 一致
                         contentSize = proxy.size
                     }
+                    .onChange(of: proxy.size) { _, newSize in
+                        contentSize = newSize
+                    }
             }
         )
     }
@@ -85,86 +86,87 @@ struct EditPhotoDisplayView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         // 双击
         .onTapGesture(count: 2) { location in
-            if scale == 1.0 {
-                // 计算缩放中心点
-                anchorPoint = UnitPoint(x: location.x / contentSize.width, y: location.y / contentSize.height)
-            }
             withAnimation {
-                // 如果不在原位，优先恢复原位，并恢复原本大小
-                if offset != .zero {
-                    offset = .zero
-                    lastOffset = .zero
-                    if scale != 1.0 {
-                        scale = 1.0
-                        lastScale = scale
-                        anchorPoint = .center
-                    }
-                } else {
-                    if scale == 1.0 {
-                        scale = 2.0
-                    } else {
-                        anchorPoint = .center
-                        scale = 1.0
-                    }
-                    lastScale = scale
-                }
+                handleDoubleTap(at: location)
             }
         }
         .gesture(
-            SimultaneousGesture(dragGesture, magnificationGesture)
+            panAndZoomGesture
         )
     }
     
-    // 拖拽手势
-    private var dragGesture: some Gesture {
-        DragGesture()
+    private var panAndZoomGesture: some Gesture {
+        DragGesture(minimumDistance: 0)
+            .simultaneously(with: MagnifyGesture(minimumScaleDelta: 0))
             .onChanged { value in
-                withAnimation(.interactiveSpring) {
-                    offset = CGSize(
-                        width: lastOffset.width + value.translation.width / scale,
-                        height: lastOffset.height + value.translation.height / scale
-                    )
-                }
+                let nextScale = clampedScale(lastScale * (value.second?.magnification ?? 1))
+                let focalLocation = value.second?.startLocation ?? contentCenter
+                let dragTranslation = value.first?.translation ?? .zero
+
+                scale = nextScale
+                offset = zoomOffset(
+                    for: nextScale,
+                    from: lastScale,
+                    around: focalLocation,
+                    baseOffset: lastOffset
+                ) + dragTranslation
             }
             .onEnded { _ in
-                lastOffset = offset
+                settleGesture()
             }
     }
-    
-    // 双指手势
-    private var magnificationGesture: some Gesture {
-        MagnifyGesture(minimumScaleDelta: 0)
-            .onChanged { value in
-                withAnimation(.interactiveSpring) {
-                    if value.magnification > 1 {
-                        // 放大
-                        scale = lastScale + (value.magnification - 1.0)
-                        
-                        let newX = value.startLocation.x * (value.startAnchor.x - anchorPoint.x) * (scale - lastScale)
-                        let newY = value.startLocation.y * (value.startAnchor.y - anchorPoint.y) * (scale - lastScale)
-                        offset = CGSize(
-                            width: lastOffset.width - newX,
-                            height: lastOffset.height - newY
-                        )
-                    } else if value.magnification < 1 {
-                        // 缩小
-                        scale = lastScale * value.magnification
-                        
-                        let newX = value.startLocation.x * (value.startAnchor.x - anchorPoint.x) * (scale - lastScale)
-                        let newY = value.startLocation.y * (value.startAnchor.y - anchorPoint.y) * (scale - lastScale)
-                        offset = CGSize(
-                            width: lastOffset.width + newX,
-                            height: lastOffset.height + newY
-                        )
-                    }
-                }
-            }
-            .onEnded { _ in
-                withAnimation(.interactiveSpring) {
-                    lastOffset = offset
-                    lastScale = scale
-                }
-            }
+
+    private var contentCenter: CGPoint {
+        CGPoint(x: contentSize.width / 2, y: contentSize.height / 2)
+    }
+
+    private func handleDoubleTap(at location: CGPoint) {
+        if abs(scale - 1) > 0.001 || offset != .zero {
+            resetTransform()
+            return
+        }
+
+        scale = 2
+        offset = zoomOffset(for: scale, from: lastScale, around: location, baseOffset: lastOffset)
+        lastScale = scale
+        lastOffset = offset
+    }
+
+    private func settleGesture() {
+        lastScale = scale
+        lastOffset = offset
+    }
+
+    private func resetTransform() {
+        scale = 1
+        lastScale = 1
+        offset = .zero
+        lastOffset = .zero
+    }
+
+    private func clampedScale(_ value: CGFloat) -> CGFloat {
+        min(max(value, 0.5), 6)
+    }
+
+    private func zoomOffset(for newScale: CGFloat, from oldScale: CGFloat, around location: CGPoint, baseOffset: CGSize) -> CGSize {
+        guard oldScale > 0 else { return baseOffset }
+
+        let scaleRatio = newScale / oldScale
+        let centerDelta = CGSize(
+            width: location.x - contentCenter.x - baseOffset.width,
+            height: location.y - contentCenter.y - baseOffset.height
+        )
+
+        return CGSize(
+            width: baseOffset.width + (1 - scaleRatio) * centerDelta.width,
+            height: baseOffset.height + (1 - scaleRatio) * centerDelta.height
+        )
     }
     
+}
+
+private extension CGSize {
+    static func + (lhs: CGSize, rhs: CGSize) -> CGSize {
+        CGSize(width: lhs.width + rhs.width, height: lhs.height + rhs.height)
+    }
 }
