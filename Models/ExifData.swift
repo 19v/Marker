@@ -16,6 +16,7 @@ class ExifData {
     var orientation: Int?
     
     // TIFF Dictionary
+    var make: String?
     var model: String?
     var software: String?
     var tileLength: Double?
@@ -107,6 +108,7 @@ class ExifData {
         self.orientation = properties[kCGImagePropertyOrientation] as? Int
         
         if let tiffData = properties[kCGImagePropertyTIFFDictionary] as? [CFString: Any] {
+            self.make = tiffData[kCGImagePropertyTIFFMake] as? String
             self.model = tiffData[kCGImagePropertyTIFFModel] as? String
             self.software = tiffData[kCGImagePropertyTIFFSoftware] as? String
             self.tileLength = tiffData[kCGImagePropertyTIFFTileLength] as? Double

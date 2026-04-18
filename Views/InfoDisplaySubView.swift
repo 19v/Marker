@@ -21,13 +21,15 @@ struct InfoDisplaySubView: View {
             .frame(height: 20)
             .padding()
             
-            HStack {
-                Text("参数").font(.headline)
-                Spacer()
-                Text(watermark.shootingParameters.value).font(.body)
+            if !watermark.shootingParameters.value.isEmpty {
+                HStack {
+                    Text("参数").font(.headline)
+                    Spacer()
+                    Text(watermark.shootingParameters.value).font(.body)
+                }
+                .frame(height: 20)
+                .padding()
             }
-            .frame(height: 20)
-            .padding()
             
             HStack {
                 Text("位置").font(.headline)

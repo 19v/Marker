@@ -24,12 +24,19 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
     
     // 图片方向，该属性决定了水印的默认使用宽度
     var orientation: Orientation = .horizontal
+    private var isShootingParametersAvailable = false
+    private var shouldShowAppleLogo = false
     
     // 初始化
     required init(exifData: ExifData) {
+        let isShotOnIPhone = BasicWatermark.isShotOnIPhone(exifData: exifData)
+        let shootingParametersValue = BasicWatermark.shootingParametersValue(exifData: exifData)
+        isShootingParametersAvailable = !shootingParametersValue.isEmpty
+        shouldShowAppleLogo = !isShootingParametersAvailable || isShotOnIPhone
+        
         // 设备名
         deviceName = DisplayItem(
-            value: exifData.model ?? UIDevice.current.name, // 默认使用当前设备名称
+            value: isShootingParametersAvailable ? (exifData.model ?? "iPhone") : "iPhone",
             colors: foregroundColors1,
             fontName: .miSansDemibold,
             fontSize: 87
@@ -56,34 +63,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
         // 拍摄参数
         // Example: `35mm  f/2.0  1/88s  ISO400`
         shootingParameters = DisplayItem(
-            value: { () -> String in
-                // 光圈值
-                let fNumber = if let fNum = exifData.fNumber {
-                    String(format: "%.1f", fNum)
-                } else {
-                    "0"
-                }
-                // 35mm胶片的等效焦距
-                let focalLenIn35mmFilm = if let focalLenIn35mmFilm = exifData.focalLenIn35mmFilm {
-                    String(focalLenIn35mmFilm)
-                } else {
-                    "0"
-                }
-                // 曝光时间
-                let exposureTime = if let exposureTime = exifData.exposureTime {
-                    "1/\(CommonUtils.decimalToFractionDenominator(decimal: exposureTime))"
-                } else {
-                    "1/1"
-                }
-                // 感光度
-                let isoSpeedRatings = if let v = exifData.isoSpeedRatings?.first,
-                                         let v {
-                    String(v)
-                } else {
-                    "0"
-                }
-                return "\(focalLenIn35mmFilm)mm  f/\(fNumber)  \(exposureTime)s  ISO\(isoSpeedRatings)"
-            }(),
+            value: shootingParametersValue,
             colors: foregroundColors1,
             fontName: .miSansDemibold,
             fontSize: 87
@@ -180,13 +160,42 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
         coordinate.clearCustomValue()
     }
     
+    private static func isShotOnIPhone(exifData: ExifData) -> Bool {
+        let model = exifData.model?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let make = exifData.make?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        
+        guard model.localizedCaseInsensitiveContains("iPhone") else {
+            return false
+        }
+        
+        return make.isEmpty || make.localizedCaseInsensitiveCompare("Apple") == .orderedSame
+    }
+    
+    private static func shootingParametersValue(exifData: ExifData) -> String {
+        guard let fNumber = exifData.fNumber,
+              let focalLenIn35mmFilm = exifData.focalLenIn35mmFilm,
+              let exposureTime = exifData.exposureTime,
+              let isoSpeedRating = exifData.isoSpeedRatings?.first,
+              let isoSpeedRating else {
+            return ""
+        }
+        
+        let aperture = String(format: "%.1f", fNumber)
+        let exposure = "1/\(CommonUtils.decimalToFractionDenominator(decimal: exposureTime))"
+        return "\(focalLenIn35mmFilm)mm  f/\(aperture)  \(exposure)s  ISO\(isoSpeedRating)"
+    }
+    
     // 返回水印
     var uiImage: UIImage {
+        let shouldShowDetails = isShootingParametersAvailable
+        let effectiveIsTimeDisplayed = shouldShowDetails && isTimeDisplayed
+        let effectiveIsCoordinateDisplayed = shouldShowDetails && isCoordinateDisplayed
+        
         let defaultWidth: CGFloat = switch orientation {
         case .horizontal: 4096
         case .vertical: 3072
         }
-        let defaultHeight: CGFloat = (isTimeDisplayed || isCoordinateDisplayed) ? 472 : 393
+        let defaultHeight: CGFloat = (effectiveIsTimeDisplayed || effectiveIsCoordinateDisplayed) ? 472 : 393
         let watermarkSize = CGSize(width: defaultWidth, height: defaultHeight)
         
         let format = UIGraphicsImageRendererFormat()
@@ -206,7 +215,7 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
         let rightVerticalPadding: CGFloat = 66
         
         // 图标
-        let iconHeight: CGFloat = (isTimeDisplayed || isCoordinateDisplayed) ? 182 : 165
+        let iconHeight: CGFloat = (effectiveIsTimeDisplayed || effectiveIsCoordinateDisplayed) ? 182 : 165
         let iconText = NSString("")
         let iconTextAttributes: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: iconHeight),
@@ -215,14 +224,32 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
         let iconTextSize = iconText.size(withAttributes: iconTextAttributes)
         
         // 分割线尺寸
-        let rightDeliverWidth: CGFloat = (isTimeDisplayed || isCoordinateDisplayed) ? 5 : 6
-        let rightDeliverHeight: CGFloat = (isTimeDisplayed || isCoordinateDisplayed) ? 178 : 142
+        let rightDeliverWidth: CGFloat = (effectiveIsTimeDisplayed || effectiveIsCoordinateDisplayed) ? 5 : 6
+        let rightDeliverHeight: CGFloat = (effectiveIsTimeDisplayed || effectiveIsCoordinateDisplayed) ? 178 : 142
         
         // 右边图标、分割线和拍摄参数的间距
-        let rightSpacing: CGFloat = (isTimeDisplayed || isCoordinateDisplayed) ? 65 : 56
+        let rightSpacing: CGFloat = (effectiveIsTimeDisplayed || effectiveIsCoordinateDisplayed) ? 65 : 56
         
         // 开始绘制
-        if isTimeDisplayed && isCoordinateDisplayed {
+        if !shouldShowDetails {
+            return renderer.image { context in
+                context.cgContext.setFillColor(backgroundColor.cgColor)
+                context.cgContext.fill(CGRect(x: 0, y: 0, width: defaultWidth, height: defaultHeight))
+                
+                let deviceName = deviceName.getText()
+                deviceName.draw(x: leftPadding, y: (defaultHeight - deviceName.size.height) / 2)
+                
+                if shouldShowAppleLogo {
+                    iconText.draw(
+                        at: CGPoint(
+                            x: defaultWidth - rightPadding - iconTextSize.width,
+                            y: (defaultHeight - iconTextSize.height) / 2
+                        ),
+                        withAttributes: iconTextAttributes
+                    )
+                }
+            }
+        } else if effectiveIsTimeDisplayed && effectiveIsCoordinateDisplayed {
             // 时间和经纬度都显示
             return renderer.image { context in
                 // 绘制背景
@@ -242,27 +269,30 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                 let shootingParameters = shootingParameters.getText()
                 let coordinate = coordinate.getText()
                 
-                let totalRightContentWidth = iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing + max(shootingParameters.size.width, coordinate.size.width)
+                let rightPrefixWidth = shouldShowAppleLogo ? iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing : 0
+                let totalRightContentWidth = rightPrefixWidth + max(shootingParameters.size.width, coordinate.size.width)
                 let totalRightContentHeight = shootingParameters.size.height + rightVerticalPadding + coordinate.size.height
                 let rightStartX = defaultWidth - rightPadding - totalRightContentWidth
-                let rightTextStartX = rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing
+                let rightTextStartX = rightStartX + rightPrefixWidth
                 
                 shootingParameters.draw(x: rightTextStartX, y: (defaultHeight - totalRightContentHeight) / 2)
                 coordinate.draw(x: rightTextStartX, y: (defaultHeight + rightVerticalPadding) / 2)
                 
                 // 绘制右侧图标
-                iconText.draw(at: CGPoint(x: rightStartX, y: (defaultHeight - iconTextSize.height) / 2 ), withAttributes: iconTextAttributes)
-                
-                // 绘制右侧分割线
-                dividerColor.setFill()
-                context.fill(CGRect(
-                    x: rightStartX + iconTextSize.width + rightSpacing,
-                    y: (defaultHeight - rightDeliverHeight) / 2,
-                    width: rightDeliverWidth,
-                    height: rightDeliverHeight
-                ))
+                if shouldShowAppleLogo {
+                    iconText.draw(at: CGPoint(x: rightStartX, y: (defaultHeight - iconTextSize.height) / 2 ), withAttributes: iconTextAttributes)
+                    
+                    // 绘制右侧分割线
+                    dividerColor.setFill()
+                    context.fill(CGRect(
+                        x: rightStartX + iconTextSize.width + rightSpacing,
+                        y: (defaultHeight - rightDeliverHeight) / 2,
+                        width: rightDeliverWidth,
+                        height: rightDeliverHeight
+                    ))
+                }
             }
-        } else if isTimeDisplayed && !isCoordinateDisplayed {
+        } else if effectiveIsTimeDisplayed && !effectiveIsCoordinateDisplayed {
             // 只显示时间
             return renderer.image { context in
                 // 绘制背景
@@ -277,27 +307,30 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                 let shootingParameters = shootingParameters.getText()
                 let shootingTime = shootingTime.getText()
                 
-                let totalRightContentWidth = iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing + max(shootingParameters.size.width, shootingTime.size.width)
+                let rightPrefixWidth = shouldShowAppleLogo ? iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing : 0
+                let totalRightContentWidth = rightPrefixWidth + max(shootingParameters.size.width, shootingTime.size.width)
                 let totalRightContentHeight = shootingParameters.size.height + rightVerticalPadding + shootingTime.size.height
                 let rightStartX = defaultWidth - rightPadding - totalRightContentWidth
-                let rightTextStartX = rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing
+                let rightTextStartX = rightStartX + rightPrefixWidth
                 
                 shootingParameters.draw(x: rightTextStartX, y: (defaultHeight - totalRightContentHeight) / 2)
                 shootingTime.draw(x: rightTextStartX, y: (defaultHeight + rightVerticalPadding) / 2)
                 
                 // 绘制右侧图标
-                iconText.draw(at: CGPoint(x: rightStartX, y: (defaultHeight - iconTextSize.height) / 2 ), withAttributes: iconTextAttributes)
-                
-                // 绘制右侧分割线
-                dividerColor.setFill()
-                context.fill(CGRect(
-                    x: rightStartX + iconTextSize.width + rightSpacing,
-                    y: (defaultHeight - rightDeliverHeight) / 2,
-                    width: rightDeliverWidth,
-                    height: rightDeliverHeight
-                ))
+                if shouldShowAppleLogo {
+                    iconText.draw(at: CGPoint(x: rightStartX, y: (defaultHeight - iconTextSize.height) / 2 ), withAttributes: iconTextAttributes)
+                    
+                    // 绘制右侧分割线
+                    dividerColor.setFill()
+                    context.fill(CGRect(
+                        x: rightStartX + iconTextSize.width + rightSpacing,
+                        y: (defaultHeight - rightDeliverHeight) / 2,
+                        width: rightDeliverWidth,
+                        height: rightDeliverHeight
+                    ))
+                }
             }
-        } else if !isTimeDisplayed && isCoordinateDisplayed {
+        } else if !effectiveIsTimeDisplayed && effectiveIsCoordinateDisplayed {
             // 只显示经纬度
             return renderer.image { context in
                 // 绘制背景
@@ -312,27 +345,30 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                 let shootingParameters = shootingParameters.getText()
                 let coordinate = coordinate.getText()
                 
-                let totalRightContentWidth = iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing + max(shootingParameters.size.width, coordinate.size.width)
+                let rightPrefixWidth = shouldShowAppleLogo ? iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing : 0
+                let totalRightContentWidth = rightPrefixWidth + max(shootingParameters.size.width, coordinate.size.width)
                 let totalRightContentHeight = shootingParameters.size.height + rightVerticalPadding + coordinate.size.height
                 let rightStartX = defaultWidth - rightPadding - totalRightContentWidth
-                let rightTextStartX = rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing
+                let rightTextStartX = rightStartX + rightPrefixWidth
                 
                 shootingParameters.draw(x: rightTextStartX, y: (defaultHeight - totalRightContentHeight) / 2)
                 coordinate.draw(x: rightTextStartX, y: (defaultHeight + rightVerticalPadding) / 2)
                 
                 // 绘制右侧图标
-                iconText.draw(at: CGPoint(x: rightStartX, y: (defaultHeight - iconTextSize.height) / 2 ), withAttributes: iconTextAttributes)
-                
-                // 绘制右侧分割线
-                dividerColor.setFill()
-                context.fill(CGRect(
-                    x: rightStartX + iconTextSize.width + rightSpacing,
-                    y: (defaultHeight - rightDeliverHeight) / 2,
-                    width: rightDeliverWidth,
-                    height: rightDeliverHeight
-                ))
+                if shouldShowAppleLogo {
+                    iconText.draw(at: CGPoint(x: rightStartX, y: (defaultHeight - iconTextSize.height) / 2 ), withAttributes: iconTextAttributes)
+                    
+                    // 绘制右侧分割线
+                    dividerColor.setFill()
+                    context.fill(CGRect(
+                        x: rightStartX + iconTextSize.width + rightSpacing,
+                        y: (defaultHeight - rightDeliverHeight) / 2,
+                        width: rightDeliverWidth,
+                        height: rightDeliverHeight
+                    ))
+                }
             }
-        } else if !isTimeDisplayed && !isCoordinateDisplayed {
+        } else if !effectiveIsTimeDisplayed && !effectiveIsCoordinateDisplayed {
             // 时间和经纬度都不显示
             return renderer.image { context in
                 // 绘制背景
@@ -346,23 +382,26 @@ class BasicWatermark: WatermarkProtocol, InfoDisplayable, BackgroundEditable, Ti
                 // 绘制右侧信息
                 let shootingParameters = shootingParameters.getText()
                 
-                let totalRightContentWidth = iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing + shootingParameters.size.width
+                let rightPrefixWidth = shouldShowAppleLogo ? iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing : 0
+                let totalRightContentWidth = rightPrefixWidth + shootingParameters.size.width
                 let rightStartX = defaultWidth - rightPadding - totalRightContentWidth
-                let rightTextStartX = rightStartX + iconTextSize.width + rightSpacing + rightDeliverWidth + rightSpacing
+                let rightTextStartX = rightStartX + rightPrefixWidth
                 
                 shootingParameters.draw(x: rightTextStartX, y: (defaultHeight - shootingParameters.size.height) / 2)
                 
                 // 绘制右侧图标
-                iconText.draw(at: CGPoint(x: rightStartX, y: (defaultHeight - iconTextSize.height) / 2 ), withAttributes: iconTextAttributes)
-                
-                // 绘制右侧分割线
-                dividerColor.setFill()
-                context.fill(CGRect(
-                    x: rightStartX + iconTextSize.width + rightSpacing,
-                    y: (defaultHeight - rightDeliverHeight) / 2,
-                    width: rightDeliverWidth,
-                    height: rightDeliverHeight
-                ))
+                if shouldShowAppleLogo {
+                    iconText.draw(at: CGPoint(x: rightStartX, y: (defaultHeight - iconTextSize.height) / 2 ), withAttributes: iconTextAttributes)
+                    
+                    // 绘制右侧分割线
+                    dividerColor.setFill()
+                    context.fill(CGRect(
+                        x: rightStartX + iconTextSize.width + rightSpacing,
+                        y: (defaultHeight - rightDeliverHeight) / 2,
+                        width: rightDeliverWidth,
+                        height: rightDeliverHeight
+                    ))
+                }
             }
         } else {
             LoggerManager.shared.error("参数有误！")
