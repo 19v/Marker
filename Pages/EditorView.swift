@@ -33,6 +33,7 @@ struct EditorView: View {
                     .frame(height: CommonUtils.safeTopInset + 44)
                 Spacer()
             }
+            .hidden()
             
             // 工具栏
             EditPhotoToolbarView(viewModel: viewModel)

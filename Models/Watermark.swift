@@ -1,5 +1,5 @@
 import UIKit
-import SwiftUICore
+import SwiftUI
 
 // MARK: - Protocols
 
